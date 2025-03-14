@@ -25,9 +25,9 @@ import {
   SelectTrigger,
   SelectValueText,
 } from "../components/ui/select";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { CreateExpense, createExpense } from "~/db/expense.server";
-import { Form } from "@remix-run/react";
+import { useFetcher } from "@remix-run/react";
 import { Category } from "@prisma/client";
 import { ActionFunctionArgs } from "@remix-run/node";
 import { InputGroup } from "~/components/ui/input-group";
@@ -36,23 +36,40 @@ import { EXPENSE_CATEGORIES } from "~/utils/constants";
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
-  const convertedAmount = (formData.get("amount") as string).replace(/\./g, "").replace(/,/g, ".")
+
+  const convertedAmount = (formData.get("amount") as string)
+    .replace(/\./g, "")
+    .replace(/,/g, ".");
+
   const expenseData: CreateExpense = {
     amount: parseFloat(convertedAmount),
     category: formData.get("category") as Category,
     expenseDate: new Date(formData.get("date") as string),
     title: formData.get("title") as string,
   };
-  console.log(expenseData);
+
   const createdExpense = await createExpense(expenseData);
   return createdExpense;
 };
 
 const Index = () => {
   const contentRef = useRef<HTMLDivElement>(null);
+  const fetcher = useFetcher();
+
+  const [openExpenseDialog, setOpenExpenseDialog] = useState(false);
+  const isSubmitting = fetcher.state === "submitting";
+
+  useEffect(() => {
+    if (fetcher.data) {
+      setOpenExpenseDialog(false);
+    }
+  }, [fetcher.data]);
 
   return (
-    <DialogRoot>
+    <DialogRoot
+      open={openExpenseDialog}
+      onOpenChange={(e) => setOpenExpenseDialog(e.open)}
+    >
       <DialogBackdrop />
       <DialogTrigger asChild>
         <Button m="4" colorPalette="teal" variant="solid">
@@ -66,7 +83,7 @@ const Index = () => {
         </DialogHeader>
         <DialogBody>
           <Stack gap="4">
-            <Form id="myForm" method="post">
+            <fetcher.Form id="expenseForm" method="post">
               <Field label="Title" required>
                 <Input name="title" placeholder="Groceries" />
               </Field>
@@ -104,7 +121,7 @@ const Index = () => {
                 </SelectContent>
               </SelectRoot>
               <Input visibility="hidden" type="submit" id="submit-form" />
-            </Form>
+            </fetcher.Form>
           </Stack>
         </DialogBody>
         <DialogFooter>
@@ -113,7 +130,7 @@ const Index = () => {
               Cancel
             </Button>
           </DialogActionTrigger>
-          <Button form="myForm" type="submit">
+          <Button loading={isSubmitting} form="expenseForm" type="submit">
             Save
           </Button>
         </DialogFooter>
