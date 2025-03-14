@@ -54,9 +54,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 const Index = () => {
   const contentRef = useRef<HTMLDivElement>(null);
+  const formRef = useRef<HTMLFormElement>(null);
   const fetcher = useFetcher();
 
   const [openExpenseDialog, setOpenExpenseDialog] = useState(false);
+  const [errors, setErrors] = useState<{
+    title?: string;
+    amount?: string;
+    date?: string;
+  }>({});
+
   const isSubmitting = fetcher.state === "submitting";
 
   useEffect(() => {
@@ -64,6 +71,32 @@ const Index = () => {
       setOpenExpenseDialog(false);
     }
   }, [fetcher.data]);
+
+  const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
+    event.preventDefault();
+    const formData = new FormData(formRef.current!);
+
+    const errors: { title?: string; amount?: string; date?: string } = {};
+
+    if (!formData.get("title")) {
+      errors["title"] = "Title is required.";
+    }
+
+    if (!formData.get("amount")) {
+      errors["amount"] = "Amount is required.";
+    }
+
+    if (!formData.get("date")) {
+      errors["date"] = "Date is required.";
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setErrors(errors);
+    } else {
+      setErrors({});
+      fetcher.submit(formData, { method: "post" });
+    }
+  };
 
   return (
     <DialogRoot
@@ -82,12 +115,22 @@ const Index = () => {
           <DialogTitle>Add expense</DialogTitle>
         </DialogHeader>
         <DialogBody>
-          <Stack gap="4">
-            <fetcher.Form id="expenseForm" method="post">
-              <Field label="Title" required>
+          <fetcher.Form ref={formRef} id="expenseForm" method="post">
+            <Stack gap="4">
+              <Field
+                errorText={errors.title}
+                label="Title"
+                required
+                invalid={!!errors.title}
+              >
                 <Input name="title" placeholder="Groceries" />
               </Field>
-              <Field label="Amount" required>
+              <Field
+                label="Amount"
+                errorText={errors.amount}
+                invalid={!!errors.amount}
+                required
+              >
                 <NumberInputRoot
                   allowMouseWheel
                   width="100%"
@@ -104,7 +147,12 @@ const Index = () => {
                   </InputGroup>
                 </NumberInputRoot>
               </Field>
-              <Field label="Date" required>
+              <Field
+                label="Date"
+                errorText={errors.date}
+                invalid={!!errors.date}
+                required
+              >
                 <Input name="date" type="date" />
               </Field>
               <SelectRoot name="category" collection={EXPENSE_CATEGORIES}>
@@ -121,16 +169,25 @@ const Index = () => {
                 </SelectContent>
               </SelectRoot>
               <Input visibility="hidden" type="submit" id="submit-form" />
-            </fetcher.Form>
-          </Stack>
+            </Stack>
+          </fetcher.Form>
         </DialogBody>
         <DialogFooter>
           <DialogActionTrigger asChild>
-            <Button type="submit" variant="outline">
+            <Button
+              type="submit"
+              onClick={() => setErrors({})}
+              variant="outline"
+            >
               Cancel
             </Button>
           </DialogActionTrigger>
-          <Button loading={isSubmitting} form="expenseForm" type="submit">
+          <Button
+            loading={isSubmitting}
+            form="expenseForm"
+            onClick={handleSubmit}
+            type="submit"
+          >
             Save
           </Button>
         </DialogFooter>
