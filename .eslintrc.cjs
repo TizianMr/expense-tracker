@@ -20,6 +20,12 @@ module.exports = {
 
   rules: {
     'no-console': 'error',
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
   },
 
   overrides: [
