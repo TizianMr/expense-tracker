@@ -269,16 +269,19 @@ const Index = () => {
               </Table.Row>
             </Table.Header>
             <Table.Body>
-              {data.items.map(item => (
-                <Table.Row key={item.id}>
-                  <Table.Cell>{item.title}</Table.Cell>
-                  <Table.Cell>{item.amount} €</Table.Cell>
-                  <Table.Cell>{item.expenseDate.toLocaleDateString('en-US', options)}</Table.Cell>
-                  <Table.Cell>
-                    <Badge colorPalette='green'>{item.category}</Badge>
-                  </Table.Cell>
-                </Table.Row>
-              ))}
+              {data.items.map(item => {
+                const category = EXPENSE_CATEGORIES.items.find(cat => cat.value === item.category);
+                return (
+                  <Table.Row key={item.id}>
+                    <Table.Cell>{item.title}</Table.Cell>
+                    <Table.Cell>{item.amount} €</Table.Cell>
+                    <Table.Cell>{item.expenseDate.toLocaleDateString('en-US', options)}</Table.Cell>
+                    <Table.Cell>
+                      <Badge colorPalette={category?.color}>{item.category || 'NOT SELECTED'}</Badge>
+                    </Table.Cell>
+                  </Table.Row>
+                );
+              })}
             </Table.Body>
             <Table.Footer>
               <tr>
