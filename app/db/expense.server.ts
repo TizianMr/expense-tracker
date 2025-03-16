@@ -10,14 +10,18 @@ export const createExpense = async (expense: CreateExpense): Promise<Expense> =>
 };
 
 export const fetchExpenses = async ({ page, pageSize }: Filter): Promise<ListResult<Expense>> => {
-  const expenses: Expense[] = await prisma.expense.findMany({
-    skip: (page - 1) * pageSize,
-    take: pageSize,
-  });
+  const expenses = await prisma.$transaction([
+    prisma.expense.count(),
+    prisma.expense.findMany({
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    }),
+  ]);
 
   return {
-    items: expenses,
+    items: expenses[1],
     page,
     pageSize,
+    totalItems: expenses[0],
   };
 };

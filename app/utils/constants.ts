@@ -9,3 +9,5 @@ export const EXPENSE_CATEGORIES = createListCollection({
     { label: 'Other', value: Category.OTHER, color: 'cyan' },
   ],
 });
+
+export const EXPENSE_TABLE_PAGE_SIZE = 5;

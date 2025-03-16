@@ -1,13 +1,15 @@
 import { Badge, Box, Button, Table, Text } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
 
+import { ListResult } from '../db/types';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
 
 type Props = {
   expenses: Expense[];
+  paginationInfo: Pick<ListResult<Expense>, 'page' | 'pageSize' | 'totalItems'>;
 };
 
-const ExpensesTable = ({ expenses }: Props) => {
+const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize } }: Props) => {
   const dateOptions: Intl.DateTimeFormatOptions = {
     weekday: undefined,
     year: 'numeric',
@@ -78,7 +80,7 @@ const ExpensesTable = ({ expenses }: Props) => {
                 pl='2'
                 color={'gray.500'}
                 textStyle='sm'>
-                Showing 1 to 5 of 42 results
+                {`Showing ${page * pageSize - pageSize + 1} to ${Math.min(page * pageSize, totalItems)} of ${totalItems} results`}
               </Text>
               <Box
                 gap='3'
