@@ -85,8 +85,16 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
               <Box
                 gap='3'
                 display='flex'>
-                <Button variant='outline'>Previous</Button>
-                <Button variant='outline'>Next</Button>
+                <Button
+                  variant='outline'
+                  disabled={page === 1}>
+                  Previous
+                </Button>
+                <Button
+                  variant='outline'
+                  disabled={page === Math.ceil(totalItems / pageSize)}>
+                  Next
+                </Button>
               </Box>
             </Box>
           </td>
