@@ -4,6 +4,7 @@ import { Link, useSearchParams } from '@remix-run/react';
 
 import { ListResult } from '../db/types';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
+import { formatCurrency } from '~/utils/helpers';
 
 type Props = {
   expenses: Expense[];
@@ -67,7 +68,7 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
           return (
             <Table.Row key={expense.id}>
               <Table.Cell>{expense.title}</Table.Cell>
-              <Table.Cell>{expense.amount} €</Table.Cell>
+              <Table.Cell>{formatCurrency(expense.amount)}</Table.Cell>
               <Table.Cell>{expense.expenseDate.toLocaleDateString('en-US', dateOptions)}</Table.Cell>
               <Table.Cell>
                 <Badge colorPalette={category?.color}>{expense.category || 'NOT SELECTED'}</Badge>
