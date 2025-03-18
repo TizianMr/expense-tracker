@@ -1,5 +1,6 @@
 import { Badge, Box, Button, Table, Text } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
+import { Link, useSearchParams } from '@remix-run/react';
 
 import { ListResult } from '../db/types';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
@@ -10,6 +11,8 @@ type Props = {
 };
 
 const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize } }: Props) => {
+  const [queryParams] = useSearchParams();
+
   const dateOptions: Intl.DateTimeFormatOptions = {
     weekday: undefined,
     year: 'numeric',
@@ -21,6 +24,12 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
     backgroundColor: '#F4F8FA',
     fontWeight: 600,
   };
+
+  const previousQuery = new URLSearchParams(queryParams);
+  previousQuery.set('page', (page - 1).toString());
+
+  const nextQuery = new URLSearchParams(queryParams);
+  nextQuery.set('page', (page + 1).toString());
 
   return (
     <Table.Root
@@ -85,16 +94,20 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
               <Box
                 gap='3'
                 display='flex'>
-                <Button
-                  variant='outline'
-                  disabled={page === 1}>
-                  Previous
-                </Button>
-                <Button
-                  variant='outline'
-                  disabled={page === Math.ceil(totalItems / pageSize)}>
-                  Next
-                </Button>
+                <Link to={`?${previousQuery.toString()}`}>
+                  <Button
+                    variant='outline'
+                    disabled={page === 1}>
+                    Previous
+                  </Button>
+                </Link>
+                <Link to={`?${nextQuery.toString()}`}>
+                  <Button
+                    variant='outline'
+                    disabled={page === Math.ceil(totalItems / pageSize)}>
+                    Next
+                  </Button>
+                </Link>
               </Box>
             </Box>
           </td>
