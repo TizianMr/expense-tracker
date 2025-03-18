@@ -22,8 +22,9 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
   };
 
   const tHeadStyle = {
-    backgroundColor: '#F4F8FA',
+    // backgroundColor: '#F4F8FA',
     fontWeight: 600,
+    color: '#71717a',
   };
 
   const previousQuery = new URLSearchParams(queryParams);
@@ -32,33 +33,34 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
   const nextQuery = new URLSearchParams(queryParams);
   nextQuery.set('page', (page + 1).toString());
 
+  const remainingRows = pageSize - expenses.length;
+
   return (
     <Table.Root
       interactive
+      tableLayout='fixed'
       size='lg'>
       <Table.Header>
         <Table.Row>
           <Table.ColumnHeader
             style={tHeadStyle}
-            textStyle={'sm'}
-            borderRadius={'10px 0px 0px 0px'}>
-            Title
+            textStyle={'sm'}>
+            {'Title'.toUpperCase()}
           </Table.ColumnHeader>
           <Table.ColumnHeader
             textStyle={'sm'}
             style={tHeadStyle}>
-            Amount
+            {'Amount'.toUpperCase()}
           </Table.ColumnHeader>
           <Table.ColumnHeader
             textStyle={'sm'}
             style={tHeadStyle}>
-            Date
+            {'Date'.toUpperCase()}
           </Table.ColumnHeader>
           <Table.ColumnHeader
             style={tHeadStyle}
-            textStyle={'sm'}
-            borderRadius={'0px 10px 0px 0px'}>
-            Category
+            textStyle={'sm'}>
+            {'Category'.toUpperCase()}
           </Table.ColumnHeader>
         </Table.Row>
       </Table.Header>
@@ -76,6 +78,14 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
             </Table.Row>
           );
         })}
+        {Array.from({ length: remainingRows }).map((_, i) => (
+          <Table.Row
+            visibility='hidden'
+            aria-hidden='true'
+            key={`empty-${i}`}>
+            <Table.Cell borderColor='transparent'>&nbsp;</Table.Cell>
+          </Table.Row>
+        ))}
       </Table.Body>
       <Table.Footer>
         <tr>
