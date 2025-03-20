@@ -3,14 +3,15 @@ export enum SortDirection {
   DESC = 'desc',
 }
 
-export interface ITableHeader {
-  title: string;
-  isSortable: boolean;
-}
+export type TableHeader =
+  | { id: string; title: string; isSortable: true } // id is used for the 'sortBy' query param
+  | { id?: string; title: string; isSortable: false };
 
-export interface Filter {
+export interface Filter<T> {
   page: number;
   pageSize: number;
+  sortBy: keyof T;
+  sortDirection: SortDirection;
 }
 
 export interface ListResult<T> {

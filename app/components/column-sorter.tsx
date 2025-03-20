@@ -3,29 +3,29 @@ import { Link, useSearchParams } from '@remix-run/react';
 import { BsChevronExpand } from 'react-icons/bs';
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi';
 
-import { ITableHeader, SortDirection } from '../interfaces/index';
+import { TableHeader, SortDirection } from '../interfaces/index';
 
 type Props = {
-  column: ITableHeader;
+  column: TableHeader;
 };
 
 export const ColumnSorter = ({ column }: Props) => {
   const [searchParams] = useSearchParams();
 
+  if (!column.isSortable) {
+    return null;
+  }
+
   const sortBy = searchParams.get('sortBy');
-  const sorted = sortBy === column.title.toLowerCase();
+  const sorted = sortBy === column.id;
   const sortDirection = searchParams.get('sortDirection') as SortDirection | null;
 
   const sortingQuery = new URLSearchParams(searchParams);
-  sortingQuery.set('sortBy', column.title.toLowerCase());
+  sortingQuery.set('sortBy', column.id);
   sortingQuery.set(
     'sortDirection',
     (sortDirection !== SortDirection.ASC ? SortDirection.ASC : SortDirection.DESC).toString(),
   );
-
-  if (!column.isSortable) {
-    return null;
-  }
 
   return (
     <Link to={`?${sortingQuery.toString()}`}>

@@ -4,7 +4,7 @@ import { Link, useSearchParams } from '@remix-run/react';
 
 import { ColumnSorter } from './column-sorter';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
-import { ITableHeader, ListResult } from '~/interfaces';
+import { TableHeader, ListResult } from '~/interfaces';
 import { formatCurrency } from '~/utils/helpers';
 
 type ExpensesTableProps = {
@@ -13,7 +13,7 @@ type ExpensesTableProps = {
 };
 
 type ColumnHeaderProps = {
-  headerInfo: ITableHeader;
+  headerInfo: TableHeader;
 };
 
 const ColumnHeader = ({ headerInfo }: ColumnHeaderProps) => {
@@ -36,7 +36,6 @@ const ColumnHeader = ({ headerInfo }: ColumnHeaderProps) => {
   );
 };
 
-// TODO: sorting
 // TODO: filtering?
 // TODO: loading spinner
 // TODO: empty state
@@ -59,20 +58,24 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
 
   const remainingRows = pageSize - expenses.length;
 
-  const columnHeader: ITableHeader[] = [
+  const columnHeader: TableHeader[] = [
     {
+      id: 'title',
       title: 'Title',
       isSortable: true,
     },
     {
+      id: 'amount',
       title: 'Amount',
       isSortable: true,
     },
     {
+      id: 'expenseDate',
       title: 'Date',
       isSortable: true,
     },
     {
+      id: 'category',
       title: 'Category',
       isSortable: true,
     },

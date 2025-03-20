@@ -1,16 +1,23 @@
 import { Card, Box, Text } from '@chakra-ui/react';
+import { Expense } from '@prisma/client';
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { useLoaderData } from '@remix-run/react';
 
 import CreateExpenseDialog from '~/components/create-expense-dialog';
 import ExpensesTable from '~/components/expenses-table';
 import { fetchExpenses } from '~/db/expense.server';
+import { SortDirection } from '~/interfaces';
 import { EXPENSE_TABLE_PAGE_SIZE } from '~/utils/constants';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const query = url.searchParams;
-  const expenses = await fetchExpenses({ page: Number(query.get('page')) || 1, pageSize: EXPENSE_TABLE_PAGE_SIZE });
+  const expenses = await fetchExpenses({
+    page: Number(query.get('page')) || 1,
+    pageSize: EXPENSE_TABLE_PAGE_SIZE,
+    sortBy: (query.get('sortBy') as keyof Expense) || 'expenseDate',
+    sortDirection: (query.get('sortDirection') as SortDirection) || SortDirection.DESC,
+  });
   return expenses;
 };
 
