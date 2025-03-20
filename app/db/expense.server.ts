@@ -1,7 +1,7 @@
 import { Expense } from '@prisma/client';
 
-import { Filter, ListResult } from './types';
 import { prisma } from '../utils/prisma.server';
+import { Filter, ListResult } from '~/interfaces';
 
 export type CreateExpense = Pick<Expense, 'title' | 'amount' | 'expenseDate' | 'category'>;
 

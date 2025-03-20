@@ -1,17 +1,47 @@
-import { Badge, Box, Button, Table, Text } from '@chakra-ui/react';
+import { Badge, Box, Button, HStack, Table, Text } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
 import { Link, useSearchParams } from '@remix-run/react';
 
-import { ListResult } from '../db/types';
+import { ColumnSorter } from './column-sorter';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
+import { ITableHeader, ListResult } from '~/interfaces';
 import { formatCurrency } from '~/utils/helpers';
 
-type Props = {
+type ExpensesTableProps = {
   expenses: Expense[];
   paginationInfo: Pick<ListResult<Expense>, 'page' | 'pageSize' | 'totalItems'>;
 };
 
-const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize } }: Props) => {
+type ColumnHeaderProps = {
+  headerInfo: ITableHeader;
+};
+
+const ColumnHeader = ({ headerInfo }: ColumnHeaderProps) => {
+  const tHeadStyle = {
+    fontWeight: 600,
+    color: '#71717a',
+  };
+
+  return (
+    <Table.ColumnHeader
+      style={tHeadStyle}
+      textStyle={'sm'}>
+      <HStack>
+        <Box>{headerInfo.title.toUpperCase()}</Box>
+        <HStack>
+          <ColumnSorter column={headerInfo} />
+        </HStack>
+      </HStack>
+    </Table.ColumnHeader>
+  );
+};
+
+// TODO: sorting
+// TODO: filtering?
+// TODO: loading spinner
+// TODO: empty state
+// https://refine.dev/docs/examples/table/chakra-ui/advanced-react-table/
+const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize } }: ExpensesTableProps) => {
   const [queryParams] = useSearchParams();
 
   const dateOptions: Intl.DateTimeFormatOptions = {
@@ -19,12 +49,6 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
     year: 'numeric',
     month: 'long',
     day: 'numeric',
-  };
-
-  const tHeadStyle = {
-    // backgroundColor: '#F4F8FA',
-    fontWeight: 600,
-    color: '#71717a',
   };
 
   const previousQuery = new URLSearchParams(queryParams);
@@ -35,6 +59,25 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
 
   const remainingRows = pageSize - expenses.length;
 
+  const columnHeader: ITableHeader[] = [
+    {
+      title: 'Title',
+      isSortable: true,
+    },
+    {
+      title: 'Amount',
+      isSortable: true,
+    },
+    {
+      title: 'Date',
+      isSortable: true,
+    },
+    {
+      title: 'Category',
+      isSortable: true,
+    },
+  ];
+
   return (
     <Table.Root
       interactive
@@ -42,26 +85,12 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
       size='lg'>
       <Table.Header>
         <Table.Row>
-          <Table.ColumnHeader
-            style={tHeadStyle}
-            textStyle={'sm'}>
-            {'Title'.toUpperCase()}
-          </Table.ColumnHeader>
-          <Table.ColumnHeader
-            textStyle={'sm'}
-            style={tHeadStyle}>
-            {'Amount'.toUpperCase()}
-          </Table.ColumnHeader>
-          <Table.ColumnHeader
-            textStyle={'sm'}
-            style={tHeadStyle}>
-            {'Date'.toUpperCase()}
-          </Table.ColumnHeader>
-          <Table.ColumnHeader
-            style={tHeadStyle}
-            textStyle={'sm'}>
-            {'Category'.toUpperCase()}
-          </Table.ColumnHeader>
+          {columnHeader.map(header => (
+            <ColumnHeader
+              key={header.title}
+              headerInfo={header}
+            />
+          ))}
         </Table.Row>
       </Table.Header>
       <Table.Body>
