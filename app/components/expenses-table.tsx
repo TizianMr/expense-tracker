@@ -1,6 +1,6 @@
 import { Badge, Box, Button, HStack, IconButton, Spinner, Table, Text } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
-import { Link, useSearchParams } from '@remix-run/react';
+import { Form, Link, useSearchParams } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 import { MdDelete } from 'react-icons/md';
 
@@ -147,7 +147,7 @@ const ExpensesTable = ({
         <Table.Row>
           {columnHeader.map(header => (
             <ColumnHeader
-              key={header.title}
+              key={header.id}
               headerInfo={header}
             />
           ))}
@@ -170,12 +170,21 @@ const ExpensesTable = ({
                   <Badge colorPalette={category?.color}>{expense.category || 'NOT SELECTED'}</Badge>
                 </Table.Cell>
                 <Table.Cell textAlign='end'>
-                  <IconButton
-                    type='submit'
-                    variant='ghost'
-                    aria-label='Delete expense'>
-                    <MdDelete color='#dc2626' />
-                  </IconButton>
+                  <Form
+                    action='expenses/delete'
+                    method='delete'>
+                    <input
+                      type='hidden'
+                      name='expenseId'
+                      value={expense.id}
+                    />
+                    <IconButton
+                      type='submit'
+                      variant='ghost'
+                      aria-label='Delete expense'>
+                      <MdDelete color='#dc2626' />
+                    </IconButton>
+                  </Form>
                 </Table.Cell>
               </Table.Row>
             );
