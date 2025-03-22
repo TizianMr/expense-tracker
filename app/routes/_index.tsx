@@ -1,7 +1,7 @@
 import { Card, Box, Text } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
 import { LoaderFunctionArgs } from '@remix-run/node';
-import { useLoaderData } from '@remix-run/react';
+import { useLoaderData, useNavigation } from '@remix-run/react';
 
 import CreateExpenseDialog from '~/components/create-expense-dialog';
 import ExpensesTable from '~/components/expenses-table';
@@ -23,6 +23,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 const Index = () => {
   const data = useLoaderData<typeof loader>();
+  const { state } = useNavigation();
 
   return (
     <Box
@@ -43,6 +44,7 @@ const Index = () => {
             <CreateExpenseDialog />
           </Box>
           <ExpensesTable
+            isDataLoading={state === 'loading'}
             expenses={data.items}
             paginationInfo={{ totalItems: data.totalItems, page: data.page, pageSize: data.pageSize }}
           />

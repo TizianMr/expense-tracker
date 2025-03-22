@@ -1,6 +1,7 @@
-import { Badge, Box, Button, HStack, Table, Text } from '@chakra-ui/react';
+import { Badge, Box, Button, HStack, Spinner, Table, Text } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
 import { Link, useSearchParams } from '@remix-run/react';
+import { useEffect, useState } from 'react';
 
 import { ColumnSorter } from './column-sorter';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
@@ -10,6 +11,7 @@ import { formatCurrency } from '~/utils/helpers';
 type ExpensesTableProps = {
   expenses: Expense[];
   paginationInfo: Pick<ListResult<Expense>, 'page' | 'pageSize' | 'totalItems'>;
+  isDataLoading: boolean;
 };
 
 type ColumnHeaderProps = {
@@ -37,11 +39,32 @@ const ColumnHeader = ({ headerInfo }: ColumnHeaderProps) => {
 };
 
 // TODO: filtering?
-// TODO: loading spinner
 // TODO: empty state
 // https://refine.dev/docs/examples/table/chakra-ui/advanced-react-table/
-const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize } }: ExpensesTableProps) => {
+const ExpensesTable = ({
+  expenses,
+  isDataLoading,
+  paginationInfo: { totalItems, page, pageSize },
+}: ExpensesTableProps) => {
   const [queryParams] = useSearchParams();
+  const [showLoadingSpinner, setShowLoadingSpinner] = useState(false);
+
+  // show loading spinner if the data is loading for more than 250ms
+  useEffect(() => {
+    let timer: NodeJS.Timeout | undefined;
+    if (isDataLoading) {
+      timer = setTimeout(() => {
+        setShowLoadingSpinner(true);
+      }, 250);
+    } else {
+      if (timer) {
+        clearTimeout(timer);
+      }
+      setShowLoadingSpinner(false);
+    }
+
+    return () => clearTimeout(timer);
+  }, [isDataLoading]);
 
   const dateOptions: Intl.DateTimeFormatOptions = {
     weekday: undefined,
@@ -83,7 +106,7 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
 
   return (
     <Table.Root
-      interactive
+      interactive={!showLoadingSpinner}
       tableLayout='fixed'
       size='lg'>
       <Table.Header>
@@ -96,33 +119,50 @@ const ExpensesTable = ({ expenses, paginationInfo: { totalItems, page, pageSize 
           ))}
         </Table.Row>
       </Table.Header>
-      <Table.Body>
-        {expenses.map(expense => {
-          const category = EXPENSE_CATEGORIES.items.find(cat => cat.value === expense.category);
-          return (
-            <Table.Row key={expense.id}>
-              <Table.Cell>{expense.title}</Table.Cell>
-              <Table.Cell>{formatCurrency(expense.amount)}</Table.Cell>
-              <Table.Cell>{expense.expenseDate.toLocaleDateString('en-US', dateOptions)}</Table.Cell>
-              <Table.Cell>
-                <Badge colorPalette={category?.color}>{expense.category || 'NOT SELECTED'}</Badge>
-              </Table.Cell>
+      <Table.Body height='17em'>
+        {showLoadingSpinner ? (
+          <tr>
+            <td
+              colSpan={columnHeader.length}
+              style={{ paddingTop: '1rem' }}>
+              <Box
+                width='100%'
+                display='flex'
+                justifyContent='center'
+                alignItems='center'>
+                <Spinner size='lg' />
+              </Box>
+            </td>
+          </tr>
+        ) : (
+          expenses.map((expense: Expense) => {
+            const category = EXPENSE_CATEGORIES.items.find(cat => cat.value === expense.category);
+            return (
+              <Table.Row key={expense.id}>
+                <Table.Cell>{expense.title}</Table.Cell>
+                <Table.Cell>{formatCurrency(expense.amount)}</Table.Cell>
+                <Table.Cell>{expense.expenseDate.toLocaleDateString('en-US', dateOptions)}</Table.Cell>
+                <Table.Cell>
+                  <Badge colorPalette={category?.color}>{expense.category || 'NOT SELECTED'}</Badge>
+                </Table.Cell>
+              </Table.Row>
+            );
+          })
+        )}
+        {!showLoadingSpinner &&
+          Array.from({ length: remainingRows }).map((_, i) => (
+            <Table.Row
+              visibility='hidden'
+              aria-hidden='true'
+              key={`empty-${i}`}>
+              <Table.Cell borderColor='transparent'>&nbsp;</Table.Cell>
             </Table.Row>
-          );
-        })}
-        {Array.from({ length: remainingRows }).map((_, i) => (
-          <Table.Row
-            visibility='hidden'
-            aria-hidden='true'
-            key={`empty-${i}`}>
-            <Table.Cell borderColor='transparent'>&nbsp;</Table.Cell>
-          </Table.Row>
-        ))}
+          ))}
       </Table.Body>
       <Table.Footer>
         <tr>
           <td
-            colSpan={4}
+            colSpan={columnHeader.length}
             style={{ paddingTop: '1rem' }}>
             <Box
               display='flex'
