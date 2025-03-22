@@ -38,9 +38,42 @@ const ColumnHeader = ({ headerInfo }: ColumnHeaderProps) => {
   );
 };
 
-// TODO: filtering?
-// TODO: empty state
-// https://refine.dev/docs/examples/table/chakra-ui/advanced-react-table/
+type TablePlaceHolderProps = {
+  colSpan: number;
+};
+
+const LoadingSpinnerContainer = ({ colSpan }: TablePlaceHolderProps) => {
+  return (
+    <tr>
+      <td colSpan={colSpan}>
+        <Box
+          width='100%'
+          display='flex'
+          justifyContent='center'
+          alignItems='center'>
+          <Spinner size='lg' />
+        </Box>
+      </td>
+    </tr>
+  );
+};
+
+const NoDataContainer = ({ colSpan }: TablePlaceHolderProps) => {
+  return (
+    <tr>
+      <td colSpan={colSpan}>
+        <Box
+          width='100%'
+          display='flex'
+          justifyContent='center'
+          alignItems='center'>
+          <Text>No data.</Text>
+        </Box>
+      </td>
+    </tr>
+  );
+};
+
 const ExpensesTable = ({
   expenses,
   isDataLoading,
@@ -119,21 +152,11 @@ const ExpensesTable = ({
           ))}
         </Table.Row>
       </Table.Header>
-      <Table.Body height='17em'>
+      <Table.Body height='19em'>
         {showLoadingSpinner ? (
-          <tr>
-            <td
-              colSpan={columnHeader.length}
-              style={{ paddingTop: '1rem' }}>
-              <Box
-                width='100%'
-                display='flex'
-                justifyContent='center'
-                alignItems='center'>
-                <Spinner size='lg' />
-              </Box>
-            </td>
-          </tr>
+          <LoadingSpinnerContainer colSpan={columnHeader.length} />
+        ) : !expenses.length ? (
+          <NoDataContainer colSpan={columnHeader.length} />
         ) : (
           expenses.map((expense: Expense) => {
             const category = EXPENSE_CATEGORIES.items.find(cat => cat.value === expense.category);
@@ -150,6 +173,7 @@ const ExpensesTable = ({
           })
         )}
         {!showLoadingSpinner &&
+          expenses.length > 0 &&
           Array.from({ length: remainingRows }).map((_, i) => (
             <Table.Row
               visibility='hidden'
