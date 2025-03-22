@@ -11,3 +11,10 @@ export const EXPENSE_CATEGORIES = createListCollection({
 });
 
 export const EXPENSE_TABLE_PAGE_SIZE = 5;
+
+export const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
+  weekday: undefined,
+  year: 'numeric',
+  month: 'long',
+  day: 'numeric',
+};

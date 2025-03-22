@@ -4,7 +4,7 @@ import { Link, useSearchParams } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 
 import { ColumnSorter } from './column-sorter';
-import { EXPENSE_CATEGORIES } from '../utils/constants';
+import { DATE_OPTIONS, EXPENSE_CATEGORIES } from '../utils/constants';
 import { TableHeader, ListResult } from '~/interfaces';
 import { formatCurrency } from '~/utils/helpers';
 
@@ -16,6 +16,10 @@ type ExpensesTableProps = {
 
 type ColumnHeaderProps = {
   headerInfo: TableHeader;
+};
+
+type TablePlaceHolderProps = {
+  colSpan: number;
 };
 
 const ColumnHeader = ({ headerInfo }: ColumnHeaderProps) => {
@@ -36,10 +40,6 @@ const ColumnHeader = ({ headerInfo }: ColumnHeaderProps) => {
       </HStack>
     </Table.ColumnHeader>
   );
-};
-
-type TablePlaceHolderProps = {
-  colSpan: number;
 };
 
 const LoadingSpinnerContainer = ({ colSpan }: TablePlaceHolderProps) => {
@@ -99,13 +99,6 @@ const ExpensesTable = ({
     return () => clearTimeout(timer);
   }, [isDataLoading]);
 
-  const dateOptions: Intl.DateTimeFormatOptions = {
-    weekday: undefined,
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  };
-
   const previousQuery = new URLSearchParams(queryParams);
   previousQuery.set('page', (page - 1).toString());
 
@@ -139,7 +132,7 @@ const ExpensesTable = ({
 
   return (
     <Table.Root
-      interactive={!showLoadingSpinner}
+      interactive={!showLoadingSpinner && expenses.length > 0}
       tableLayout='fixed'
       size='lg'>
       <Table.Header>
@@ -155,7 +148,7 @@ const ExpensesTable = ({
       <Table.Body height='19em'>
         {showLoadingSpinner ? (
           <LoadingSpinnerContainer colSpan={columnHeader.length} />
-        ) : !expenses.length ? (
+        ) : expenses.length === 0 ? (
           <NoDataContainer colSpan={columnHeader.length} />
         ) : (
           expenses.map((expense: Expense) => {
@@ -164,7 +157,7 @@ const ExpensesTable = ({
               <Table.Row key={expense.id}>
                 <Table.Cell>{expense.title}</Table.Cell>
                 <Table.Cell>{formatCurrency(expense.amount)}</Table.Cell>
-                <Table.Cell>{expense.expenseDate.toLocaleDateString('en-US', dateOptions)}</Table.Cell>
+                <Table.Cell>{expense.expenseDate.toLocaleDateString('en-US', DATE_OPTIONS)}</Table.Cell>
                 <Table.Cell>
                   <Badge colorPalette={category?.color}>{expense.category || 'NOT SELECTED'}</Badge>
                 </Table.Cell>
