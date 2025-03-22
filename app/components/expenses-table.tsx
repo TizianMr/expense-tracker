@@ -1,7 +1,8 @@
-import { Badge, Box, Button, HStack, Spinner, Table, Text } from '@chakra-ui/react';
+import { Badge, Box, Button, HStack, IconButton, Spinner, Table, Text } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
 import { Link, useSearchParams } from '@remix-run/react';
 import { useEffect, useState } from 'react';
+import { MdDelete } from 'react-icons/md';
 
 import { ColumnSorter } from './column-sorter';
 import { DATE_OPTIONS, EXPENSE_CATEGORIES } from '../utils/constants';
@@ -31,9 +32,10 @@ const ColumnHeader = ({ headerInfo }: ColumnHeaderProps) => {
   return (
     <Table.ColumnHeader
       style={tHeadStyle}
-      textStyle={'sm'}>
+      textStyle={'sm'}
+      width={headerInfo.width || 'auto'}>
       <HStack>
-        <Box>{headerInfo.title.toUpperCase()}</Box>
+        <Box>{headerInfo.title?.toUpperCase()}</Box>
         <HStack>
           <ColumnSorter column={headerInfo} />
         </HStack>
@@ -74,6 +76,7 @@ const NoDataContainer = ({ colSpan }: TablePlaceHolderProps) => {
   );
 };
 
+// TODO: research and refactor to use tanstack-table
 const ExpensesTable = ({
   expenses,
   isDataLoading,
@@ -128,13 +131,18 @@ const ExpensesTable = ({
       title: 'Category',
       isSortable: true,
     },
+    {
+      id: 'actions',
+      width: '100px',
+      isSortable: false,
+    },
   ];
 
   return (
     <Table.Root
       interactive={!showLoadingSpinner && expenses.length > 0}
       tableLayout='fixed'
-      size='lg'>
+      size='md'>
       <Table.Header>
         <Table.Row>
           {columnHeader.map(header => (
@@ -160,6 +168,14 @@ const ExpensesTable = ({
                 <Table.Cell>{expense.expenseDate.toLocaleDateString('en-US', DATE_OPTIONS)}</Table.Cell>
                 <Table.Cell>
                   <Badge colorPalette={category?.color}>{expense.category || 'NOT SELECTED'}</Badge>
+                </Table.Cell>
+                <Table.Cell textAlign='end'>
+                  <IconButton
+                    type='submit'
+                    variant='ghost'
+                    aria-label='Delete expense'>
+                    <MdDelete color='#dc2626' />
+                  </IconButton>
                 </Table.Cell>
               </Table.Row>
             );
