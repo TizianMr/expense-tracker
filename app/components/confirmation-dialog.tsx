@@ -53,7 +53,6 @@ export const ConfirmationDialog = ({
           <Button
             colorPalette='red'
             loading={isSubmitting}
-            form='expenseForm'
             onClick={onSubmit}
             type='submit'>
             {primaryActionText}
