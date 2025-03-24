@@ -1,9 +1,11 @@
-import { Card, Box, Text } from '@chakra-ui/react';
+import { Card, Box, Text, Button } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { useLoaderData, useNavigation } from '@remix-run/react';
+import { useState } from 'react';
+import { IoMdAdd } from 'react-icons/io';
 
-import CreateExpenseDialog from '~/components/create-expense-dialog';
+import { default as CreateExpenseDialog } from '~/components/expense-dialog';
 import ExpensesTable from '~/components/expenses-table';
 import { fetchExpenses } from '~/db/expense.server';
 import { SortDirection } from '~/interfaces';
@@ -24,6 +26,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 const Index = () => {
   const data = useLoaderData<typeof loader>();
   const { state } = useNavigation();
+  const [openCreateExpenseDialog, setOpenCreateExpenseDialog] = useState(false);
 
   return (
     <Box
@@ -41,7 +44,19 @@ const Index = () => {
             alignItems='center'
             justifyContent='space-between'>
             <Text textStyle='xl'>Expenses</Text>
-            <CreateExpenseDialog />
+            <Button
+              m='4'
+              colorPalette='teal'
+              variant='solid'
+              onClick={() => setOpenCreateExpenseDialog(true)}>
+              <IoMdAdd /> Add expense
+            </Button>
+            <CreateExpenseDialog
+              title='Add expense'
+              isOpen={openCreateExpenseDialog}
+              onClose={() => setOpenCreateExpenseDialog(false)}
+              action='expenses/create'
+            />
           </Box>
           <ExpensesTable
             isDataLoading={state === 'loading'}
