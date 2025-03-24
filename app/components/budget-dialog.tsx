@@ -81,36 +81,36 @@ const BudgetDialog = ({ title, action, isOpen, onClose }: Props) => {
         </DialogHeader>
         <DialogBody>
           <fetcher.Form
-            ref={formRef}
-            id='budgetForm'>
+            id='budgetForm'
+            ref={formRef}>
             <Stack gap='4'>
               <Field
-                errorText={errors.title}
-                label='Title'
                 required
-                invalid={!!errors.title}>
+                errorText={errors.title}
+                invalid={!!errors.title}
+                label='Title'>
                 <Input
                   name='title'
                   placeholder='Groceries'
                 />
               </Field>
               <Field
-                label='Amount'
+                required
                 errorText={errors.amount}
                 invalid={!!errors.amount}
-                required>
+                label='Amount'>
                 <NumberInputRoot
                   allowMouseWheel
-                  width='100%'
-                  name='amount'
-                  locale='de-DE'
                   formatOptions={{
                     maximumFractionDigits: 2,
                     minimumFractionDigits: 2,
-                  }}>
+                  }}
+                  locale='de-DE'
+                  name='amount'
+                  width='100%'>
                   <InputGroup
-                    width={'100%'}
-                    startElement={<FaEuroSign />}>
+                    startElement={<FaEuroSign />}
+                    width={'100%'}>
                     <NumberInputField pattern='\d{1,3}(.\d{3})*(,\d{2})?' />
                   </InputGroup>
                 </NumberInputRoot>
@@ -121,16 +121,16 @@ const BudgetDialog = ({ title, action, isOpen, onClose }: Props) => {
         <DialogFooter>
           <DialogActionTrigger asChild>
             <Button
-              onClick={() => setErrors({})}
-              variant='outline'>
+              variant='outline'
+              onClick={() => setErrors({})}>
               Cancel
             </Button>
           </DialogActionTrigger>
           <Button
-            loading={isSubmitting}
             form='budgetForm'
-            onClick={handleSubmit}
-            type='submit'>
+            loading={isSubmitting}
+            type='submit'
+            onClick={handleSubmit}>
             Save
           </Button>
         </DialogFooter>

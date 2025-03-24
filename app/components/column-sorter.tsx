@@ -31,13 +31,13 @@ export const ColumnSorter = ({ column }: Props) => {
     <Link to={`?${sortingQuery.toString()}`}>
       <IconButton
         aria-label='Sort'
+        color={sorted ? 'primary' : 'gray'}
         rounded='full'
         size='xs'
-        variant='ghost'
-        color={sorted ? 'primary' : 'gray'}>
+        variant='ghost'>
         <ColumnSorterIcon
-          sorted={sorted}
           sortDirection={sortDirection}
+          sorted={sorted}
         />
       </IconButton>
     </Link>

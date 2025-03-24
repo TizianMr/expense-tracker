@@ -14,8 +14,8 @@ export const DialogContent = React.forwardRef<HTMLDivElement, DialogContentProps
 
   return (
     <Portal
-      disabled={!portalled}
-      container={portalRef}>
+      container={portalRef}
+      disabled={!portalled}>
       {backdrop && <ChakraDialog.Backdrop />}
       <ChakraDialog.Positioner>
         <ChakraDialog.Content
@@ -33,14 +33,14 @@ export const DialogCloseTrigger = React.forwardRef<HTMLButtonElement, ChakraDial
   function DialogCloseTrigger(props, ref) {
     return (
       <ChakraDialog.CloseTrigger
+        insetEnd='2'
         position='absolute'
         top='2'
-        insetEnd='2'
         {...props}
         asChild>
         <CloseButton
-          size='sm'
-          ref={ref}>
+          ref={ref}
+          size='sm'>
           {props.children}
         </CloseButton>
       </ChakraDialog.CloseTrigger>

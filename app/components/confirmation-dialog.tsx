@@ -53,8 +53,8 @@ export const ConfirmationDialog = ({
           <Button
             colorPalette='red'
             loading={isSubmitting}
-            onClick={onSubmit}
-            type='submit'>
+            type='submit'
+            onClick={onSubmit}>
             {primaryActionText}
           </Button>
         </DialogFooter>
