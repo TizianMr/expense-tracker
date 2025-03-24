@@ -1,5 +1,5 @@
 import { Button, Input, Stack } from '@chakra-ui/react';
-import { Expense } from '@prisma/client';
+import { Budget } from '@prisma/client';
 import { useFetcher } from '@remix-run/react';
 import { useEffect, useRef, useState } from 'react';
 import { FaEuroSign } from 'react-icons/fa';
@@ -18,30 +18,26 @@ import {
 import { Field } from './ui/field';
 import { InputGroup } from './ui/input-group';
 import { NumberInputField, NumberInputRoot } from './ui/number-input';
-import { SelectContent, SelectItem, SelectLabel, SelectRoot, SelectTrigger, SelectValueText } from './ui/select';
-import { EXPENSE_CATEGORIES } from '../utils/constants';
 
 type Props = {
-  expense?: Expense;
   title: string;
   action: string;
   isOpen: boolean;
   onClose: () => void;
 };
 
-const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
+const BudgetDialog = ({ title, action, isOpen, onClose }: Props) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   // https://github.com/remix-run/remix/discussions/2749
-  const [fetcherKey, setFetcherKey] = useState(expense?.id);
-  const fetcher = useFetcher<Expense>({ key: fetcherKey });
+  const [fetcherKey, setFetcherKey] = useState('');
+  const fetcher = useFetcher<Budget>({ key: fetcherKey });
   const isSubmitting = fetcher.state === 'submitting';
 
   const [errors, setErrors] = useState<{
     title?: string;
     amount?: string;
-    date?: string;
   }>({});
 
   useEffect(() => {
@@ -55,7 +51,7 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
     event.preventDefault();
     const formData = new FormData(formRef.current!);
 
-    const errors: { title?: string; amount?: string; date?: string } = {};
+    const errors: { title?: string; amount?: string } = {};
 
     if (!formData.get('title')) {
       errors['title'] = 'Title is required.';
@@ -65,18 +61,11 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
       errors['amount'] = 'Amount is required.';
     }
 
-    if (!formData.get('date')) {
-      errors['date'] = 'Date is required.';
-    }
-
     if (Object.keys(errors).length > 0) {
       setErrors(errors);
     } else {
       setErrors({});
-      if (expense?.id) {
-        formData.append('expenseId', expense.id.toString());
-      }
-      fetcher.submit(formData, { method: expense ? 'put' : 'post', action });
+      fetcher.submit(formData, { method: 'post', action });
     }
   };
 
@@ -93,7 +82,7 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
         <DialogBody>
           <fetcher.Form
             ref={formRef}
-            id='expenseForm'>
+            id='budgetForm'>
             <Stack gap='4'>
               <Field
                 errorText={errors.title}
@@ -102,7 +91,6 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
                 invalid={!!errors.title}>
                 <Input
                   name='title'
-                  defaultValue={expense?.title ?? ''}
                   placeholder='Groceries'
                 />
               </Field>
@@ -114,7 +102,6 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
                 <NumberInputRoot
                   allowMouseWheel
                   width='100%'
-                  defaultValue={expense?.amount.toString() ?? '0'}
                   name='amount'
                   locale='de-DE'
                   formatOptions={{
@@ -128,40 +115,6 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
                   </InputGroup>
                 </NumberInputRoot>
               </Field>
-              <Field
-                label='Date'
-                errorText={errors.date}
-                invalid={!!errors.date}
-                required>
-                <Input
-                  name='date'
-                  type='date'
-                  defaultValue={expense?.expenseDate.toISOString().split('T')[0] ?? ''}
-                />
-              </Field>
-              <SelectRoot
-                name='category'
-                defaultValue={[expense?.category ?? '']}
-                collection={EXPENSE_CATEGORIES}>
-                <SelectLabel>Category</SelectLabel>
-                <SelectTrigger>
-                  <SelectValueText placeholder='Select category' />
-                </SelectTrigger>
-                <SelectContent portalRef={contentRef}>
-                  {EXPENSE_CATEGORIES.items.map(item => (
-                    <SelectItem
-                      item={item}
-                      key={item.value}>
-                      {item.label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </SelectRoot>
-              <Input
-                visibility='hidden'
-                type='submit'
-                id='submit-form'
-              />
             </Stack>
           </fetcher.Form>
         </DialogBody>
@@ -175,7 +128,7 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
           </DialogActionTrigger>
           <Button
             loading={isSubmitting}
-            form='expenseForm'
+            form='budgetForm'
             onClick={handleSubmit}
             type='submit'>
             Save
@@ -187,4 +140,4 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
   );
 };
 
-export default ExpenseDialog;
+export default BudgetDialog;
