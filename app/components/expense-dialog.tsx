@@ -33,7 +33,9 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const fetcher = useFetcher();
+  // https://github.com/remix-run/remix/discussions/2749
+  const [fetcherKey, setFetcherKey] = useState(expense?.id);
+  const fetcher = useFetcher<Expense>({ key: fetcherKey });
   const isSubmitting = fetcher.state === 'submitting';
 
   const [errors, setErrors] = useState<{
@@ -43,10 +45,11 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
   }>({});
 
   useEffect(() => {
-    if (fetcher.data) {
+    if (fetcher.state === 'idle' && fetcher.data) {
+      setFetcherKey(fetcher.data.id);
       onClose();
     }
-  }, [fetcher.data, onClose]);
+  }, [fetcher.data, fetcher.state, onClose]);
 
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -70,6 +73,9 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
       setErrors(errors);
     } else {
       setErrors({});
+      if (expense?.id) {
+        formData.append('expenseId', expense.id.toString());
+      }
       fetcher.submit(formData, { method: expense ? 'put' : 'post', action });
     }
   };
