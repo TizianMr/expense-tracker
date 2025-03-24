@@ -95,7 +95,7 @@ const Index = () => {
                 title='Add budget'
                 isOpen={openCreateBudgetDialog}
                 onClose={() => setOpenCreateBudgetDialog(false)}
-                action=''
+                action='budgets/create'
               />
             </Box>
           </Card.Body>

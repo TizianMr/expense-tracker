@@ -13,19 +13,27 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Category {
+  FOOD
+  TRANSPORT
+  SHOPPING
+  OTHER
+}
+
 model Expense {
   id          String    @id @default(cuid())
   amount      Float
-  title String
+  title       String
   expenseDate DateTime
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   category    Category?
 }
 
-enum Category {
-  FOOD
-  TRANSPORT
-  SHOPPING
-  OTHER
+model Budget {
+  id        String   @id @default(cuid())
+  amount    Float
+  title     String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 }

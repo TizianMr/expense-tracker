@@ -1,5 +1,5 @@
 import { Button, Input, Stack } from '@chakra-ui/react';
-import { Expense } from '@prisma/client';
+import { Budget } from '@prisma/client';
 import { useFetcher } from '@remix-run/react';
 import { useEffect, useRef, useState } from 'react';
 import { FaEuroSign } from 'react-icons/fa';
@@ -26,19 +26,18 @@ type Props = {
   onClose: () => void;
 };
 
-const BudgetDialog = ({ title, isOpen, onClose }: Props) => {
+const BudgetDialog = ({ title, action, isOpen, onClose }: Props) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   // https://github.com/remix-run/remix/discussions/2749
   const [fetcherKey, setFetcherKey] = useState('');
-  const fetcher = useFetcher<Expense>({ key: fetcherKey });
+  const fetcher = useFetcher<Budget>({ key: fetcherKey });
   const isSubmitting = fetcher.state === 'submitting';
 
   const [errors, setErrors] = useState<{
     title?: string;
     amount?: string;
-    date?: string;
   }>({});
 
   useEffect(() => {
@@ -50,7 +49,24 @@ const BudgetDialog = ({ title, isOpen, onClose }: Props) => {
 
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
-    // TODO: not yet implemented
+    const formData = new FormData(formRef.current!);
+
+    const errors: { title?: string; amount?: string } = {};
+
+    if (!formData.get('title')) {
+      errors['title'] = 'Title is required.';
+    }
+
+    if (!formData.get('amount')) {
+      errors['amount'] = 'Amount is required.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      setErrors(errors);
+    } else {
+      setErrors({});
+      fetcher.submit(formData, { method: 'post', action });
+    }
   };
 
   return (
@@ -66,8 +82,7 @@ const BudgetDialog = ({ title, isOpen, onClose }: Props) => {
         <DialogBody>
           <fetcher.Form
             ref={formRef}
-            id='budgetForm'
-            method='post'>
+            id='budgetForm'>
             <Stack gap='4'>
               <Field
                 errorText={errors.title}

@@ -93,8 +93,7 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
         <DialogBody>
           <fetcher.Form
             ref={formRef}
-            id='expenseForm'
-            method='post'>
+            id='expenseForm'>
             <Stack gap='4'>
               <Field
                 errorText={errors.title}
