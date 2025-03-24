@@ -2,10 +2,11 @@ import { Badge, Box, Button, HStack, IconButton, Spinner, Table, Text } from '@c
 import { Expense } from '@prisma/client';
 import { Link, useNavigation, useSearchParams, useSubmit } from '@remix-run/react';
 import { useEffect, useRef, useState } from 'react';
-import { MdDelete } from 'react-icons/md';
+import { MdDelete, MdEdit } from 'react-icons/md';
 
 import { ColumnSorter } from './column-sorter';
 import { ConfirmationDialog } from './confirmation-dialog';
+import { default as EditExpenseDialog } from './expense-dialog';
 import { DATE_OPTIONS, EXPENSE_CATEGORIES } from '../utils/constants';
 import { TableHeader, ListResult } from '~/interfaces';
 import { formatCurrency } from '~/utils/helpers';
@@ -87,6 +88,7 @@ const ExpensesTable = ({
   const [queryParams] = useSearchParams();
   const [showLoadingSpinner, setShowLoadingSpinner] = useState(false);
   const [openConfirmDeleteDialog, setOpenConfirmDeleteDialog] = useState(false);
+  const [openEditExpenseDialog, setOpenEditExpenseDialog] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   const wasLoading = useRef(false);
@@ -167,8 +169,20 @@ const ExpensesTable = ({
     setOpenConfirmDeleteDialog(false);
   };
 
+  const handleOpenEditDialog = (expense: Expense) => {
+    setSelectedExpense(expense);
+    setOpenEditExpenseDialog(true);
+  };
+
   return (
     <>
+      <EditExpenseDialog
+        title='Edit expense'
+        isOpen={openEditExpenseDialog}
+        onClose={() => setOpenEditExpenseDialog(false)}
+        expense={selectedExpense!}
+        action='expenses/edit'
+      />
       <ConfirmationDialog
         isOpen={openConfirmDeleteDialog}
         title='Delete expense?'
@@ -208,13 +222,20 @@ const ExpensesTable = ({
                     <Badge colorPalette={category?.color}>{expense.category || 'NOT SELECTED'}</Badge>
                   </Table.Cell>
                   <Table.Cell textAlign='end'>
-                    <IconButton
-                      type='submit'
-                      onClick={() => handleOpenDeleteDialog(expense)}
-                      variant='ghost'
-                      aria-label='Delete expense'>
-                      <MdDelete color='#dc2626' />
-                    </IconButton>
+                    <HStack>
+                      <IconButton
+                        onClick={() => handleOpenEditDialog(expense)}
+                        variant='ghost'
+                        aria-label='Edit expense'>
+                        <MdEdit />
+                      </IconButton>
+                      <IconButton
+                        onClick={() => handleOpenDeleteDialog(expense)}
+                        variant='ghost'
+                        aria-label='Delete expense'>
+                        <MdDelete color='#dc2626' />
+                      </IconButton>
+                    </HStack>
                   </Table.Cell>
                 </Table.Row>
               );

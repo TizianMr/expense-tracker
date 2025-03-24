@@ -1,8 +1,8 @@
 import { Button, Input, Stack } from '@chakra-ui/react';
+import { Expense } from '@prisma/client';
 import { useFetcher } from '@remix-run/react';
 import { useEffect, useRef, useState } from 'react';
 import { FaEuroSign } from 'react-icons/fa';
-import { IoMdAdd } from 'react-icons/io';
 
 import {
   DialogActionTrigger,
@@ -14,7 +14,6 @@ import {
   DialogHeader,
   DialogRoot,
   DialogTitle,
-  DialogTrigger,
 } from './ui/dialog';
 import { Field } from './ui/field';
 import { InputGroup } from './ui/input-group';
@@ -22,14 +21,23 @@ import { NumberInputField, NumberInputRoot } from './ui/number-input';
 import { SelectContent, SelectItem, SelectLabel, SelectRoot, SelectTrigger, SelectValueText } from './ui/select';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
 
-const CreateExpenseDialog = () => {
+type Props = {
+  expense?: Expense;
+  title: string;
+  action: string;
+  isOpen: boolean;
+  onClose: () => void;
+};
+
+const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
-  const fetcher = useFetcher();
+  // https://github.com/remix-run/remix/discussions/2749
+  const [fetcherKey, setFetcherKey] = useState(expense?.id);
+  const fetcher = useFetcher<Expense>({ key: fetcherKey });
   const isSubmitting = fetcher.state === 'submitting';
 
-  const [openDialog, setOpenDialog] = useState(false);
   const [errors, setErrors] = useState<{
     title?: string;
     amount?: string;
@@ -37,10 +45,11 @@ const CreateExpenseDialog = () => {
   }>({});
 
   useEffect(() => {
-    if (fetcher.data) {
-      setOpenDialog(false);
+    if (fetcher.state === 'idle' && fetcher.data) {
+      setFetcherKey(fetcher.data.id);
+      onClose();
     }
-  }, [fetcher.data]);
+  }, [fetcher.data, fetcher.state, onClose]);
 
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -64,27 +73,22 @@ const CreateExpenseDialog = () => {
       setErrors(errors);
     } else {
       setErrors({});
-      fetcher.submit(formData, { method: 'post', action: '/expenses/create' });
+      if (expense?.id) {
+        formData.append('expenseId', expense.id.toString());
+      }
+      fetcher.submit(formData, { method: expense ? 'put' : 'post', action });
     }
   };
 
   return (
     <DialogRoot
-      open={openDialog}
-      onOpenChange={e => setOpenDialog(e.open)}>
+      open={isOpen}
+      onOpenChange={onClose}>
       <DialogBackdrop />
-      <DialogTrigger asChild>
-        <Button
-          m='4'
-          colorPalette='teal'
-          variant='solid'>
-          <IoMdAdd /> Add expense
-        </Button>
-      </DialogTrigger>
       <DialogContent ref={contentRef}>
         <DialogCloseTrigger />
         <DialogHeader>
-          <DialogTitle>Add expense</DialogTitle>
+          <DialogTitle>{title}</DialogTitle>
         </DialogHeader>
         <DialogBody>
           <fetcher.Form
@@ -99,6 +103,7 @@ const CreateExpenseDialog = () => {
                 invalid={!!errors.title}>
                 <Input
                   name='title'
+                  defaultValue={expense?.title ?? ''}
                   placeholder='Groceries'
                 />
               </Field>
@@ -110,9 +115,9 @@ const CreateExpenseDialog = () => {
                 <NumberInputRoot
                   allowMouseWheel
                   width='100%'
+                  defaultValue={expense?.amount.toString() ?? '0'}
                   name='amount'
                   locale='de-DE'
-                  defaultValue='0'
                   formatOptions={{
                     maximumFractionDigits: 2,
                     minimumFractionDigits: 2,
@@ -132,10 +137,12 @@ const CreateExpenseDialog = () => {
                 <Input
                   name='date'
                   type='date'
+                  defaultValue={expense?.expenseDate.toISOString().split('T')[0] ?? ''}
                 />
               </Field>
               <SelectRoot
                 name='category'
+                defaultValue={[expense?.category ?? '']}
                 collection={EXPENSE_CATEGORIES}>
                 <SelectLabel>Category</SelectLabel>
                 <SelectTrigger>
@@ -181,4 +188,4 @@ const CreateExpenseDialog = () => {
   );
 };
 
-export default CreateExpenseDialog;
+export default ExpenseDialog;
