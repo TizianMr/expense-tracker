@@ -92,57 +92,57 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
         </DialogHeader>
         <DialogBody>
           <fetcher.Form
-            ref={formRef}
-            id='expenseForm'>
+            id='expenseForm'
+            ref={formRef}>
             <Stack gap='4'>
               <Field
-                errorText={errors.title}
-                label='Title'
                 required
-                invalid={!!errors.title}>
+                errorText={errors.title}
+                invalid={!!errors.title}
+                label='Title'>
                 <Input
-                  name='title'
                   defaultValue={expense?.title ?? ''}
+                  name='title'
                   placeholder='Groceries'
                 />
               </Field>
               <Field
-                label='Amount'
+                required
                 errorText={errors.amount}
                 invalid={!!errors.amount}
-                required>
+                label='Amount'>
                 <NumberInputRoot
                   allowMouseWheel
-                  width='100%'
                   defaultValue={expense?.amount.toString() ?? '0'}
-                  name='amount'
-                  locale='de-DE'
                   formatOptions={{
                     maximumFractionDigits: 2,
                     minimumFractionDigits: 2,
-                  }}>
+                  }}
+                  locale='de-DE'
+                  name='amount'
+                  width='100%'>
                   <InputGroup
-                    width={'100%'}
-                    startElement={<FaEuroSign />}>
+                    startElement={<FaEuroSign />}
+                    width={'100%'}>
                     <NumberInputField pattern='\d{1,3}(.\d{3})*(,\d{2})?' />
                   </InputGroup>
                 </NumberInputRoot>
               </Field>
               <Field
-                label='Date'
+                required
                 errorText={errors.date}
                 invalid={!!errors.date}
-                required>
+                label='Date'>
                 <Input
+                  defaultValue={expense?.expenseDate.toISOString().split('T')[0] ?? ''}
                   name='date'
                   type='date'
-                  defaultValue={expense?.expenseDate.toISOString().split('T')[0] ?? ''}
                 />
               </Field>
               <SelectRoot
-                name='category'
+                collection={EXPENSE_CATEGORIES}
                 defaultValue={[expense?.category ?? '']}
-                collection={EXPENSE_CATEGORIES}>
+                name='category'>
                 <SelectLabel>Category</SelectLabel>
                 <SelectTrigger>
                   <SelectValueText placeholder='Select category' />
@@ -158,9 +158,9 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
                 </SelectContent>
               </SelectRoot>
               <Input
-                visibility='hidden'
-                type='submit'
                 id='submit-form'
+                type='submit'
+                visibility='hidden'
               />
             </Stack>
           </fetcher.Form>
@@ -168,16 +168,16 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
         <DialogFooter>
           <DialogActionTrigger asChild>
             <Button
-              onClick={() => setErrors({})}
-              variant='outline'>
+              variant='outline'
+              onClick={() => setErrors({})}>
               Cancel
             </Button>
           </DialogActionTrigger>
           <Button
-            loading={isSubmitting}
             form='expenseForm'
-            onClick={handleSubmit}
-            type='submit'>
+            loading={isSubmitting}
+            type='submit'
+            onClick={handleSubmit}>
             Save
           </Button>
         </DialogFooter>

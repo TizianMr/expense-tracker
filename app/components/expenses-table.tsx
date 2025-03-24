@@ -51,10 +51,10 @@ const LoadingSpinnerContainer = ({ colSpan }: TablePlaceHolderProps) => {
     <tr>
       <td colSpan={colSpan}>
         <Box
-          width='100%'
+          alignItems='center'
           display='flex'
           justifyContent='center'
-          alignItems='center'>
+          width='100%'>
           <Spinner size='lg' />
         </Box>
       </td>
@@ -67,10 +67,10 @@ const NoDataContainer = ({ colSpan }: TablePlaceHolderProps) => {
     <tr>
       <td colSpan={colSpan}>
         <Box
-          width='100%'
+          alignItems='center'
           display='flex'
           justifyContent='center'
-          alignItems='center'>
+          width='100%'>
           <Text>No data.</Text>
         </Box>
       </td>
@@ -177,30 +177,30 @@ const ExpensesTable = ({
   return (
     <>
       <EditExpenseDialog
-        title='Edit expense'
-        isOpen={openEditExpenseDialog}
-        onClose={() => setOpenEditExpenseDialog(false)}
-        expense={selectedExpense!}
         action='expenses/edit'
+        expense={selectedExpense!}
+        isOpen={openEditExpenseDialog}
+        title='Edit expense'
+        onClose={() => setOpenEditExpenseDialog(false)}
       />
       <ConfirmationDialog
-        isOpen={openConfirmDeleteDialog}
-        title='Delete expense?'
         description='Deleted expenses cannot be restored.'
+        isOpen={openConfirmDeleteDialog}
         isSubmitting={isLoading}
+        title='Delete expense?'
         onClose={handleCloseDeleteDialog}
         onSubmit={handleDeleteExpense}
       />
       <Table.Root
         interactive={!showLoadingSpinner && expenses.length > 0}
-        tableLayout='fixed'
-        size='md'>
+        size='md'
+        tableLayout='fixed'>
         <Table.Header>
           <Table.Row>
             {columnHeader.map(header => (
               <ColumnHeader
-                key={header.id}
                 headerInfo={header}
+                key={header.id}
               />
             ))}
           </Table.Row>
@@ -224,15 +224,15 @@ const ExpensesTable = ({
                   <Table.Cell textAlign='end'>
                     <HStack>
                       <IconButton
-                        onClick={() => handleOpenEditDialog(expense)}
+                        aria-label='Edit expense'
                         variant='ghost'
-                        aria-label='Edit expense'>
+                        onClick={() => handleOpenEditDialog(expense)}>
                         <MdEdit />
                       </IconButton>
                       <IconButton
-                        onClick={() => handleOpenDeleteDialog(expense)}
+                        aria-label='Delete expense'
                         variant='ghost'
-                        aria-label='Delete expense'>
+                        onClick={() => handleOpenDeleteDialog(expense)}>
                         <MdDelete color='#dc2626' />
                       </IconButton>
                     </HStack>
@@ -245,9 +245,9 @@ const ExpensesTable = ({
             expenses.length > 0 &&
             Array.from({ length: remainingRows }).map((_, i) => (
               <Table.Row
-                visibility='hidden'
                 aria-hidden='true'
-                key={`empty-${i}`}>
+                key={`empty-${i}`}
+                visibility='hidden'>
                 <Table.Cell borderColor='transparent'>&nbsp;</Table.Cell>
               </Table.Row>
             ))}
@@ -258,29 +258,29 @@ const ExpensesTable = ({
               colSpan={columnHeader.length}
               style={{ paddingTop: '1rem' }}>
               <Box
+                alignItems='center'
                 display='flex'
-                justifyContent='space-between'
-                alignItems='center'>
+                justifyContent='space-between'>
                 <Text
-                  pl='2'
                   color={'gray.500'}
+                  pl='2'
                   textStyle='sm'>
                   {`Showing ${page * pageSize - pageSize + 1} to ${Math.min(page * pageSize, totalItems)} of ${totalItems} results`}
                 </Text>
                 <Box
-                  gap='3'
-                  display='flex'>
+                  display='flex'
+                  gap='3'>
                   <Link to={`?${previousQuery.toString()}`}>
                     <Button
-                      variant='outline'
-                      disabled={page === 1}>
+                      disabled={page === 1}
+                      variant='outline'>
                       Previous
                     </Button>
                   </Link>
                   <Link to={`?${nextQuery.toString()}`}>
                     <Button
-                      variant='outline'
-                      disabled={page === Math.ceil(totalItems / pageSize)}>
+                      disabled={page === Math.ceil(totalItems / pageSize)}
+                      variant='outline'>
                       Next
                     </Button>
                   </Link>

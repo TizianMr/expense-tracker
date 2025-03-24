@@ -33,69 +33,69 @@ const Index = () => {
   return (
     <>
       <Box
-        justifyContent='center'
-        display='flex'>
+        display='flex'
+        justifyContent='center'>
         <Card.Root
-          width='70%'
           mt='5'
           padding='0 !important'
-          variant='elevated'>
+          variant='elevated'
+          width='70%'>
           <Card.Body>
             <Box
-              display='flex'
-              mt='-5'
               alignItems='center'
-              justifyContent='space-between'>
+              display='flex'
+              justifyContent='space-between'
+              mt='-5'>
               <Text textStyle='xl'>Expenses</Text>
               <Button
-                m='4'
                 colorPalette='teal'
+                m='4'
                 variant='solid'
                 onClick={() => setOpenCreateExpenseDialog(true)}>
                 <IoMdAdd /> Add expense
               </Button>
               <CreateExpenseDialog
-                title='Add expense'
-                isOpen={openCreateExpenseDialog}
-                onClose={() => setOpenCreateExpenseDialog(false)}
                 action='expenses/create'
+                isOpen={openCreateExpenseDialog}
+                title='Add expense'
+                onClose={() => setOpenCreateExpenseDialog(false)}
               />
             </Box>
             <ExpensesTable
-              isDataLoading={state === 'loading'}
               expenses={data.items}
+              isDataLoading={state === 'loading'}
               paginationInfo={{ totalItems: data.totalItems, page: data.page, pageSize: data.pageSize }}
             />
           </Card.Body>
         </Card.Root>
       </Box>
       <Box
-        justifyContent='center'
-        display='flex'>
+        display='flex'
+        justifyContent='center'>
         <Card.Root
-          width='70%'
           mt='5'
           padding='0 !important'
-          variant='elevated'>
+          variant='elevated'
+          width='70%'>
           <Card.Body>
             <Box
-              display='flex'
-              mt='-5'
               alignItems='center'
-              justifyContent='space-between'>
+              display='flex'
+              justifyContent='space-between'
+              mt='-5'>
               <Text textStyle='xl'>Budgets</Text>
               <Button
-                m='4'
                 colorPalette='teal'
+                m='4'
                 variant='solid'
                 onClick={() => setOpenCreateBudgetDialog(true)}>
                 <IoMdAdd /> Add budget
               </Button>
               <CreateBudgetDialog
-                title='Add budget'
-                isOpen={openCreateBudgetDialog}
-                onClose={() => setOpenCreateBudgetDialog(false)}
                 action='budgets/create'
+                isOpen={openCreateBudgetDialog}
+                title='Add budget'
+                onClose={() => setOpenCreateBudgetDialog(false)}
               />
             </Box>
           </Card.Body>
