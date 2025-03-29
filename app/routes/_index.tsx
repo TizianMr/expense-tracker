@@ -8,6 +8,7 @@ import { IoMdAdd } from 'react-icons/io';
 import { default as CreateBudgetDialog } from '~/components/budget-dialog';
 import { default as CreateExpenseDialog } from '~/components/expense-dialog';
 import ExpensesTable from '~/components/expenses-table';
+import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { SortDirection } from '~/interfaces';
 import { EXPENSE_TABLE_PAGE_SIZE } from '~/utils/constants';
@@ -15,17 +16,29 @@ import { EXPENSE_TABLE_PAGE_SIZE } from '~/utils/constants';
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const query = url.searchParams;
-  const expenses = await fetchExpenses({
-    page: Number(query.get('page')) || 1,
-    pageSize: EXPENSE_TABLE_PAGE_SIZE,
-    sortBy: (query.get('sortBy') as keyof Expense) || 'expenseDate',
-    sortDirection: (query.get('sortDirection') as SortDirection) || SortDirection.DESC,
-  });
-  return expenses;
+
+  const [expenses, budgets] = await Promise.all([
+    // expenses
+    fetchExpenses({
+      page: Number(query.get('page')) || 1,
+      pageSize: EXPENSE_TABLE_PAGE_SIZE,
+      sortBy: (query.get('sortBy') as keyof Expense) || 'expenseDate',
+      sortDirection: (query.get('sortDirection') as SortDirection) || SortDirection.DESC,
+    }),
+    // budgets
+    await fetchBudgets({
+      page: 1,
+      pageSize: 1,
+      sortBy: 'id',
+      sortDirection: SortDirection.ASC,
+    }),
+  ]);
+
+  return { expenses, budgets };
 };
 
 const Index = () => {
-  const data = useLoaderData<typeof loader>();
+  const { expenses, budgets } = useLoaderData<typeof loader>();
   const { state } = useNavigation();
   const [openCreateExpenseDialog, setOpenCreateExpenseDialog] = useState(false);
   const [openCreateBudgetDialog, setOpenCreateBudgetDialog] = useState(false);
@@ -62,9 +75,9 @@ const Index = () => {
               />
             </Box>
             <ExpensesTable
-              expenses={data.items}
+              expenses={expenses.items}
               isDataLoading={state === 'loading'}
-              paginationInfo={{ totalItems: data.totalItems, page: data.page, pageSize: data.pageSize }}
+              paginationInfo={{ totalItems: expenses.totalItems, page: expenses.page, pageSize: expenses.pageSize }}
             />
           </Card.Body>
         </Card.Root>
@@ -98,6 +111,7 @@ const Index = () => {
                 onClose={() => setOpenCreateBudgetDialog(false)}
               />
             </Box>
+            {JSON.stringify(budgets, null, 2)}
           </Card.Body>
         </Card.Root>
       </Box>
