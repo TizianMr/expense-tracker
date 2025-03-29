@@ -1,5 +1,5 @@
-import { Button, Input, Stack } from '@chakra-ui/react';
-import { Expense } from '@prisma/client';
+import { Button, createListCollection, Input, ListCollection, Stack } from '@chakra-ui/react';
+import { Budget, Expense } from '@prisma/client';
 import { useFetcher } from '@remix-run/react';
 import { useEffect, useRef, useState } from 'react';
 import { FaEuroSign } from 'react-icons/fa';
@@ -23,18 +23,22 @@ import { EXPENSE_CATEGORIES } from '../utils/constants';
 
 type Props = {
   expense?: Expense;
+  budgets: Pick<Budget, 'id' | 'title'>[];
   title: string;
   action: string;
   isOpen: boolean;
   onClose: () => void;
 };
 
-const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
+const ExpenseDialog = ({ expense, budgets, title, action, isOpen, onClose }: Props) => {
   const contentRef = useRef<HTMLDivElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
 
   // https://github.com/remix-run/remix/discussions/2749
   const [fetcherKey, setFetcherKey] = useState(expense?.id);
+  const [budgetCollection, setBudgetCollection] = useState<ListCollection<{ label: string; value: string }>>(
+    createListCollection({ items: [] }),
+  );
   const fetcher = useFetcher<Expense>({ key: fetcherKey });
   const isSubmitting = fetcher.state === 'submitting';
 
@@ -43,6 +47,16 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
     amount?: string;
     date?: string;
   }>({});
+
+  useEffect(() => {
+    if (budgets) {
+      setBudgetCollection(
+        createListCollection({
+          items: budgets.map(budget => ({ label: budget.title, value: budget.id })),
+        }),
+      );
+    }
+  }, [budgets]);
 
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.data) {
@@ -157,11 +171,23 @@ const ExpenseDialog = ({ expense, title, action, isOpen, onClose }: Props) => {
                   ))}
                 </SelectContent>
               </SelectRoot>
-              <Input
-                id='submit-form'
-                type='submit'
-                visibility='hidden'
-              />
+              <SelectRoot
+                collection={budgetCollection}
+                name='budget'>
+                <SelectLabel>Budget</SelectLabel>
+                <SelectTrigger>
+                  <SelectValueText placeholder='Select budget' />
+                </SelectTrigger>
+                <SelectContent portalRef={contentRef}>
+                  {budgetCollection.items.map(item => (
+                    <SelectItem
+                      item={item}
+                      key={item.value}>
+                      {item.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </SelectRoot>
             </Stack>
           </fetcher.Form>
         </DialogBody>

@@ -28,7 +28,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     // budgets
     await fetchBudgets({
       page: 1,
-      pageSize: 1,
+      pageSize: 100,
       sortBy: 'id',
       sortDirection: SortDirection.ASC,
     }),
@@ -69,6 +69,7 @@ const Index = () => {
               </Button>
               <CreateExpenseDialog
                 action='expenses/create'
+                budgets={budgets.items}
                 isOpen={openCreateExpenseDialog}
                 title='Add expense'
                 onClose={() => setOpenCreateExpenseDialog(false)}
