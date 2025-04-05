@@ -43,3 +43,7 @@ export const fetchExpenses = async ({
     totalItems: expenses[0],
   };
 };
+
+export const fetchExpenseById = async (id: string): Promise<Expense | null> => {
+  return await prisma.expense.findUnique({ where: { id } });
+};

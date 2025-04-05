@@ -1,7 +1,7 @@
 import { createListCollection, Input, ListCollection, Stack } from '@chakra-ui/react';
 import { Budget, Category, Expense } from '@prisma/client';
-import { ActionFunctionArgs } from '@remix-run/node';
-import { useOutletContext } from '@remix-run/react';
+import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { useLoaderData, useOutletContext } from '@remix-run/react';
 import { useEffect, useState } from 'react';
 import { FaEuroSign } from 'react-icons/fa';
 
@@ -17,28 +17,38 @@ import {
   SelectTrigger,
   SelectValueText,
 } from '../components/ui/select';
+import { fetchExpenseById, updateExpense, UpdateExpense } from '../db/expense.server';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
-import { createExpense, CreateExpense } from '~/db/expense.server';
 
-export const action = async ({ request }: ActionFunctionArgs) => {
+export const loader = async ({ params }: LoaderFunctionArgs) => {
+  const expenseId = params.expense as string;
+
+  const expense = await fetchExpenseById(expenseId);
+
+  return { expense };
+};
+
+export const action = async ({ request, params }: ActionFunctionArgs) => {
   const formData = await request.formData();
 
   const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
 
-  const expenseData: CreateExpense = {
+  const expense: UpdateExpense = {
+    id: params.expense as string,
     amount: parseFloat(convertedAmount),
     category: formData.get('category') as Category,
     expenseDate: new Date(formData.get('date') as string),
     title: formData.get('title') as string,
   };
 
-  const createdExpense = await createExpense(expenseData);
-  return createdExpense;
+  const updatedExpense = await updateExpense(expense);
+  return updatedExpense;
 };
 
-// TODO: own loader to fetch budgets
+// TODO: own loader to fetch budgets and expense?
 
-const CreateExpenseDialog = () => {
+const EditExpenseDialog = () => {
+  const { expense } = useLoaderData<typeof loader>();
   const { contentRef, errors } = useOutletContext<{
     contentRef: React.RefObject<HTMLDivElement>;
     errors: FormErrors;
@@ -65,8 +75,9 @@ const CreateExpenseDialog = () => {
         invalid={!!errors.title}
         label='Title'>
         <Input
+          defaultValue={expense?.title ?? ''}
           name='title'
-          placeholder='Groceries'
+          placeholder='test'
         />
       </Field>
       <Field
@@ -76,7 +87,7 @@ const CreateExpenseDialog = () => {
         label='Amount'>
         <NumberInputRoot
           allowMouseWheel
-          defaultValue='0'
+          defaultValue={expense?.amount.toString() ?? '0'}
           formatOptions={{
             maximumFractionDigits: 2,
             minimumFractionDigits: 2,
@@ -97,12 +108,14 @@ const CreateExpenseDialog = () => {
         invalid={!!errors.date}
         label='Date'>
         <Input
+          defaultValue={expense?.expenseDate.toISOString().split('T')[0] ?? ''}
           name='date'
           type='date'
         />
       </Field>
       <SelectRoot
         collection={EXPENSE_CATEGORIES}
+        defaultValue={[expense?.category ?? '']}
         name='category'>
         <SelectLabel>Category</SelectLabel>
         <SelectTrigger>
@@ -139,4 +152,4 @@ const CreateExpenseDialog = () => {
   );
 };
 
-export default CreateExpenseDialog;
+export default EditExpenseDialog;

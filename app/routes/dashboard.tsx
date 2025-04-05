@@ -12,6 +12,7 @@ import { fetchExpenses } from '~/db/expense.server';
 import { SortDirection } from '~/interfaces';
 import { EXPENSE_TABLE_PAGE_SIZE } from '~/utils/constants';
 
+// TODO: loader shouldn't be triggered when dialog is opened
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const query = url.searchParams;

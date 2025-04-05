@@ -21,13 +21,14 @@ export type FormErrors = {
   date?: string;
 };
 
-const ExpenseDialog = () => {
+const ExpenseDialogRoot = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const inOutlet = !!useOutlet();
 
-  const pathnames = location.pathname.split('/');
-  const action: 'create' | 'edit' = pathnames[pathnames.length - 1] as 'create' | 'edit';
+  const pathnames = location.pathname.split('/expenses/');
+  const action = pathnames[pathnames.length - 1];
+  const isEdit = action.includes('edit');
 
   const formRef = useRef<HTMLFormElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
@@ -73,10 +74,7 @@ const ExpenseDialog = () => {
       setErrors(errors);
     } else {
       setErrors({});
-      //   if (expense?.id) {
-      //     formData.append('expenseId', expense.id.toString());
-      //   }
-      fetcher.submit(formData, { method: action === 'edit' ? 'put' : 'post', action });
+      fetcher.submit(formData, { method: isEdit ? 'put' : 'post', action });
     }
   };
 
@@ -89,7 +87,7 @@ const ExpenseDialog = () => {
       <DialogContent ref={contentRef}>
         <DialogCloseTrigger />
         <DialogHeader>
-          <DialogTitle>Create Expense</DialogTitle>
+          <DialogTitle>{`${isEdit ? 'Edit' : 'Create'} expense`}</DialogTitle>
         </DialogHeader>
         <DialogBody>
           <fetcher.Form
@@ -120,4 +118,4 @@ const ExpenseDialog = () => {
   );
 };
 
-export default ExpenseDialog;
+export default ExpenseDialogRoot;
