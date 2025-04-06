@@ -6,13 +6,23 @@ import { useLoaderData, useOutletContext } from '@remix-run/react';
 import { FormErrors } from './dashboard.expenses';
 import { fetchExpenseById, updateExpense, UpdateExpense } from '../db/expense.server';
 import ExpenseForm from '~/components/expense-form';
+import { fetchBudgets } from '~/db/budget.server';
+import { SortDirection } from '~/interfaces';
 
 export const loader = async ({ params }: LoaderFunctionArgs) => {
   const expenseId = params.expense as string;
 
-  const expense = await fetchExpenseById(expenseId);
+  const [expense, budgets] = await Promise.all([
+    await fetchExpenseById(expenseId),
+    await fetchBudgets({
+      page: 1,
+      pageSize: 100,
+      sortBy: 'id',
+      sortDirection: SortDirection.ASC,
+    }),
+  ]);
 
-  return { expense };
+  return { expense, budgets };
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
@@ -32,27 +42,12 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   return updatedExpense;
 };
 
-// TODO: own loader to fetch budgets and expense?
-
 const EditExpenseDialog = () => {
-  const { expense } = useLoaderData<typeof loader>();
+  const { expense, budgets } = useLoaderData<typeof loader>();
   const { contentRef, errors } = useOutletContext<{
     contentRef: React.RefObject<HTMLDivElement>;
     errors: FormErrors;
   }>();
-  // const [budgetCollection, setBudgetCollection] = useState<ListCollection<{ label: string; value: string }>>(
-  //   createListCollection({ items: [] }),
-  // );
-
-  // useEffect(() => {
-  //   if (budgets) {
-  //     setBudgetCollection(
-  //       createListCollection({
-  //         items: budgets.map(budget => ({ label: budget.title, value: budget.id })),
-  //       }),
-  //     );
-  //   }
-  // }, [budgets]);
 
   if (!expense) {
     return (
@@ -65,6 +60,7 @@ const EditExpenseDialog = () => {
 
   return (
     <ExpenseForm
+      budgets={budgets.items}
       contentRef={contentRef}
       errors={errors}
       expense={expense}

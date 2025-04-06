@@ -1,5 +1,6 @@
-import { Input, Stack } from '@chakra-ui/react';
-import { Expense } from '@prisma/client';
+import { createListCollection, Input, ListCollection, Stack } from '@chakra-ui/react';
+import { Budget, Expense } from '@prisma/client';
+import { useState, useEffect } from 'react';
 import { FaEuroSign } from 'react-icons/fa';
 
 import { Field } from './ui/field';
@@ -13,9 +14,24 @@ type Props = {
   contentRef: React.RefObject<HTMLDivElement>;
   errors: FormErrors;
   expense?: Expense;
+  budgets: Budget[];
 };
 
-const ExpenseForm = ({ contentRef, errors, expense }: Props) => {
+const ExpenseForm = ({ contentRef, errors, expense, budgets }: Props) => {
+  const [budgetCollection, setBudgetCollection] = useState<ListCollection<{ label: string; value: string }>>(
+    createListCollection({ items: [] }),
+  );
+
+  useEffect(() => {
+    if (budgets) {
+      setBudgetCollection(
+        createListCollection({
+          items: budgets.map(budget => ({ label: budget.title, value: budget.id })),
+        }),
+      );
+    }
+  }, [budgets]);
+
   return (
     <Stack gap='4'>
       <Field
@@ -80,23 +96,23 @@ const ExpenseForm = ({ contentRef, errors, expense }: Props) => {
           ))}
         </SelectContent>
       </SelectRoot>
-      {/* <SelectRoot
-            collection={budgetCollection}
-            name='budget'>
-            <SelectLabel>Budget</SelectLabel>
-            <SelectTrigger>
-              <SelectValueText placeholder='Select budget' />
-            </SelectTrigger>
-            <SelectContent portalRef={contentRef}>
-              {budgetCollection.items.map(item => (
-                <SelectItem
-                  item={item}
-                  key={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </SelectRoot> */}
+      <SelectRoot
+        collection={budgetCollection}
+        name='budget'>
+        <SelectLabel>Budget</SelectLabel>
+        <SelectTrigger>
+          <SelectValueText placeholder='Select budget' />
+        </SelectTrigger>
+        <SelectContent portalRef={contentRef}>
+          {budgetCollection.items.map(item => (
+            <SelectItem
+              item={item}
+              key={item.value}>
+              {item.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </SelectRoot>
     </Stack>
   );
 };

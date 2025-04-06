@@ -1,10 +1,23 @@
 import { Category } from '@prisma/client';
 import { ActionFunctionArgs } from '@remix-run/node';
-import { useOutletContext } from '@remix-run/react';
+import { useLoaderData, useOutletContext } from '@remix-run/react';
 
 import { FormErrors } from './dashboard.expenses';
 import ExpenseForm from '~/components/expense-form';
+import { fetchBudgets } from '~/db/budget.server';
 import { createExpense, CreateExpense } from '~/db/expense.server';
+import { SortDirection } from '~/interfaces';
+
+export const loader = async () => {
+  const budgets = await fetchBudgets({
+    page: 1,
+    pageSize: 100,
+    sortBy: 'id',
+    sortDirection: SortDirection.ASC,
+  });
+
+  return { budgets };
+};
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.formData();
@@ -22,29 +35,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   return createdExpense;
 };
 
-// TODO: own loader to fetch budgets
-
 const CreateExpenseDialog = () => {
+  const { budgets } = useLoaderData<typeof loader>();
   const { contentRef, errors } = useOutletContext<{
     contentRef: React.RefObject<HTMLDivElement>;
     errors: FormErrors;
   }>();
-  // const [budgetCollection, setBudgetCollection] = useState<ListCollection<{ label: string; value: string }>>(
-  //   createListCollection({ items: [] }),
-  // );
-
-  // useEffect(() => {
-  //   if (budgets) {
-  //     setBudgetCollection(
-  //       createListCollection({
-  //         items: budgets.map(budget => ({ label: budget.title, value: budget.id })),
-  //       }),
-  //     );
-  //   }
-  // }, [budgets]);
 
   return (
     <ExpenseForm
+      budgets={budgets.items}
       contentRef={contentRef}
       errors={errors}
     />
