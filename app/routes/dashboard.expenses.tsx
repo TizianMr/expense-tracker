@@ -78,6 +78,10 @@ const ExpenseDialogRoot = () => {
     }
   };
 
+  if (pathnames.length < 2) {
+    navigate('/dashboard');
+  }
+
   return (
     <DialogRoot
       open={isOpen}
