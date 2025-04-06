@@ -80,7 +80,7 @@ const ExpenseForm = ({ contentRef, errors, expense, budgets }: Props) => {
       </Field>
       <SelectRoot
         collection={EXPENSE_CATEGORIES}
-        defaultValue={[expense?.category ?? '']}
+        defaultValue={expense?.category ? [expense.category] : undefined}
         name='category'>
         <SelectLabel>Category</SelectLabel>
         <SelectTrigger>

@@ -33,9 +33,7 @@ const ExpenseDialogRoot = () => {
   const formRef = useRef<HTMLFormElement>(null);
   const contentRef = useRef<HTMLDivElement>(null);
 
-  // https://github.com/remix-run/remix/discussions/2749
-  const [fetcherKey, setFetcherKey] = useState('');
-  const fetcher = useFetcher<Expense>({ key: fetcherKey });
+  const fetcher = useFetcher<Expense>();
   const isSubmitting = fetcher.state === 'submitting';
 
   const [isOpen, setIsOpen] = useState(inOutlet);
@@ -43,7 +41,6 @@ const ExpenseDialogRoot = () => {
 
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.data) {
-      setFetcherKey(fetcher.data.id);
       setIsOpen(false);
     }
   }, [fetcher.data, fetcher.state, navigate]);
