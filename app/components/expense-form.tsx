@@ -1,6 +1,7 @@
 import { createListCollection, Input, ListCollection, Stack } from '@chakra-ui/react';
 import { Budget, Expense } from '@prisma/client';
-import { useState, useEffect } from 'react';
+import { useFetcher } from '@remix-run/react';
+import { useState, useEffect, useRef } from 'react';
 import { FaEuroSign } from 'react-icons/fa';
 
 import { Field } from './ui/field';
@@ -9,6 +10,7 @@ import { NumberInputField, NumberInputRoot } from './ui/number-input';
 import { SelectContent, SelectItem, SelectLabel, SelectRoot, SelectTrigger, SelectValueText } from './ui/select';
 import { FormErrors } from '../routes/dashboard.expenses';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
+import { ListResult } from '~/interfaces';
 
 type Props = {
   contentRef: React.RefObject<HTMLDivElement>;
@@ -17,10 +19,76 @@ type Props = {
   budgets: Budget[];
 };
 
+const SCROLL_TRESHOLD = 80; // px
+
 const ExpenseForm = ({ contentRef, errors, expense, budgets }: Props) => {
   const [budgetCollection, setBudgetCollection] = useState<ListCollection<{ label: string; value: string }>>(
     createListCollection({ items: [] }),
   );
+  const selectRef = useRef<HTMLDivElement>(null);
+  const [page, setPage] = useState(2);
+  const fetcher = useFetcher<ListResult<Budget>>();
+  const [shouldFetch, setShouldFetch] = useState(true);
+
+  const scrolledToLastPage = fetcher.data && page > Math.ceil(fetcher.data.totalItems / fetcher.data.pageSize);
+
+  // Add Listeners to scroll and client resize
+  useEffect(() => {
+    let ref: HTMLDivElement | null = null;
+    if (selectRef.current) {
+      ref = selectRef.current;
+    }
+
+    const scrollListener = () => {
+      if (!ref) return;
+      // Check if the user scrolled to the bottom of the select content
+      setShouldFetch(ref.scrollHeight - ref.scrollTop - SCROLL_TRESHOLD < ref.clientHeight);
+    };
+
+    if (ref) {
+      ref.addEventListener('scroll', scrollListener);
+    }
+
+    // Clean up
+    return () => {
+      if (ref) {
+        ref.removeEventListener('scroll', scrollListener);
+      }
+    };
+  }, [shouldFetch]);
+
+  useEffect(() => {
+    if (!shouldFetch) return;
+
+    if (fetcher.state === 'loading' || scrolledToLastPage) {
+      setShouldFetch(false);
+      return;
+    }
+
+    // TODO: replace with location.pathname
+    fetcher.load(`/dashboard/expenses/create?page=${page}`);
+
+    setShouldFetch(false);
+  }, [fetcher, page, scrolledToLastPage, shouldFetch]);
+
+  useEffect(() => {
+    if (scrolledToLastPage) {
+      setShouldFetch(false);
+      return;
+    }
+
+    if (fetcher.data && fetcher.data.items) {
+      setBudgetCollection(prevCollection =>
+        createListCollection({
+          items: [
+            ...prevCollection.items,
+            ...(fetcher.data?.items.map(budget => ({ label: budget.title, value: budget.id })) ?? []),
+          ],
+        }),
+      );
+      setPage(prevPage => prevPage + 1);
+    }
+  }, [fetcher.data, scrolledToLastPage]);
 
   useEffect(() => {
     if (budgets) {
@@ -103,7 +171,11 @@ const ExpenseForm = ({ contentRef, errors, expense, budgets }: Props) => {
         <SelectTrigger>
           <SelectValueText placeholder='Select budget' />
         </SelectTrigger>
-        <SelectContent portalRef={contentRef}>
+        <SelectContent
+          maxH='20em'
+          overflowY='auto'
+          portalRef={contentRef}
+          ref={selectRef}>
           {budgetCollection.items.map(item => (
             <SelectItem
               item={item}
