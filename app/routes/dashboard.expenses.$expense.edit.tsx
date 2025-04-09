@@ -36,6 +36,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     category: formData.get('category') as Category,
     expenseDate: new Date(formData.get('date') as string),
     title: formData.get('title') as string,
+    budgetId: formData.get('budget') as string,
   };
 
   const updatedExpense = await updateExpense(expense);
