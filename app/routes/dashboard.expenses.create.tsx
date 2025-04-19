@@ -41,7 +41,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 const CreateExpenseDialog = () => {
   const budgets = useLoaderData<typeof loader>();
-  const { contentRef, errors } = useOutletContext<{
+  const { errors } = useOutletContext<{
     contentRef: React.RefObject<HTMLDivElement>;
     errors: FormErrors;
   }>();
@@ -49,7 +49,6 @@ const CreateExpenseDialog = () => {
   return (
     <ExpenseForm
       budgets={budgets.items}
-      contentRef={contentRef}
       errors={errors}
     />
   );

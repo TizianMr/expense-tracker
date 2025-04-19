@@ -1,6 +1,6 @@
 import { Expense } from '@prisma/client';
 import { Outlet, useFetcher, useLocation, useNavigate, useOutlet } from '@remix-run/react';
-import { Button, Dialog, DialogPanel } from '@tremor/react';
+import { Button, Dialog, DialogPanel, Divider } from '@tremor/react';
 import { useEffect, useRef, useState } from 'react';
 
 export type FormErrors = {
@@ -19,7 +19,6 @@ const ExpenseDialogRoot = () => {
   const isEdit = action.includes('edit');
 
   const formRef = useRef<HTMLFormElement>(null);
-  const contentRef = useRef<HTMLDivElement>(null);
 
   const fetcher = useFetcher<Expense>();
   const isSubmitting = fetcher.state === 'submitting';
@@ -38,7 +37,7 @@ const ExpenseDialogRoot = () => {
     setTimeout(() => {
       setErrors({});
       navigate('/dashboard');
-    }, 150); // delay navigation to allow dialog to close with animation
+    }, 200); // delay navigation to allow dialog to close with animation
   };
 
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -53,6 +52,11 @@ const ExpenseDialogRoot = () => {
 
     if (!formData.get('amount')) {
       errors['amount'] = 'Amount is required.';
+    }
+
+    const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
+    if (isNaN(Number(convertedAmount))) {
+      errors['amount'] = 'Amount is not a valid number.';
     }
 
     if (!formData.get('date')) {
@@ -77,14 +81,15 @@ const ExpenseDialogRoot = () => {
       open={isOpen}
       onClose={handleClose}>
       <DialogPanel>
-        <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
+        <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong pb-4'>
           {`${isEdit ? 'Edit' : 'Create'} expense`}
         </h3>
         <fetcher.Form
           id='expenseForm'
           ref={formRef}>
-          <Outlet context={{ contentRef, errors }} />
+          <Outlet context={{ errors }} />
         </fetcher.Form>
+        <Divider />
         <div className='mt-8 flex items-center justify-end space-x-2'>
           <Button
             variant='secondary'
