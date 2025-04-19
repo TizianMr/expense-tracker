@@ -1,19 +1,7 @@
-import { Button } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
 import { Outlet, useFetcher, useLocation, useNavigate, useOutlet } from '@remix-run/react';
+import { Button, Dialog, DialogPanel } from '@tremor/react';
 import { useEffect, useRef, useState } from 'react';
-
-import {
-  DialogActionTrigger,
-  DialogBackdrop,
-  DialogBody,
-  DialogCloseTrigger,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogRoot,
-  DialogTitle,
-} from '../components/ui/dialog';
 
 export type FormErrors = {
   title?: string;
@@ -47,6 +35,10 @@ const ExpenseDialogRoot = () => {
 
   const handleClose = () => {
     setIsOpen(false);
+    setTimeout(() => {
+      setErrors({});
+      navigate('/dashboard');
+    }, 150); // delay navigation to allow dialog to close with animation
   };
 
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -70,8 +62,8 @@ const ExpenseDialogRoot = () => {
     if (Object.keys(errors).length > 0) {
       setErrors(errors);
     } else {
-      setErrors({});
       fetcher.submit(formData, { method: isEdit ? 'put' : 'post', action });
+      handleClose();
     }
   };
 
@@ -80,42 +72,34 @@ const ExpenseDialogRoot = () => {
   }
 
   return (
-    <DialogRoot
+    <Dialog
+      static
       open={isOpen}
-      onExitComplete={() => navigate('/dashboard')}
-      onOpenChange={handleClose}>
-      <DialogBackdrop />
-      <DialogContent ref={contentRef}>
-        <DialogCloseTrigger />
-        <DialogHeader>
-          <DialogTitle>{`${isEdit ? 'Edit' : 'Create'} expense`}</DialogTitle>
-        </DialogHeader>
-        <DialogBody>
-          <fetcher.Form
-            id='expenseForm'
-            ref={formRef}>
-            <Outlet context={{ contentRef, errors }} />
-          </fetcher.Form>
-        </DialogBody>
-        <DialogFooter>
-          <DialogActionTrigger asChild>
-            <Button
-              variant='outline'
-              onClick={() => setErrors({})}>
-              Cancel
-            </Button>
-          </DialogActionTrigger>
+      onClose={handleClose}>
+      <DialogPanel>
+        <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
+          {`${isEdit ? 'Edit' : 'Create'} expense`}
+        </h3>
+        <fetcher.Form
+          id='expenseForm'
+          ref={formRef}>
+          <Outlet context={{ contentRef, errors }} />
+        </fetcher.Form>
+        <div className='mt-8 flex items-center justify-end space-x-2'>
           <Button
-            form='expenseForm'
-            loading={isSubmitting}
-            type='submit'
-            onClick={handleSubmit}>
-            Save
+            variant='secondary'
+            onClick={handleClose}>
+            Cancel
           </Button>
-        </DialogFooter>
-        <DialogCloseTrigger />
-      </DialogContent>
-    </DialogRoot>
+          <Button
+            loading={isSubmitting}
+            variant='primary'
+            onClick={handleSubmit}>
+            Create
+          </Button>
+        </div>
+      </DialogPanel>
+    </Dialog>
   );
 };
 
