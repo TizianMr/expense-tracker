@@ -2,6 +2,8 @@ import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/reac
 
 import { Provider } from './components/ui/provider';
 
+import './tailwind.css';
+
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
     <html lang='en'>
