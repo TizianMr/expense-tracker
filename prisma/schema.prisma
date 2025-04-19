@@ -28,12 +28,15 @@ model Expense {
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
   category    Category?
+  Budget      Budget?   @relation(fields: [budgetId], references: [id])
+  budgetId    String?
 }
 
 model Budget {
-  id        String   @id @default(cuid())
+  id        String    @id @default(cuid())
   amount    Float
   title     String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  expenses  Expense[]
 }

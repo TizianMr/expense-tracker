@@ -1,12 +1,11 @@
 import { Badge, Box, Button, HStack, IconButton, Spinner, Table, Text } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
-import { Link, useNavigation, useSearchParams, useSubmit } from '@remix-run/react';
+import { Link, NavLink, useNavigation, useSearchParams, useSubmit } from '@remix-run/react';
 import { useEffect, useRef, useState } from 'react';
 import { MdDelete, MdEdit } from 'react-icons/md';
 
 import { ColumnSorter } from './column-sorter';
 import { ConfirmationDialog } from './confirmation-dialog';
-import { default as EditExpenseDialog } from './expense-dialog';
 import { DATE_OPTIONS, EXPENSE_CATEGORIES } from '../utils/constants';
 import { TableHeader, ListResult } from '~/interfaces';
 import { formatCurrency } from '~/utils/helpers';
@@ -88,7 +87,6 @@ const ExpensesTable = ({
   const [queryParams] = useSearchParams();
   const [showLoadingSpinner, setShowLoadingSpinner] = useState(false);
   const [openConfirmDeleteDialog, setOpenConfirmDeleteDialog] = useState(false);
-  const [openEditExpenseDialog, setOpenEditExpenseDialog] = useState(false);
   const [selectedExpense, setSelectedExpense] = useState<Expense | null>(null);
 
   const wasLoading = useRef(false);
@@ -169,20 +167,8 @@ const ExpensesTable = ({
     setOpenConfirmDeleteDialog(false);
   };
 
-  const handleOpenEditDialog = (expense: Expense) => {
-    setSelectedExpense(expense);
-    setOpenEditExpenseDialog(true);
-  };
-
   return (
     <>
-      <EditExpenseDialog
-        action='expenses/edit'
-        expense={selectedExpense!}
-        isOpen={openEditExpenseDialog}
-        title='Edit expense'
-        onClose={() => setOpenEditExpenseDialog(false)}
-      />
       <ConfirmationDialog
         description='Deleted expenses cannot be restored.'
         isOpen={openConfirmDeleteDialog}
@@ -223,12 +209,13 @@ const ExpensesTable = ({
                   </Table.Cell>
                   <Table.Cell textAlign='end'>
                     <HStack>
-                      <IconButton
-                        aria-label='Edit expense'
-                        variant='ghost'
-                        onClick={() => handleOpenEditDialog(expense)}>
-                        <MdEdit />
-                      </IconButton>
+                      <NavLink to={`expenses/${expense.id}/edit`}>
+                        <IconButton
+                          aria-label='Edit expense'
+                          variant='ghost'>
+                          <MdEdit />
+                        </IconButton>
+                      </NavLink>
                       <IconButton
                         aria-label='Delete expense'
                         variant='ghost'

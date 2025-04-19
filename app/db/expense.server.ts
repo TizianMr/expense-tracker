@@ -3,7 +3,7 @@ import { Expense } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import { Filter, ListResult } from '~/interfaces';
 
-export type CreateExpense = Pick<Expense, 'title' | 'amount' | 'expenseDate' | 'category'>;
+export type CreateExpense = Pick<Expense, 'title' | 'amount' | 'expenseDate' | 'category' | 'budgetId'>;
 export type UpdateExpense = Pick<Expense, 'id'> & CreateExpense;
 type DeleteExpense = Pick<Expense, 'id'>;
 
@@ -42,4 +42,8 @@ export const fetchExpenses = async ({
     pageSize,
     totalItems: expenses[0],
   };
+};
+
+export const fetchExpenseById = async (id: string): Promise<Expense | null> => {
+  return await prisma.expense.findUnique({ where: { id } });
 };
