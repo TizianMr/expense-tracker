@@ -85,7 +85,7 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
             defaultValue={expense?.category ?? undefined}
             id='expense-category'
             name='category'>
-            {EXPENSE_CATEGORIES.items.map(item => (
+            {EXPENSE_CATEGORIES.map(item => (
               <SearchSelectItem
                 key={item.value}
                 value={item.value}>

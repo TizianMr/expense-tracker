@@ -6,7 +6,9 @@ import './tailwind.css';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang='en'>
+    <html
+      className='antialiased'
+      lang='en'>
       <head>
         <meta charSet='utf-8' />
         <meta

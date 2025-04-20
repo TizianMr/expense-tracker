@@ -1,10 +1,10 @@
 import { Expense } from '@prisma/client';
 import { LoaderFunctionArgs } from '@remix-run/node';
-import { NavLink, Outlet, useLoaderData, useNavigation } from '@remix-run/react';
+import { NavLink, Outlet, useLoaderData } from '@remix-run/react';
 import { RiAddLine } from '@remixicon/react';
 import { Button, Card } from '@tremor/react';
 
-import ExpensesTable from '~/components/expenses-table';
+import { TableUsageExample } from '~/components/example-table';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { SortDirection } from '~/interfaces';
@@ -37,12 +37,11 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 const Dashboard = () => {
   const { expenses, budgets } = useLoaderData<typeof loader>();
-  const { state } = useNavigation();
 
   return (
     <>
       <div className='flex justify-content-center'>
-        <Card className='mx-auto w-[50vw]'>
+        <Card className='flex flex-col mx-auto w-[80vw] h-[40vh]'>
           <div className='flex items-center justify-between'>
             <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
               Expenses
@@ -51,10 +50,9 @@ const Dashboard = () => {
               <Button icon={RiAddLine}>Create expense</Button>
             </NavLink>
           </div>
-          <ExpensesTable
+          <TableUsageExample
             expenses={expenses.items}
-            isDataLoading={state === 'loading'}
-            paginationInfo={{ totalItems: expenses.totalItems, page: expenses.page, pageSize: expenses.pageSize }}
+            paginationState={{ totalItems: expenses.totalItems, page: expenses.page, pageSize: expenses.pageSize }}
           />
         </Card>
       </div>

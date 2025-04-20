@@ -3,10 +3,6 @@ export enum SortDirection {
   DESC = 'desc',
 }
 
-export type TableHeader =
-  | { id: string; title?: string; isSortable: true; width?: string } // id is used for the 'sortBy' query param
-  | { id?: string; title?: string; isSortable: false; width?: string };
-
 export interface Filter<T> {
   page: number;
   pageSize: number;
@@ -20,3 +16,23 @@ export interface ListResult<T> {
   pageSize: number;
   totalItems: number;
 }
+
+/*************TABLE*************/
+export type ThDef = {
+  id: string;
+  title?: string;
+  isSortable: boolean;
+  options?: { align: 'left' | 'center' | 'right' };
+}; // id is used for the 'sortBy' query param
+
+export type TableState = {
+  sortBy: string | null;
+  sortDirection: SortDirection | null;
+  paginationState: TablePaginationState;
+};
+
+export type TablePaginationState = {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+};

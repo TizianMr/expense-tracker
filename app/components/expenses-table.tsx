@@ -7,7 +7,7 @@ import { MdDelete, MdEdit } from 'react-icons/md';
 import { ColumnSorter } from './column-sorter';
 import { ConfirmationDialog } from './confirmation-dialog';
 import { DATE_OPTIONS, EXPENSE_CATEGORIES } from '../utils/constants';
-import { TableHeader, ListResult } from '~/interfaces';
+import { ThDef, ListResult } from '~/interfaces';
 import { formatCurrency } from '~/utils/helpers';
 
 type ExpensesTableProps = {
@@ -17,7 +17,7 @@ type ExpensesTableProps = {
 };
 
 type ColumnHeaderProps = {
-  headerInfo: TableHeader;
+  headerInfo: ThDef;
 };
 
 type TablePlaceHolderProps = {
@@ -125,7 +125,7 @@ const ExpensesTable = ({
 
   const remainingRows = pageSize - expenses.length;
 
-  const columnHeader: TableHeader[] = [
+  const columnHeader: ThDef[] = [
     {
       id: 'title',
       title: 'Title',
@@ -148,7 +148,6 @@ const ExpensesTable = ({
     },
     {
       id: 'actions',
-      width: '100px',
       isSortable: false,
     },
   ];
@@ -198,7 +197,7 @@ const ExpensesTable = ({
             <NoDataContainer colSpan={columnHeader.length} />
           ) : (
             expenses.map((expense: Expense) => {
-              const category = EXPENSE_CATEGORIES.items.find(cat => cat.value === expense.category);
+              const category = EXPENSE_CATEGORIES.find(cat => cat.value === expense.category);
               return (
                 <Table.Row key={expense.id}>
                   <Table.Cell>{expense.title}</Table.Cell>

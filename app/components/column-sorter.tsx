@@ -3,10 +3,10 @@ import { Link, useSearchParams } from '@remix-run/react';
 import { BsChevronExpand } from 'react-icons/bs';
 import { HiChevronDown, HiChevronUp } from 'react-icons/hi';
 
-import { TableHeader, SortDirection } from '../interfaces/index';
+import { ThDef, SortDirection } from '../interfaces/index';
 
 type Props = {
-  column: TableHeader;
+  column: ThDef;
 };
 
 export const ColumnSorter = ({ column }: Props) => {
