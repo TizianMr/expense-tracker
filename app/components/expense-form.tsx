@@ -1,43 +1,18 @@
 import { Budget, Expense } from '@prisma/client';
-import { RiMoneyEuroCircleLine } from '@remixicon/react';
 import { DatePicker, SearchSelect, SearchSelectItem, TextInput } from '@tremor/react';
 
-import { FormErrors } from '../routes/dashboard.expenses';
+import { ExpenseFormErrors } from '../routes/dashboard.expenses';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
+import CurrencyInput from './ui/currency-input';
 import { useControlledInput } from '~/customHooks/useControlledInput';
 
-const formatAmount = (value: string) => {
-  // Remove all non-numeric characters except digits, dots, and commas
-  const numericValue = value.replace(/[^\d.,]/g, '');
-
-  const standardizedValue = numericValue.replace(',', '.');
-
-  const parsedValue = parseFloat(standardizedValue);
-
-  if (isNaN(parsedValue)) {
-    return value; // Return the original value to avoid clearing the input
-  }
-
-  return new Intl.NumberFormat('de-DE', {
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-    useGrouping: true, // Add thousands separators
-  }).format(parsedValue);
-};
-
 type Props = {
-  errors: FormErrors;
+  errors: ExpenseFormErrors;
   expense?: Expense;
   budgets: Budget[];
 };
 
 const ExpenseForm = ({ errors, expense, budgets }: Props) => {
-  const {
-    handleChange: handleAmountChange,
-    value: selectedAmount,
-    setValue: setSelectedAmount,
-  } = useControlledInput(expense?.amount ? formatAmount(expense.amount.toString()) : '');
-
   const { handleChange: handleDateChange, value: selectedDate } = useControlledInput(
     expense?.expenseDate ?? new Date(),
   );
@@ -46,10 +21,6 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
     label: budget.title,
     value: budget.id,
   }));
-
-  const handleAmountBlur = () => {
-    setSelectedAmount(formatAmount(selectedAmount));
-  };
 
   return (
     <>
@@ -62,7 +33,6 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
           </label>
           <TextInput
             required
-            autoComplete='title-name'
             className='mt-2'
             defaultValue={expense?.title}
             error={!!errors.title}
@@ -74,26 +44,15 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
           />
         </div>
 
-        <div>
-          <label
-            className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
-            htmlFor='expense-date'>
-            Amount <span className='text-red-500'>*</span>
-          </label>
-          <TextInput
-            required
-            className='mt-2'
-            error={!!errors.amount}
-            errorMessage={errors.amount}
-            icon={RiMoneyEuroCircleLine}
-            name='amount'
-            pattern='\d{1,3}(.\d{3})*(,\d{2})?'
-            placeholder='Amount...'
-            value={selectedAmount}
-            onBlur={handleAmountBlur}
-            onValueChange={handleAmountChange}
-          />
-        </div>
+        <CurrencyInput
+          required
+          defaultValue={expense?.amount.toString() ?? ''}
+          error={!!errors.amount}
+          errorMessage={errors.amount}
+          label='Amount'
+          name='amount'
+          placeholder='Amount...'
+        />
 
         <div>
           <label

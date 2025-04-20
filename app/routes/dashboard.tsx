@@ -3,9 +3,7 @@ import { LoaderFunctionArgs } from '@remix-run/node';
 import { NavLink, Outlet, useLoaderData, useNavigation } from '@remix-run/react';
 import { RiAddLine } from '@remixicon/react';
 import { Button, Card } from '@tremor/react';
-import { useState } from 'react';
 
-import { default as CreateBudgetDialog } from '~/components/budget-dialog';
 import ExpensesTable from '~/components/expenses-table';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
@@ -40,7 +38,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 const Dashboard = () => {
   const { expenses, budgets } = useLoaderData<typeof loader>();
   const { state } = useNavigation();
-  const [openCreateBudgetDialog, setOpenCreateBudgetDialog] = useState(false);
 
   return (
     <>
@@ -51,7 +48,7 @@ const Dashboard = () => {
               Expenses
             </h1>
             <NavLink to='expenses/create'>
-              <Button icon={RiAddLine}>Add expense</Button>
+              <Button icon={RiAddLine}>Create expense</Button>
             </NavLink>
           </div>
           <ExpensesTable
@@ -67,17 +64,9 @@ const Dashboard = () => {
             <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
               Budgets
             </h1>
-            <Button
-              icon={RiAddLine}
-              onClick={() => setOpenCreateBudgetDialog(true)}>
-              Add budget
-            </Button>
-            <CreateBudgetDialog
-              action='budgets/create'
-              isOpen={openCreateBudgetDialog}
-              title='Add budget'
-              onClose={() => setOpenCreateBudgetDialog(false)}
-            />
+            <NavLink to='budgets/create'>
+              <Button icon={RiAddLine}>Create budget</Button>
+            </NavLink>
           </div>
           {JSON.stringify(budgets, null, 2)}
         </Card>

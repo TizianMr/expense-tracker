@@ -1,30 +1,29 @@
-import { Expense } from '@prisma/client';
+import { Budget } from '@prisma/client';
 import { Outlet, useFetcher, useLocation, useNavigate, useOutlet } from '@remix-run/react';
 import { Button, Dialog, DialogPanel, Divider } from '@tremor/react';
 import { useEffect, useRef, useState } from 'react';
 
-export type ExpenseFormErrors = {
+export type BudgetFormErrors = {
   title?: string;
   amount?: string;
-  date?: string;
 };
 
-const ExpenseDialogRoot = () => {
+const BudgetDialogRoot = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const inOutlet = !!useOutlet();
 
-  const pathnames = location.pathname.split('/expenses/');
+  const pathnames = location.pathname.split('/budgets/');
   const action = pathnames[pathnames.length - 1];
   const isEdit = action.includes('edit');
 
   const formRef = useRef<HTMLFormElement>(null);
 
-  const fetcher = useFetcher<Expense>();
+  const fetcher = useFetcher<Budget>();
   const isSubmitting = fetcher.state === 'submitting';
 
   const [isOpen, setIsOpen] = useState(inOutlet);
-  const [errors, setErrors] = useState<ExpenseFormErrors>({});
+  const [errors, setErrors] = useState<BudgetFormErrors>({});
 
   useEffect(() => {
     if (fetcher.state === 'idle' && fetcher.data) {
@@ -44,7 +43,7 @@ const ExpenseDialogRoot = () => {
     event.preventDefault();
     const formData = new FormData(formRef.current!);
 
-    const errors: ExpenseFormErrors = {};
+    const errors: BudgetFormErrors = {};
 
     if (!formData.get('title')) {
       errors['title'] = 'Title is required.';
@@ -54,19 +53,10 @@ const ExpenseDialogRoot = () => {
       errors['amount'] = 'Amount is required.';
     }
 
-    const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
-    if (isNaN(Number(convertedAmount))) {
-      errors['amount'] = 'Amount is not a valid number.';
-    }
-
-    if (!formData.get('date')) {
-      errors['date'] = 'Date is required.';
-    }
-
     if (Object.keys(errors).length > 0) {
       setErrors(errors);
     } else {
-      fetcher.submit(formData, { method: isEdit ? 'put' : 'post', action });
+      fetcher.submit(formData, { method: 'post', action });
       handleClose();
     }
   };
@@ -82,7 +72,7 @@ const ExpenseDialogRoot = () => {
       onClose={handleClose}>
       <DialogPanel>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong pb-4'>
-          {`${isEdit ? 'Edit' : 'Create'} expense`}
+          {`${isEdit ? 'Edit' : 'Create'} budget`}
         </h3>
         <fetcher.Form
           id='expenseForm'
@@ -108,4 +98,4 @@ const ExpenseDialogRoot = () => {
   );
 };
 
-export default ExpenseDialogRoot;
+export default BudgetDialogRoot;

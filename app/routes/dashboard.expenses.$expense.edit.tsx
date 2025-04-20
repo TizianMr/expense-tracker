@@ -1,9 +1,10 @@
-import { Alert } from '@chakra-ui/react';
 import { Category } from '@prisma/client';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { useLoaderData, useOutletContext } from '@remix-run/react';
+import { RiErrorWarningLine } from '@remixicon/react';
+import { Callout } from '@tremor/react';
 
-import { FormErrors } from './dashboard.expenses';
+import { ExpenseFormErrors } from './dashboard.expenses';
 import { fetchExpenseById, updateExpense, UpdateExpense } from '../db/expense.server';
 import ExpenseForm from '~/components/expense-form';
 import { fetchBudgets } from '~/db/budget.server';
@@ -46,16 +47,18 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 const EditExpenseDialog = () => {
   const { expense, budgets } = useLoaderData<typeof loader>();
   const { errors } = useOutletContext<{
-    contentRef: React.RefObject<HTMLDivElement>;
-    errors: FormErrors;
+    errors: ExpenseFormErrors;
   }>();
 
   if (!expense) {
     return (
-      <Alert.Root status='error'>
-        <Alert.Indicator />
-        <Alert.Title>The expense you are trying to edit could not be found.</Alert.Title>
-      </Alert.Root>
+      <Callout
+        className='mt-4'
+        color='rose'
+        icon={RiErrorWarningLine}
+        title='Expense not found'>
+        The expense you are trying to edit could not be found.
+      </Callout>
     );
   }
 
