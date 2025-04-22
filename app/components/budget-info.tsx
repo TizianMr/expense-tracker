@@ -10,7 +10,7 @@ type Props = {
 
 const BudgetInfo = ({ totalAmount, remainingAmount, title }: Props) => {
   const usedBudgetInPercentage = (100 * (totalAmount - remainingAmount)) / totalAmount;
-  const color = usedBudgetInPercentage >= 90 ? 'red' : usedBudgetInPercentage <= 60 ? 'green' : 'yellow';
+  const color = usedBudgetInPercentage >= 90 ? 'red' : usedBudgetInPercentage <= 60 ? 'emerald' : 'yellow';
 
   return (
     <div className='space-y-3'>

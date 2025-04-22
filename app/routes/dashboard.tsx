@@ -1,11 +1,12 @@
 import { Expense } from '@prisma/client';
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { NavLink, Outlet, useLoaderData } from '@remix-run/react';
-import { RiAddLine } from '@remixicon/react';
-import { Button, Card } from '@tremor/react';
+import { RiAddLine, RiQuestionLine } from '@remixicon/react';
+import { Button, Card, Icon, Legend } from '@tremor/react';
 
 import BudgetInfo from '~/components/budget-info';
 import { ExpenseTable } from '~/components/expense-table';
+import { Tooltip } from '~/components/ui/tooltip';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { SortDirection } from '~/interfaces';
@@ -60,9 +61,31 @@ const Dashboard = () => {
       <div className='flex justify-content-center'>
         <Card className='mx-auto w-[25vw]'>
           <div className='flex items-center justify-between'>
-            <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
-              Budgets
-            </h1>
+            <div className='flex items-center'>
+              <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
+                Budgets
+              </h1>
+              <Tooltip
+                className='w-[20rem]'
+                content={
+                  <Legend
+                    categories={[
+                      'No worries! You are well within your budget.',
+                      "Heads up! You're nearing your budget limit.",
+                      "Alert! You've nearly maxed out your budget.",
+                    ]}
+                    className='tooltip-legend-white'
+                    colors={['emerald', 'orange', 'red']}
+                  />
+                }
+                showArrow={false}>
+                <Icon
+                  icon={RiQuestionLine}
+                  size='sm'
+                />
+              </Tooltip>
+            </div>
+
             <NavLink to='budgets/create'>
               <Button icon={RiAddLine}>Create budget</Button>
             </NavLink>
