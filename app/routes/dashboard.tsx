@@ -4,6 +4,7 @@ import { NavLink, Outlet, useLoaderData } from '@remix-run/react';
 import { RiAddLine } from '@remixicon/react';
 import { Button, Card } from '@tremor/react';
 
+import BudgetInfo from '~/components/budget-info';
 import { ExpenseTable } from '~/components/expense-table';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
@@ -26,7 +27,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     // budgets
     await fetchBudgets({
       page: 1,
-      pageSize: 100,
+      pageSize: 5,
       sortBy: 'id',
       sortDirection: SortDirection.ASC,
     }),
@@ -57,7 +58,7 @@ const Dashboard = () => {
         </Card>
       </div>
       <div className='flex justify-content-center'>
-        <Card className='mx-auto w-[50vw]'>
+        <Card className='mx-auto w-[25vw]'>
           <div className='flex items-center justify-between'>
             <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
               Budgets
@@ -66,7 +67,16 @@ const Dashboard = () => {
               <Button icon={RiAddLine}>Create budget</Button>
             </NavLink>
           </div>
-          {JSON.stringify(budgets, null, 2)}
+          <div className='space-y-6 mt-5'>
+            {budgets.items.map(budget => (
+              <BudgetInfo
+                key={budget.id}
+                remainingAmount={budget.remainingBudget}
+                title={budget.title}
+                totalAmount={budget.amount}
+              />
+            ))}
+          </div>
         </Card>
       </div>
       <Outlet />
