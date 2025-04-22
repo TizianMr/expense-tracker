@@ -3,8 +3,8 @@ import { useState } from 'react';
 
 import { ExpenseDropdown } from './expense-dropdown';
 import LoadingSpinner from './ui/loading-spinner';
+import Pagination from './ui/pagination';
 import TableHeader from './ui/table-header';
-import TablePagination from './ui/table-pagination';
 import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
 import { ExpenseWithBudget } from '~/db/expense.server';
 import { SortDirection, TablePaginationState, TableState, ThDef } from '~/interfaces';
@@ -129,7 +129,10 @@ export function ExpenseTable({ expenses, paginationState }: Props) {
         </TableBody>
       </Table>
       <div className='mt-auto'>
-        <TablePagination paginationState={paginationState} />
+        <Pagination
+          paginationState={paginationState}
+          searchParamKey='expense'
+        />
       </div>
     </div>
   );

@@ -1,58 +1,86 @@
+import { Expense } from '@prisma/client';
 import { useSearchParams } from '@remix-run/react';
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightDoubleLine, RiArrowRightSLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
+import qs from 'qs';
 
-import { TablePaginationState } from '~/interfaces';
+import { QueryParams, TablePaginationState } from '~/interfaces';
 
 type Props = {
   paginationState: TablePaginationState;
+  searchParamKey: 'expense' | 'budget';
 };
 
-const TablePagination = ({ paginationState: { page, pageSize, totalItems } }: Props) => {
+const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems }, searchParamKey }: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const nestedParams = qs.parse(searchParams.toString()) as QueryParams<Expense>;
 
   const paginationButtons = [
     {
       icon: RiArrowLeftDoubleLine,
       onClick: () => {
-        const firstPageQuery = new URLSearchParams(searchParams);
-        firstPageQuery.set('page', '1');
-        setSearchParams(firstPageQuery);
+        const updated = {
+          ...nestedParams,
+          [searchParamKey]: {
+            ...(nestedParams[searchParamKey] ?? {}),
+            page: 1,
+          },
+        };
+
+        setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
-      disabled: page === 1,
+      disabled: currentPage == 1,
       srText: 'First page',
       mobileView: 'hidden sm:block',
     },
     {
       icon: RiArrowLeftSLine,
       onClick: () => {
-        const previousQuery = new URLSearchParams(searchParams);
-        previousQuery.set('page', (page - 1).toString());
-        setSearchParams(previousQuery);
+        const updated = {
+          ...nestedParams,
+          [searchParamKey]: {
+            ...(nestedParams[searchParamKey] ?? {}),
+            page: currentPage - 1,
+          },
+        };
+
+        setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
-      disabled: page === 1,
+      disabled: currentPage == 1,
       srText: 'Previous page',
       mobileView: '',
     },
     {
       icon: RiArrowRightSLine,
       onClick: () => {
-        const nextQuery = new URLSearchParams(searchParams);
-        nextQuery.set('page', (page + 1).toString());
-        setSearchParams(nextQuery);
+        const updated = {
+          ...nestedParams,
+          [searchParamKey]: {
+            ...(nestedParams[searchParamKey] ?? {}),
+            page: currentPage + 1,
+          },
+        };
+
+        setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
-      disabled: page === Math.ceil(totalItems / pageSize),
+      disabled: Number(currentPage) == Math.ceil(totalItems / pageSize),
       srText: 'Next page',
       mobileView: '',
     },
     {
       icon: RiArrowRightDoubleLine,
       onClick: () => {
-        const lastPageQuery = new URLSearchParams(searchParams);
-        lastPageQuery.set('page', Math.ceil(totalItems / pageSize).toString());
-        setSearchParams(lastPageQuery);
+        const updated = {
+          ...nestedParams,
+          [searchParamKey]: {
+            ...(nestedParams[searchParamKey] ?? {}),
+            page: Math.ceil(totalItems / pageSize),
+          },
+        };
+
+        setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
-      disabled: page === Math.ceil(totalItems / pageSize),
+      disabled: currentPage === Math.ceil(totalItems / pageSize),
       srText: 'Last page',
       mobileView: 'hidden sm:block',
     },
@@ -63,7 +91,7 @@ const TablePagination = ({ paginationState: { page, pageSize, totalItems } }: Pr
       <p className='hidden text-sm tabular-nums text-gray-500 sm:block'>
         Showing{' '}
         <span className='font-semibold text-gray-900 dark:text-gray-50'>
-          {page * pageSize - pageSize + 1}-{Math.min(page * pageSize, totalItems)}
+          {currentPage * pageSize - pageSize + 1}-{Math.min(currentPage * pageSize, totalItems)}
         </span>{' '}
         of <span className='font-semibold text-gray-900 dark:text-gray-50'>{totalItems}</span>
       </p>{' '}
@@ -94,4 +122,4 @@ const TablePagination = ({ paginationState: { page, pageSize, totalItems } }: Pr
   );
 };
 
-export default TablePagination;
+export default Pagination;

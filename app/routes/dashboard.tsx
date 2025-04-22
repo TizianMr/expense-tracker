@@ -3,32 +3,35 @@ import { LoaderFunctionArgs } from '@remix-run/node';
 import { NavLink, Outlet, useLoaderData } from '@remix-run/react';
 import { RiAddLine, RiQuestionLine } from '@remixicon/react';
 import { Button, Card, Icon, Legend } from '@tremor/react';
+import qs from 'qs';
 
 import BudgetInfo from '~/components/budget-info';
 import { ExpenseTable } from '~/components/expense-table';
+import Pagination from '~/components/ui/pagination';
 import { Tooltip } from '~/components/ui/tooltip';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
-import { SortDirection } from '~/interfaces';
-import { EXPENSE_TABLE_PAGE_SIZE } from '~/utils/constants';
+import { QueryParams, SortDirection } from '~/interfaces';
+import { BUDGET_PAGE_SIZE, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 
 // TODO: loader shouldn't be triggered when dialog is opened
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const query = url.searchParams;
+  const parsedQueryParams = qs.parse(query.toString()) as QueryParams<Expense>;
 
   const [expenses, budgets] = await Promise.all([
     // expenses
     fetchExpenses({
-      page: Number(query.get('page')) || 1,
-      pageSize: EXPENSE_TABLE_PAGE_SIZE,
-      sortBy: (query.get('sortBy') as keyof Expense) || 'expenseDate',
-      sortDirection: (query.get('sortDirection') as SortDirection) || SortDirection.DESC,
+      page: Number(parsedQueryParams.expense?.page) || 1,
+      pageSize: EXPENSE_PAGE_SIZE,
+      sortBy: parsedQueryParams.expense?.sortBy || 'expenseDate',
+      sortDirection: parsedQueryParams.expense?.sortDirection || SortDirection.DESC,
     }),
     // budgets
     await fetchBudgets({
-      page: 1,
-      pageSize: 5,
+      page: Number(parsedQueryParams.budget?.page) || 1,
+      pageSize: BUDGET_PAGE_SIZE,
       sortBy: 'id',
       sortDirection: SortDirection.ASC,
     }),
@@ -99,6 +102,12 @@ const Dashboard = () => {
                 totalAmount={budget.amount}
               />
             ))}
+          </div>
+          <div className='mt-6'>
+            <Pagination
+              paginationState={{ totalItems: budgets.totalItems, page: budgets.page, pageSize: budgets.pageSize }}
+              searchParamKey='budget'
+            />
           </div>
         </Card>
       </div>

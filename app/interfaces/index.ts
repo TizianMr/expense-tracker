@@ -19,6 +19,22 @@ export interface ListResult<T> {
   totalItems: number;
 }
 
+/*************QUERY PARAMS*************/
+interface ExpenseQuery<T> {
+  page?: number;
+  sortBy?: keyof T;
+  sortDirection?: SortDirection;
+}
+
+interface BudgetQuery {
+  page?: number;
+}
+
+export interface QueryParams<T> {
+  expense?: ExpenseQuery<T>;
+  budget?: BudgetQuery;
+}
+
 /*************TABLE*************/
 export type ThDef = {
   id: string;

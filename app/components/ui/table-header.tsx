@@ -1,6 +1,7 @@
 import { useSearchParams } from '@remix-run/react';
 import { RiArrowDownSLine, RiArrowUpSLine } from '@remixicon/react';
 import { TableHeaderCell } from '@tremor/react';
+import qs from 'qs';
 
 import { SortDirection, TableState, ThDef } from '~/interfaces';
 import { cx } from '~/utils/helpers';
@@ -25,7 +26,7 @@ type ConditionalProps =
 type Props = CommonProps & ConditionalProps;
 
 const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, options }: Props) => {
-  const [, setSearchParams] = useSearchParams();
+  const [searchParams, setSearchParams] = useSearchParams();
   const sortDirection: SortDirection | null = tableState?.sortBy === id ? tableState.sortDirection : null;
 
   if (!isSortable) {
@@ -62,17 +63,24 @@ const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, op
   };
 
   const setNewSearchParams = (newSortDirection: SortDirection | null) => {
-    const params = new URLSearchParams();
+    const nestedParams = qs.parse(searchParams.toString());
+    let updated;
 
     if (newSortDirection) {
-      params.set('sortBy', id);
-      params.set('sortDirection', newSortDirection);
+      updated = {
+        ...nestedParams,
+        expense: {
+          sortBy: id,
+          sortDirection: newSortDirection,
+        },
+      };
     } else {
-      params.delete('sortBy');
-      params.delete('sortDirection');
+      updated = {
+        budget: nestedParams.budget,
+      };
     }
 
-    setSearchParams(params);
+    setSearchParams(qs.stringify(updated), { preventScrollReset: true });
   };
 
   return (

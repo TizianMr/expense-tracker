@@ -7,7 +7,8 @@ export const EXPENSE_CATEGORIES = [
   { label: 'Other', value: Category.OTHER, color: 'cyan' },
 ];
 
-export const EXPENSE_TABLE_PAGE_SIZE = 5;
+export const EXPENSE_PAGE_SIZE = 5;
+export const BUDGET_PAGE_SIZE = 5;
 
 export const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
   weekday: undefined,
