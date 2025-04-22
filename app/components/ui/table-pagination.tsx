@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from '@remix-run/react';
+import { useSearchParams } from '@remix-run/react';
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightDoubleLine, RiArrowRightSLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
 
@@ -9,26 +9,15 @@ type Props = {
 };
 
 const TablePagination = ({ paginationState: { page, pageSize, totalItems } }: Props) => {
-  const [queryParams] = useSearchParams();
-  const navigate = useNavigate();
-
-  const previousQuery = new URLSearchParams(queryParams);
-  previousQuery.set('page', (page - 1).toString());
-
-  const nextQuery = new URLSearchParams(queryParams);
-  nextQuery.set('page', (page + 1).toString());
-
-  const firstPageQuery = new URLSearchParams(queryParams);
-  firstPageQuery.set('page', '1');
-
-  const lastPageQuery = new URLSearchParams(queryParams);
-  lastPageQuery.set('page', Math.ceil(totalItems / pageSize).toString());
+  const [searchParams, setSearchParams] = useSearchParams();
 
   const paginationButtons = [
     {
       icon: RiArrowLeftDoubleLine,
       onClick: () => {
-        navigate(`?${firstPageQuery.toString()}`);
+        const firstPageQuery = new URLSearchParams(searchParams);
+        firstPageQuery.set('page', '1');
+        setSearchParams(firstPageQuery);
       },
       disabled: page === 1,
       srText: 'First page',
@@ -37,7 +26,9 @@ const TablePagination = ({ paginationState: { page, pageSize, totalItems } }: Pr
     {
       icon: RiArrowLeftSLine,
       onClick: () => {
-        navigate(`?${previousQuery.toString()}`);
+        const previousQuery = new URLSearchParams(searchParams);
+        previousQuery.set('page', (page - 1).toString());
+        setSearchParams(previousQuery);
       },
       disabled: page === 1,
       srText: 'Previous page',
@@ -46,7 +37,9 @@ const TablePagination = ({ paginationState: { page, pageSize, totalItems } }: Pr
     {
       icon: RiArrowRightSLine,
       onClick: () => {
-        navigate(`?${nextQuery.toString()}`);
+        const nextQuery = new URLSearchParams(searchParams);
+        nextQuery.set('page', (page + 1).toString());
+        setSearchParams(nextQuery);
       },
       disabled: page === Math.ceil(totalItems / pageSize),
       srText: 'Next page',
@@ -55,7 +48,9 @@ const TablePagination = ({ paginationState: { page, pageSize, totalItems } }: Pr
     {
       icon: RiArrowRightDoubleLine,
       onClick: () => {
-        navigate(`?${lastPageQuery.toString()}`);
+        const lastPageQuery = new URLSearchParams(searchParams);
+        lastPageQuery.set('page', Math.ceil(totalItems / pageSize).toString());
+        setSearchParams(lastPageQuery);
       },
       disabled: page === Math.ceil(totalItems / pageSize),
       srText: 'Last page',

@@ -23,100 +23,98 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
   }));
 
   return (
-    <>
-      <div className='space-y-6'>
-        <div>
-          <label
-            className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
-            htmlFor='expense-title'>
-            Title <span className='text-red-500'>*</span>
-          </label>
-          <TextInput
-            required
-            className='mt-2'
-            defaultValue={expense?.title}
-            error={!!errors.title}
-            errorMessage={errors.title}
-            id='expense-title'
-            name='title'
-            placeholder='Title name'
-            type='text'
-          />
-        </div>
-
-        <CurrencyInput
+    <div className='space-y-6'>
+      <div>
+        <label
+          className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
+          htmlFor='expense-title'>
+          Title <span className='text-red-500'>*</span>
+        </label>
+        <TextInput
           required
-          defaultValue={expense?.amount.toString() ?? ''}
-          error={!!errors.amount}
-          errorMessage={errors.amount}
-          label='Amount'
-          name='amount'
-          placeholder='Amount...'
+          className='mt-2'
+          defaultValue={expense?.title}
+          error={!!errors.title}
+          errorMessage={errors.title}
+          id='expense-title'
+          name='title'
+          placeholder='Title name'
+          type='text'
         />
-
-        <div>
-          <label
-            className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
-            htmlFor='expense-date'>
-            Date <span className='text-red-500'>*</span>
-          </label>
-          <DatePicker
-            className='mt-2'
-            defaultValue={selectedDate}
-            enableClear={false}
-            id='expense-date'
-            onValueChange={date => handleDateChange(date as Date)}
-          />
-          <input
-            name='date'
-            type='hidden'
-            value={selectedDate.toLocaleDateString('en-CA')} // Format as YYYY-MM-DD
-          />
-        </div>
-
-        <div>
-          <label
-            className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
-            htmlFor='expense-category'>
-            Category
-          </label>
-          <SearchSelect
-            className='mt-2'
-            defaultValue={expense?.category ?? undefined}
-            id='expense-category'
-            name='category'>
-            {EXPENSE_CATEGORIES.map(item => (
-              <SearchSelectItem
-                key={item.value}
-                value={item.value}>
-                {item.label}
-              </SearchSelectItem>
-            ))}
-          </SearchSelect>
-        </div>
-
-        <div>
-          <label
-            className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
-            htmlFor='expense-budget'>
-            Budget
-          </label>
-          <SearchSelect
-            className='mt-2'
-            defaultValue={expense?.budgetId ?? undefined}
-            id='expense-budget'
-            name='budget'>
-            {budgetsList.map(budget => (
-              <SearchSelectItem
-                key={budget.value}
-                value={budget.value}>
-                {budget.label}
-              </SearchSelectItem>
-            ))}
-          </SearchSelect>
-        </div>
       </div>
-    </>
+
+      <CurrencyInput
+        required
+        defaultValue={expense?.amount.toString() ?? ''}
+        error={!!errors.amount}
+        errorMessage={errors.amount}
+        label='Amount'
+        name='amount'
+        placeholder='Amount...'
+      />
+
+      <div>
+        <label
+          className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
+          htmlFor='expense-date'>
+          Date <span className='text-red-500'>*</span>
+        </label>
+        <DatePicker
+          className='mt-2'
+          defaultValue={selectedDate}
+          enableClear={false}
+          id='expense-date'
+          onValueChange={date => handleDateChange(date as Date)}
+        />
+        <input
+          name='date'
+          type='hidden'
+          value={selectedDate.toLocaleDateString('en-CA')} // Format as YYYY-MM-DD
+        />
+      </div>
+
+      <div>
+        <label
+          className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
+          htmlFor='expense-category'>
+          Category
+        </label>
+        <SearchSelect
+          className='mt-2'
+          defaultValue={expense?.category ?? undefined}
+          id='expense-category'
+          name='category'>
+          {EXPENSE_CATEGORIES.map(item => (
+            <SearchSelectItem
+              key={item.value}
+              value={item.value}>
+              {item.label}
+            </SearchSelectItem>
+          ))}
+        </SearchSelect>
+      </div>
+
+      <div>
+        <label
+          className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
+          htmlFor='expense-budget'>
+          Budget
+        </label>
+        <SearchSelect
+          className='mt-2'
+          defaultValue={expense?.budgetId ?? undefined}
+          id='expense-budget'
+          name='budget'>
+          {budgetsList.map(budget => (
+            <SearchSelectItem
+              key={budget.value}
+              value={budget.value}>
+              {budget.label}
+            </SearchSelectItem>
+          ))}
+        </SearchSelect>
+      </div>
+    </div>
   );
 };
 

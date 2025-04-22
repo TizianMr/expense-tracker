@@ -1,7 +1,6 @@
-import { useNavigate } from '@remix-run/react';
+import { useSearchParams } from '@remix-run/react';
 import { RiArrowDownSLine, RiArrowUpSLine } from '@remixicon/react';
 import { TableHeaderCell } from '@tremor/react';
-import { useEffect, useRef } from 'react';
 
 import { SortDirection, TableState, ThDef } from '~/interfaces';
 import { cx } from '~/utils/helpers';
@@ -26,23 +25,8 @@ type ConditionalProps =
 type Props = CommonProps & ConditionalProps;
 
 const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, options }: Props) => {
-  const navigate = useNavigate();
+  const [, setSearchParams] = useSearchParams();
   const sortDirection: SortDirection | null = tableState?.sortBy === id ? tableState.sortDirection : null;
-  const sortingQueryRef = useRef(new URLSearchParams());
-
-  useEffect(() => {
-    const currentSortingQuery = sortingQueryRef.current;
-
-    if (sortDirection) {
-      currentSortingQuery.set('sortBy', id);
-      currentSortingQuery.set('sortDirection', sortDirection.toString());
-    } else {
-      currentSortingQuery.delete('sortBy');
-      currentSortingQuery.delete('sortDirection');
-    }
-
-    navigate(`${location.pathname}?${currentSortingQuery.toString()}`);
-  }, [id, navigate, sortDirection]);
 
   if (!isSortable) {
     return (
@@ -53,6 +37,14 @@ const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, op
   }
 
   const handleSorting = () => {
+    const newDirection = determineNewSortDirection();
+
+    setNewSearchParams(newDirection);
+
+    onSortingChange?.(id, newDirection);
+  };
+
+  const determineNewSortDirection = (): SortDirection | null => {
     let newDirection: SortDirection | null;
     switch (sortDirection) {
       case SortDirection.ASC:
@@ -66,7 +58,21 @@ const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, op
         break;
     }
 
-    onSortingChange?.(id, newDirection);
+    return newDirection;
+  };
+
+  const setNewSearchParams = (newSortDirection: SortDirection | null) => {
+    const params = new URLSearchParams();
+
+    if (newSortDirection) {
+      params.set('sortBy', id);
+      params.set('sortDirection', newSortDirection);
+    } else {
+      params.delete('sortBy');
+      params.delete('sortDirection');
+    }
+
+    setSearchParams(params);
   };
 
   return (

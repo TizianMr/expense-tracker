@@ -4,7 +4,7 @@ import { NavLink, Outlet, useLoaderData } from '@remix-run/react';
 import { RiAddLine } from '@remixicon/react';
 import { Button, Card } from '@tremor/react';
 
-import { TableUsageExample } from '~/components/example-table';
+import { ExpenseTable } from '~/components/expense-table';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { SortDirection } from '~/interfaces';
@@ -50,7 +50,7 @@ const Dashboard = () => {
               <Button icon={RiAddLine}>Create expense</Button>
             </NavLink>
           </div>
-          <TableUsageExample
+          <ExpenseTable
             expenses={expenses.items}
             paginationState={{ totalItems: expenses.totalItems, page: expenses.page, pageSize: expenses.pageSize }}
           />

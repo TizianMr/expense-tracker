@@ -6,7 +6,7 @@ import * as DropdownMenuPrimitives from '@radix-ui/react-dropdown-menu';
 import { RiArrowRightSLine, RiCheckboxBlankCircleLine, RiCheckLine, RiRadioButtonFill } from '@remixicon/react';
 import * as React from 'react';
 
-import { cx } from '../utils/helpers';
+import { cx } from '../../utils/helpers';
 
 const DropdownMenu = DropdownMenuPrimitives.Root;
 DropdownMenu.displayName = 'DropdownMenu';

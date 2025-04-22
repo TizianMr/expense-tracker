@@ -2,7 +2,7 @@ import { NavLink } from '@remix-run/react';
 import { RiMoreFill } from '@remixicon/react';
 import { Button } from '@tremor/react';
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './dropdown';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from './ui/dropdown';
 
 type Props = {
   expenseId: string;
