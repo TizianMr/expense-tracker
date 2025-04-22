@@ -16,8 +16,6 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   const [expense, budgets] = await Promise.all([
     await fetchExpenseById(expenseId),
     await fetchBudgets({
-      page: 1,
-      pageSize: 100,
       sortBy: 'id',
       sortDirection: SortDirection.ASC,
     }),
@@ -64,7 +62,7 @@ const EditExpenseDialog = () => {
 
   return (
     <ExpenseForm
-      budgets={budgets.items}
+      budgets={budgets}
       errors={errors}
       expense={expense}
     />

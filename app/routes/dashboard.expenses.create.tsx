@@ -1,5 +1,5 @@
 import { Category } from '@prisma/client';
-import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { ActionFunctionArgs } from '@remix-run/node';
 import { useLoaderData, useOutletContext } from '@remix-run/react';
 
 import { ExpenseFormErrors } from './dashboard.expenses';
@@ -8,13 +8,8 @@ import { fetchBudgets } from '~/db/budget.server';
 import { createExpense, CreateExpense } from '~/db/expense.server';
 import { SortDirection } from '~/interfaces';
 
-export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const url = new URL(request.url);
-  const query = url.searchParams;
-
+export const loader = async () => {
   const budgets = await fetchBudgets({
-    page: Number(query.get('page')) || 1,
-    pageSize: 5,
     sortBy: 'id',
     sortDirection: SortDirection.ASC,
   });
@@ -47,7 +42,7 @@ const CreateExpenseDialog = () => {
 
   return (
     <ExpenseForm
-      budgets={budgets.items}
+      budgets={budgets}
       errors={errors}
     />
   );

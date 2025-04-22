@@ -4,10 +4,12 @@ export enum SortDirection {
 }
 
 export interface Filter<T> {
-  page: number;
-  pageSize: number;
   sortBy: keyof T;
   sortDirection: SortDirection;
+}
+export interface FilterWithPagination<T> extends Filter<T> {
+  page: number;
+  pageSize: number;
 }
 
 export interface ListResult<T> {

@@ -1,7 +1,7 @@
 import { Budget, Expense } from '@prisma/client';
 
 import { prisma } from '../utils/prisma.server';
-import { Filter, ListResult } from '~/interfaces';
+import { FilterWithPagination, ListResult } from '~/interfaces';
 
 export type CreateExpense = Pick<Expense, 'title' | 'amount' | 'expenseDate' | 'category' | 'budgetId'>;
 export type UpdateExpense = Pick<Expense, 'id'> & CreateExpense;
@@ -25,7 +25,7 @@ export const fetchExpenses = async ({
   pageSize,
   sortBy,
   sortDirection,
-}: Filter<Expense>): Promise<ListResult<ExpenseWithBudget>> => {
+}: FilterWithPagination<Expense>): Promise<ListResult<ExpenseWithBudget>> => {
   const expenses = await prisma.$transaction([
     prisma.expense.count(),
     prisma.expense.findMany({

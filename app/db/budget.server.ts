@@ -1,6 +1,6 @@
 import { Budget } from '@prisma/client';
 
-import { Filter, ListResult } from '~/interfaces';
+import { Filter, FilterWithPagination, ListResult } from '~/interfaces';
 
 export type CreateBudget = Pick<Budget, 'title' | 'amount'>;
 type BudgetWithRemaining = Budget & { remainingBudget: number };
@@ -9,20 +9,25 @@ export const createBudget = async (budget: CreateBudget): Promise<Budget> => {
   return await prisma.budget.create({ data: budget });
 };
 
-export const fetchBudgets = async ({
-  page,
-  pageSize,
-  sortBy,
-  sortDirection,
-}: Filter<Budget>): Promise<ListResult<BudgetWithRemaining>> => {
+// function signatures
+export function fetchBudgets(filter: FilterWithPagination<Budget>): Promise<ListResult<BudgetWithRemaining>>;
+export function fetchBudgets(filter: Filter<Budget>): Promise<BudgetWithRemaining[]>;
+
+export async function fetchBudgets(
+  filter: Filter<Budget> | FilterWithPagination<Budget>,
+): Promise<ListResult<BudgetWithRemaining> | BudgetWithRemaining[]> {
+  const isPaginated = 'page' in filter && 'pageSize' in filter;
+
   const budgets = await prisma.$transaction([
     prisma.budget.count(),
     prisma.budget.findMany({
       orderBy: {
-        [sortBy]: sortDirection,
+        [filter.sortBy]: filter.sortDirection,
       },
-      skip: (page - 1) * pageSize,
-      take: pageSize,
+      ...(isPaginated && {
+        skip: (filter.page - 1) * filter.pageSize,
+        take: filter.pageSize,
+      }),
       include: {
         expenses: {
           select: {
@@ -45,10 +50,14 @@ export const fetchBudgets = async ({
     };
   });
 
-  return {
-    items: budgetsWithRemaining,
-    page,
-    pageSize,
-    totalItems: budgets[0],
-  };
-};
+  if (isPaginated) {
+    return {
+      items: budgetsWithRemaining,
+      page: filter.page,
+      pageSize: filter.pageSize,
+      totalItems: budgets[0],
+    };
+  }
+
+  return budgetsWithRemaining;
+}
