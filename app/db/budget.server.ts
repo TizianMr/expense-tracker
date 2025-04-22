@@ -18,6 +18,9 @@ export async function fetchBudgets(
 ): Promise<ListResult<BudgetWithRemaining> | BudgetWithRemaining[]> {
   const isPaginated = 'page' in filter && 'pageSize' in filter;
 
+  const startOfMonth = new Date(new Date().getFullYear(), new Date().getMonth(), 1);
+  const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
+
   const budgets = await prisma.$transaction([
     prisma.budget.count(),
     prisma.budget.findMany({
@@ -30,6 +33,12 @@ export async function fetchBudgets(
       }),
       include: {
         expenses: {
+          where: {
+            expenseDate: {
+              gte: startOfMonth,
+              lte: endOfMonth,
+            },
+          },
           select: {
             amount: true,
           },

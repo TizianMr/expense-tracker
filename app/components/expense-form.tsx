@@ -106,7 +106,6 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
         <SearchSelect
           className='mt-2'
           defaultValue={expense?.budgetId ?? undefined}
-          disabled={!isExpenseDateWithCurrentMonth}
           id='expense-budget'
           name='budget'>
           {budgetsList.map(budget => (
@@ -119,7 +118,7 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
         </SearchSelect>
         {!isExpenseDateWithCurrentMonth && (
           <p className='mt-2 text-tremor-label text-orange-500 dark:text-orange-300'>
-            Expenses can only be assigned to a budget if they are withing the current month.
+            Only expenses for the current month are considered in the budget overview.
           </p>
         )}
       </div>

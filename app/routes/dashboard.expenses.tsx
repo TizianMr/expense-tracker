@@ -81,9 +81,12 @@ const ExpenseDialogRoot = () => {
       open={isOpen}
       onClose={handleClose}>
       <DialogPanel>
-        <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong pb-4'>
+        <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
           {`${isEdit ? 'Edit' : 'Create'} expense`}
         </h3>
+        <p className='mt-1 pb-4 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content'>
+          Quickly record your latest purchase.
+        </p>
         <fetcher.Form
           id='expenseForm'
           ref={formRef}>
