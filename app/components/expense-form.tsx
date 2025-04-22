@@ -22,6 +22,9 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
     value: budget.id,
   }));
 
+  const isExpenseDateWithCurrentMonth =
+    selectedDate.getMonth() === new Date().getMonth() && selectedDate.getFullYear() === new Date().getFullYear();
+
   return (
     <div className='space-y-6'>
       <div>
@@ -103,6 +106,7 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
         <SearchSelect
           className='mt-2'
           defaultValue={expense?.budgetId ?? undefined}
+          disabled={!isExpenseDateWithCurrentMonth}
           id='expense-budget'
           name='budget'>
           {budgetsList.map(budget => (
@@ -113,6 +117,11 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
             </SearchSelectItem>
           ))}
         </SearchSelect>
+        {!isExpenseDateWithCurrentMonth && (
+          <p className='mt-2 text-tremor-label text-orange-500 dark:text-orange-300'>
+            Expenses can only be assigned to a budget if they are withing the current month.
+          </p>
+        )}
       </div>
     </div>
   );
