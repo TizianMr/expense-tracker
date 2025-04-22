@@ -1,118 +1,120 @@
-import { createListCollection, Input, Stack } from '@chakra-ui/react';
 import { Budget, Expense } from '@prisma/client';
-import { useRef } from 'react';
-import { FaEuroSign } from 'react-icons/fa';
+import { DatePicker, SearchSelect, SearchSelectItem, TextInput } from '@tremor/react';
 
-import { Field } from './ui/field';
-import { InputGroup } from './ui/input-group';
-import { NumberInputField, NumberInputRoot } from './ui/number-input';
-import { SelectContent, SelectItem, SelectLabel, SelectRoot, SelectTrigger, SelectValueText } from './ui/select';
-import { FormErrors } from '../routes/dashboard.expenses';
+import { ExpenseFormErrors } from '../routes/dashboard.expenses';
 import { EXPENSE_CATEGORIES } from '../utils/constants';
-import { useInfiniteScroll } from '~/customHooks/useInfiniteScroll';
+import CurrencyInput from './ui/currency-input';
+import { useControlledInput } from '~/customHooks/useControlledInput';
 
 type Props = {
-  contentRef: React.RefObject<HTMLDivElement>;
-  errors: FormErrors;
+  errors: ExpenseFormErrors;
   expense?: Expense;
   budgets: Budget[];
 };
 
-const ExpenseForm = ({ contentRef, errors, expense, budgets }: Props) => {
-  const selectRef = useRef<HTMLDivElement>(null);
-  const initialCollection = createListCollection({
-    items: budgets.map(budget => ({ label: budget.title, value: budget.id })),
-  });
+const ExpenseForm = ({ errors, expense, budgets }: Props) => {
+  const { handleChange: handleDateChange, value: selectedDate } = useControlledInput(
+    expense?.expenseDate ?? new Date(),
+  );
 
-  const budgetCollection = useInfiniteScroll<Budget>(initialCollection, selectRef, 'title', 'id');
+  const budgetsList = budgets.map(budget => ({
+    label: budget.title,
+    value: budget.id,
+  }));
 
   return (
-    <Stack gap='4'>
-      <Field
-        required
-        errorText={errors.title}
-        invalid={!!errors.title}
-        label='Title'>
-        <Input
-          defaultValue={expense?.title ?? ''}
+    <div className='space-y-6'>
+      <div>
+        <label
+          className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
+          htmlFor='expense-title'>
+          Title <span className='text-red-500'>*</span>
+        </label>
+        <TextInput
+          required
+          className='mt-2'
+          defaultValue={expense?.title}
+          error={!!errors.title}
+          errorMessage={errors.title}
+          id='expense-title'
           name='title'
-          placeholder='test'
+          placeholder='Title name'
+          type='text'
         />
-      </Field>
-      <Field
+      </div>
+
+      <CurrencyInput
         required
-        errorText={errors.amount}
-        invalid={!!errors.amount}
-        label='Amount'>
-        <NumberInputRoot
-          allowMouseWheel
-          defaultValue={expense?.amount.toString() ?? '0'}
-          formatOptions={{
-            maximumFractionDigits: 2,
-            minimumFractionDigits: 2,
-          }}
-          locale='de-DE'
-          name='amount'
-          width='100%'>
-          <InputGroup
-            startElement={<FaEuroSign />}
-            width={'100%'}>
-            <NumberInputField pattern='\d{1,3}(.\d{3})*(,\d{2})?' />
-          </InputGroup>
-        </NumberInputRoot>
-      </Field>
-      <Field
-        required
-        errorText={errors.date}
-        invalid={!!errors.date}
-        label='Date'>
-        <Input
-          defaultValue={expense?.expenseDate.toISOString().split('T')[0] ?? ''}
+        defaultValue={expense?.amount.toString() ?? ''}
+        error={!!errors.amount}
+        errorMessage={errors.amount}
+        label='Amount'
+        name='amount'
+        placeholder='Amount...'
+      />
+
+      <div>
+        <label
+          className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
+          htmlFor='expense-date'>
+          Date <span className='text-red-500'>*</span>
+        </label>
+        <DatePicker
+          className='mt-2'
+          defaultValue={selectedDate}
+          enableClear={false}
+          id='expense-date'
+          onValueChange={date => handleDateChange(date as Date)}
+        />
+        <input
           name='date'
-          type='date'
+          type='hidden'
+          value={selectedDate.toLocaleDateString('en-CA')} // Format as YYYY-MM-DD
         />
-      </Field>
-      <SelectRoot
-        collection={EXPENSE_CATEGORIES}
-        defaultValue={expense?.category ? [expense.category] : undefined}
-        name='category'>
-        <SelectLabel>Category</SelectLabel>
-        <SelectTrigger>
-          <SelectValueText placeholder='Select category' />
-        </SelectTrigger>
-        <SelectContent portalRef={contentRef}>
-          {EXPENSE_CATEGORIES.items.map(item => (
-            <SelectItem
-              item={item}
-              key={item.value}>
+      </div>
+
+      <div>
+        <label
+          className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
+          htmlFor='expense-category'>
+          Category
+        </label>
+        <SearchSelect
+          className='mt-2'
+          defaultValue={expense?.category ?? undefined}
+          id='expense-category'
+          name='category'>
+          {EXPENSE_CATEGORIES.map(item => (
+            <SearchSelectItem
+              key={item.value}
+              value={item.value}>
               {item.label}
-            </SelectItem>
+            </SearchSelectItem>
           ))}
-        </SelectContent>
-      </SelectRoot>
-      <SelectRoot
-        collection={budgetCollection}
-        defaultValue={expense?.budgetId ? [expense.budgetId] : undefined}
-        name='budget'>
-        <SelectLabel>Budget</SelectLabel>
-        <SelectTrigger>
-          <SelectValueText placeholder='Select budget' />
-        </SelectTrigger>
-        <SelectContent
-          maxH='20em'
-          overflowY='auto'
-          portalRef={contentRef}
-          ref={selectRef}>
-          {budgetCollection.items.map(item => (
-            <SelectItem
-              item={item}
-              key={item.value}>
-              {item.label}
-            </SelectItem>
+        </SearchSelect>
+      </div>
+
+      <div>
+        <label
+          className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
+          htmlFor='expense-budget'>
+          Budget
+        </label>
+        <SearchSelect
+          className='mt-2'
+          defaultValue={expense?.budgetId ?? undefined}
+          id='expense-budget'
+          name='budget'>
+          {budgetsList.map(budget => (
+            <SearchSelectItem
+              key={budget.value}
+              value={budget.value}>
+              {budget.label}
+            </SearchSelectItem>
           ))}
-        </SelectContent>
-      </SelectRoot>
-    </Stack>
+        </SearchSelect>
+      </div>
+    </div>
   );
 };
 

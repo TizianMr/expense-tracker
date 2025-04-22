@@ -1,10 +1,12 @@
 import { Links, Meta, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
 
-import { Provider } from './components/ui/provider';
+import './tailwind.css';
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang='en'>
+    <html
+      className='antialiased'
+      lang='en'>
       <head>
         <meta charSet='utf-8' />
         <meta
@@ -24,9 +26,5 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return (
-    <Provider defaultTheme='light'>
-      <Outlet />
-    </Provider>
-  );
+  return <Outlet />;
 }

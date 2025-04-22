@@ -1,10 +1,11 @@
-import { Expense } from '@prisma/client';
+import { Budget, Expense } from '@prisma/client';
 
 import { prisma } from '../utils/prisma.server';
-import { Filter, ListResult } from '~/interfaces';
+import { FilterWithPagination, ListResult } from '~/interfaces';
 
 export type CreateExpense = Pick<Expense, 'title' | 'amount' | 'expenseDate' | 'category' | 'budgetId'>;
 export type UpdateExpense = Pick<Expense, 'id'> & CreateExpense;
+export type ExpenseWithBudget = Omit<Expense, 'budgetId'> & { budget: Pick<Budget, 'id' | 'title'> | null };
 type DeleteExpense = Pick<Expense, 'id'>;
 
 export const createExpense = async (expense: CreateExpense): Promise<Expense> => {
@@ -24,7 +25,7 @@ export const fetchExpenses = async ({
   pageSize,
   sortBy,
   sortDirection,
-}: Filter<Expense>): Promise<ListResult<Expense>> => {
+}: FilterWithPagination<Expense>): Promise<ListResult<ExpenseWithBudget>> => {
   const expenses = await prisma.$transaction([
     prisma.expense.count(),
     prisma.expense.findMany({
@@ -33,11 +34,29 @@ export const fetchExpenses = async ({
       },
       skip: (page - 1) * pageSize,
       take: pageSize,
+      select: {
+        id: true,
+        title: true,
+        amount: true,
+        expenseDate: true,
+        category: true,
+        createdAt: true,
+        updatedAt: true,
+        Budget: {
+          select: {
+            id: true,
+            title: true,
+          },
+        },
+      },
     }),
   ]);
 
   return {
-    items: expenses[1],
+    items: expenses[1].map(({ Budget, ...expense }) => ({
+      ...expense,
+      budget: Budget ? { id: Budget.id, title: Budget.title } : null,
+    })),
     page,
     pageSize,
     totalItems: expenses[0],

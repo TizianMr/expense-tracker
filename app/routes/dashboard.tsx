@@ -1,12 +1,10 @@
-import { Card, Box, Text, Button } from '@chakra-ui/react';
 import { Expense } from '@prisma/client';
 import { LoaderFunctionArgs } from '@remix-run/node';
-import { NavLink, Outlet, useLoaderData, useNavigation } from '@remix-run/react';
-import { useState } from 'react';
-import { IoMdAdd } from 'react-icons/io';
+import { NavLink, Outlet, useLoaderData } from '@remix-run/react';
+import { RiAddLine } from '@remixicon/react';
+import { Button, Card } from '@tremor/react';
 
-import { default as CreateBudgetDialog } from '~/components/budget-dialog';
-import ExpensesTable from '~/components/expenses-table';
+import { ExpenseTable } from '~/components/expense-table';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { SortDirection } from '~/interfaces';
@@ -39,76 +37,38 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 const Dashboard = () => {
   const { expenses, budgets } = useLoaderData<typeof loader>();
-  const { state } = useNavigation();
-  const [openCreateBudgetDialog, setOpenCreateBudgetDialog] = useState(false);
 
   return (
     <>
-      <Box
-        display='flex'
-        justifyContent='center'>
-        <Card.Root
-          mt='5'
-          padding='0 !important'
-          variant='elevated'
-          width='70%'>
-          <Card.Body>
-            <Box
-              alignItems='center'
-              display='flex'
-              justifyContent='space-between'
-              mt='-5'>
-              <Text textStyle='xl'>Expenses</Text>
-              <NavLink to='expenses/create'>
-                <Button
-                  colorPalette='teal'
-                  m='4'
-                  variant='solid'>
-                  <IoMdAdd /> Add expense
-                </Button>
-              </NavLink>
-            </Box>
-            <ExpensesTable
-              expenses={expenses.items}
-              isDataLoading={state === 'loading'}
-              paginationInfo={{ totalItems: expenses.totalItems, page: expenses.page, pageSize: expenses.pageSize }}
-            />
-          </Card.Body>
-        </Card.Root>
-      </Box>
-      <Box
-        display='flex'
-        justifyContent='center'>
-        <Card.Root
-          mt='5'
-          padding='0 !important'
-          variant='elevated'
-          width='70%'>
-          <Card.Body>
-            <Box
-              alignItems='center'
-              display='flex'
-              justifyContent='space-between'
-              mt='-5'>
-              <Text textStyle='xl'>Budgets</Text>
-              <Button
-                colorPalette='teal'
-                m='4'
-                variant='solid'
-                onClick={() => setOpenCreateBudgetDialog(true)}>
-                <IoMdAdd /> Add budget
-              </Button>
-              <CreateBudgetDialog
-                action='budgets/create'
-                isOpen={openCreateBudgetDialog}
-                title='Add budget'
-                onClose={() => setOpenCreateBudgetDialog(false)}
-              />
-            </Box>
-            {JSON.stringify(budgets, null, 2)}
-          </Card.Body>
-        </Card.Root>
-      </Box>
+      <div className='flex justify-content-center'>
+        <Card className='flex flex-col mx-auto w-[80vw] h-[40vh]'>
+          <div className='flex items-center justify-between'>
+            <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
+              Expenses
+            </h1>
+            <NavLink to='expenses/create'>
+              <Button icon={RiAddLine}>Create expense</Button>
+            </NavLink>
+          </div>
+          <ExpenseTable
+            expenses={expenses.items}
+            paginationState={{ totalItems: expenses.totalItems, page: expenses.page, pageSize: expenses.pageSize }}
+          />
+        </Card>
+      </div>
+      <div className='flex justify-content-center'>
+        <Card className='mx-auto w-[50vw]'>
+          <div className='flex items-center justify-between'>
+            <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
+              Budgets
+            </h1>
+            <NavLink to='budgets/create'>
+              <Button icon={RiAddLine}>Create budget</Button>
+            </NavLink>
+          </div>
+          {JSON.stringify(budgets, null, 2)}
+        </Card>
+      </div>
       <Outlet />
     </>
   );
