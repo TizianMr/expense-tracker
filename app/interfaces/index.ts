@@ -1,3 +1,5 @@
+import { Expense } from '@prisma/client';
+
 export enum SortDirection {
   ASC = 'asc',
   DESC = 'desc',
@@ -6,6 +8,10 @@ export enum SortDirection {
 export interface Filter<T> {
   sortBy: keyof T;
   sortDirection: SortDirection;
+  filter?: {
+    filterBy: keyof T;
+    filterValue: T[keyof T];
+  }[];
 }
 export interface FilterWithPagination<T> extends Filter<T> {
   page: number;
@@ -20,9 +26,9 @@ export interface ListResult<T> {
 }
 
 /*************QUERY PARAMS*************/
-interface ExpenseQuery<T> {
+interface ExpenseQuery {
   page?: number;
-  sortBy?: keyof T;
+  sortBy?: keyof Expense;
   sortDirection?: SortDirection;
 }
 
@@ -30,9 +36,20 @@ interface BudgetQuery {
   page?: number;
 }
 
-export interface QueryParams<T> {
-  expense?: ExpenseQuery<T>;
+interface BudgetDetailsQuery {
+  page?: number;
+  sortBy?: keyof Expense;
+  sortDirection?: SortDirection;
+  filter?: {
+    filterBy: keyof Expense;
+    filterValue: Expense[keyof Expense];
+  };
+}
+
+export interface QueryParams {
+  expense?: ExpenseQuery;
   budget?: BudgetQuery;
+  budgetDetails?: BudgetDetailsQuery;
 }
 
 /*************TABLE*************/

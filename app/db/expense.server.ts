@@ -25,10 +25,30 @@ export const fetchExpenses = async ({
   pageSize,
   sortBy,
   sortDirection,
+  filter,
 }: FilterWithPagination<Expense>): Promise<ListResult<ExpenseWithBudget>> => {
   const expenses = await prisma.$transaction([
-    prisma.expense.count(),
+    prisma.expense.count({
+      where: {
+        AND:
+          (filter ?? []).map(filter => ({
+            [filter.filterBy]:
+              filter.filterValue === null
+                ? null // Filter for null fields
+                : { equals: filter.filterValue },
+          })) || [],
+      },
+    }),
     prisma.expense.findMany({
+      where: {
+        AND:
+          (filter ?? []).map(filter => ({
+            [filter.filterBy]:
+              filter.filterValue === null
+                ? null // Filter for null fields
+                : { equals: filter.filterValue },
+          })) || [],
+      },
       orderBy: {
         [sortBy]: sortDirection,
       },

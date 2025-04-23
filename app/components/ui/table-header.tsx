@@ -3,7 +3,7 @@ import { RiArrowDownSLine, RiArrowUpSLine } from '@remixicon/react';
 import { TableHeaderCell } from '@tremor/react';
 import qs from 'qs';
 
-import { SortDirection, TableState, ThDef } from '~/interfaces';
+import { QueryParams, SortDirection, TableState, ThDef } from '~/interfaces';
 import { cx } from '~/utils/helpers';
 
 interface CommonProps extends Omit<ThDef, 'title' | 'isSortable'> {
@@ -16,16 +16,18 @@ type ConditionalProps =
       isSortable: true;
       tableState: Omit<TableState, 'paginationState'>;
       onSortingChange: (sortBy: string, direction: SortDirection | null) => void;
+      searchParamKey: 'expense' | 'budgetDetails';
     }
   | {
       isSortable: false;
       tableState?: never;
       onSortingChange?: never;
+      searchParamKey?: never;
     };
 
 type Props = CommonProps & ConditionalProps;
 
-const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, options }: Props) => {
+const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, options, searchParamKey }: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const sortDirection: SortDirection | null = tableState?.sortBy === id ? tableState.sortDirection : null;
 
@@ -63,21 +65,22 @@ const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, op
   };
 
   const setNewSearchParams = (newSortDirection: SortDirection | null) => {
-    const nestedParams = qs.parse(searchParams.toString());
+    const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
     let updated;
 
     if (newSortDirection) {
       updated = {
         ...nestedParams,
-        expense: {
+        [searchParamKey]: {
+          ...(nestedParams[searchParamKey] ?? {}),
           sortBy: id,
           sortDirection: newSortDirection,
         },
       };
     } else {
-      updated = {
-        budget: nestedParams.budget,
-      };
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      const { [searchParamKey]: _, ...rest } = nestedParams; // Destructure to exclude the property
+      updated = rest;
     }
 
     setSearchParams(qs.stringify(updated), { preventScrollReset: true });

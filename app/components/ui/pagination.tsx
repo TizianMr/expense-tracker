@@ -1,4 +1,3 @@
-import { Expense } from '@prisma/client';
 import { useSearchParams } from '@remix-run/react';
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightDoubleLine, RiArrowRightSLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
@@ -8,12 +7,12 @@ import { QueryParams, TablePaginationState } from '~/interfaces';
 
 type Props = {
   paginationState: TablePaginationState;
-  searchParamKey: 'expense' | 'budget';
+  searchParamKey: 'expense' | 'budget' | 'budgetDetails';
 };
 
 const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems }, searchParamKey }: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const nestedParams = qs.parse(searchParams.toString()) as QueryParams<Expense>;
+  const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
 
   const paginationButtons = [
     {

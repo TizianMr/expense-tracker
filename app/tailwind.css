@@ -9,3 +9,7 @@ html, body {
 .tooltip-legend-white p {
   color: white !important;
 }
+
+.big-dialog {
+  max-width: 80vw;
+}

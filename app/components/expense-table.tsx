@@ -14,9 +14,11 @@ import { formatCurrency } from '~/utils/helpers';
 type Props = {
   expenses: ExpenseWithBudget[];
   paginationState: TablePaginationState;
+  excludeColumns?: string[];
+  searchParamKey: 'expense' | 'budgetDetails';
 };
 
-export function ExpenseTable({ expenses, paginationState }: Props) {
+export function ExpenseTable({ expenses, paginationState, excludeColumns, searchParamKey }: Props) {
   const { isLoadingLongerThanDelay: dataIsLoading } = useDelayedLoading();
   const [tableState, setTableState] = useState<Omit<TableState, 'paginationState'>>({
     sortBy: null,
@@ -61,17 +63,20 @@ export function ExpenseTable({ expenses, paginationState }: Props) {
     setTableState({ sortBy, sortDirection: direction });
   };
 
+  const filteredColumnHeader = columnHeader.filter(header => !excludeColumns?.includes(header.id));
+
   return (
     <div className='flex flex-col flex-1 h-full'>
       <Table className='mt-5'>
         <TableHead>
           <TableRow>
-            {columnHeader.map(header =>
+            {filteredColumnHeader.map(header =>
               header.isSortable ? (
                 <TableHeader
                   {...header}
                   isSortable
                   key={header.id}
+                  searchParamKey={searchParamKey}
                   tableState={tableState}
                   onSortingChange={handleSortingChange}>
                   {header.title}
@@ -100,21 +105,31 @@ export function ExpenseTable({ expenses, paginationState }: Props) {
           ) : expenses.length ? (
             expenses.map(expense => {
               const category = EXPENSE_CATEGORIES.find(cat => cat.value === expense.category);
-              return (
-                <TableRow key={expense.id}>
-                  <TableCell>{expense.title}</TableCell>
-                  <TableCell>{formatCurrency(expense.amount)}</TableCell>
-                  <TableCell>{expense.expenseDate.toLocaleDateString('en-US', DATE_OPTIONS)}</TableCell>
-                  <TableCell>
+              const cellRenderers: Record<string, JSX.Element> = {
+                title: <TableCell key='title'>{expense.title}</TableCell>,
+                amount: <TableCell key='amount'>{formatCurrency(expense.amount)}</TableCell>,
+                expenseDate: (
+                  <TableCell key='expenseDate'>
+                    {expense.expenseDate.toLocaleDateString('en-US', DATE_OPTIONS)}
+                  </TableCell>
+                ),
+                category: (
+                  <TableCell key='category'>
                     {expense.category ? <Badge color={category?.color}>{expense.category}</Badge> : '-'}
                   </TableCell>
-                  <TableCell>{expense.budget?.title ?? '-'}</TableCell>
-                  <TableCell>
+                ),
+                budget: <TableCell key='budget'>{expense.budget?.title ?? '-'}</TableCell>,
+                actions: (
+                  <TableCell key='actions'>
                     <div className='flex justify-end'>
                       <ExpenseDropdown expenseId={expense.id} />
                     </div>
                   </TableCell>
-                </TableRow>
+                ),
+              };
+
+              return (
+                <TableRow key={expense.id}>{filteredColumnHeader.map(header => cellRenderers[header.id])}</TableRow>
               );
             })
           ) : (
@@ -131,7 +146,7 @@ export function ExpenseTable({ expenses, paginationState }: Props) {
       <div className='mt-auto'>
         <Pagination
           paginationState={paginationState}
-          searchParamKey='expense'
+          searchParamKey={searchParamKey}
         />
       </div>
     </div>

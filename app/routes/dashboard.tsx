@@ -1,4 +1,3 @@
-import { Expense } from '@prisma/client';
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { NavLink, Outlet, useLoaderData } from '@remix-run/react';
 import { RiAddLine, RiBarChartFill, RiQuestionLine } from '@remixicon/react';
@@ -20,7 +19,7 @@ import { BUDGET_PAGE_SIZE, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const url = new URL(request.url);
   const query = url.searchParams;
-  const parsedQueryParams = qs.parse(query.toString()) as QueryParams<Expense>;
+  const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
 
   const [expenses, budgets] = await Promise.all([
     // expenses
@@ -44,7 +43,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 const Dashboard = () => {
   const { expenses, budgets } = useLoaderData<typeof loader>();
-  const { isLoadingLongerThanDelay: dataIsLoading } = useDelayedLoading();
+  const { isLoadingLongerThanDelay: isDataLoading } = useDelayedLoading();
 
   return (
     <>
@@ -61,6 +60,7 @@ const Dashboard = () => {
           <ExpenseTable
             expenses={expenses.items}
             paginationState={{ totalItems: expenses.totalItems, page: expenses.page, pageSize: expenses.pageSize }}
+            searchParamKey='expense'
           />
         </Card>
       </div>
@@ -97,15 +97,16 @@ const Dashboard = () => {
             </NavLink>
           </div>
           <div className='space-y-6 mt-5'>
-            {dataIsLoading ? (
+            {isDataLoading ? (
               <LoadingSpinner />
             ) : budgets.items.length ? (
               budgets.items.map(budget => (
                 <BudgetInfo
+                  id={budget.id}
                   key={budget.id}
-                  remainingAmount={budget.remainingBudget}
                   title={budget.title}
                   totalAmount={budget.amount}
+                  usedAmount={budget.totalUsedBudget}
                 />
               ))
             ) : (
