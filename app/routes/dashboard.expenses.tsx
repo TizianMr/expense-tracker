@@ -3,6 +3,8 @@ import { Outlet, useFetcher, useLocation, useNavigate, useOutlet } from '@remix-
 import { Button, Dialog, DialogPanel, Divider } from '@tremor/react';
 import { useEffect, useRef, useState } from 'react';
 
+import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
+
 export type ExpenseFormErrors = {
   title?: string;
   amount?: string;
@@ -13,6 +15,7 @@ const ExpenseDialogRoot = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const inOutlet = !!useOutlet();
+  const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
 
   const pathnames = location.pathname.split('/expenses/');
   const action = pathnames[pathnames.length - 1];
@@ -34,10 +37,8 @@ const ExpenseDialogRoot = () => {
 
   const handleClose = () => {
     setIsOpen(false);
-    setTimeout(() => {
-      setErrors({});
-      navigate('/dashboard');
-    }, 200); // delay navigation to allow dialog to close with animation
+    triggerDelayedNavigation(); // delay navigation to allow dialog to close with animation
+    setErrors({});
   };
 
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -81,9 +82,12 @@ const ExpenseDialogRoot = () => {
       open={isOpen}
       onClose={handleClose}>
       <DialogPanel>
-        <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong pb-4'>
+        <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
           {`${isEdit ? 'Edit' : 'Create'} expense`}
         </h3>
+        <p className='mt-1 pb-4 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content'>
+          Quickly record your latest purchase.
+        </p>
         <fetcher.Form
           id='expenseForm'
           ref={formRef}>

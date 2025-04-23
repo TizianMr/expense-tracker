@@ -3,6 +3,8 @@ import { Outlet, useFetcher, useLocation, useNavigate, useOutlet } from '@remix-
 import { Button, Dialog, DialogPanel, Divider } from '@tremor/react';
 import { useEffect, useRef, useState } from 'react';
 
+import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
+
 export type BudgetFormErrors = {
   title?: string;
   amount?: string;
@@ -12,6 +14,7 @@ const BudgetDialogRoot = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const inOutlet = !!useOutlet();
+  const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
 
   const pathnames = location.pathname.split('/budgets/');
   const action = pathnames[pathnames.length - 1];
@@ -33,10 +36,8 @@ const BudgetDialogRoot = () => {
 
   const handleClose = () => {
     setIsOpen(false);
-    setTimeout(() => {
-      setErrors({});
-      navigate('/dashboard');
-    }, 200); // delay navigation to allow dialog to close with animation
+    triggerDelayedNavigation(); // delay navigation to allow dialog to close with animation
+    setErrors({});
   };
 
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -71,9 +72,12 @@ const BudgetDialogRoot = () => {
       open={isOpen}
       onClose={handleClose}>
       <DialogPanel>
-        <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong pb-4'>
+        <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
           {`${isEdit ? 'Edit' : 'Create'} budget`}
         </h3>
+        <p className='mt-1 pb-4 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content'>
+          Keep track of your expenses by using budgets. Budgets reset every month.
+        </p>
         <fetcher.Form
           id='expenseForm'
           ref={formRef}>

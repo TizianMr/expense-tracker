@@ -4,6 +4,7 @@ import { Button, Dialog, DialogPanel } from '@tremor/react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { deleteExpense } from '../db/expense.server';
+import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 
 export const action = async ({ params }: ActionFunctionArgs) => {
   const expenseId = params.expense as string;
@@ -17,14 +18,13 @@ const DeleteDialog = () => {
   const data = useActionData<typeof action>();
   const navigate = useNavigate();
   const { state } = useNavigation();
+  const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
   const [isOpen, setIsOpen] = useState(true);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
-    setTimeout(() => {
-      navigate('/dashboard');
-    }, 200); // delay navigation to allow dialog to close with animation
-  }, [navigate]);
+    triggerDelayedNavigation(); // delay navigation to allow dialog to close with animation
+  }, [triggerDelayedNavigation]);
 
   useEffect(() => {
     if (data) {

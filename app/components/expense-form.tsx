@@ -22,6 +22,9 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
     value: budget.id,
   }));
 
+  const isExpenseDateWithCurrentMonth =
+    selectedDate.getMonth() === new Date().getMonth() && selectedDate.getFullYear() === new Date().getFullYear();
+
   return (
     <div className='space-y-6'>
       <div>
@@ -113,6 +116,11 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
             </SearchSelectItem>
           ))}
         </SearchSelect>
+        {!isExpenseDateWithCurrentMonth && (
+          <p className='mt-2 text-tremor-label text-orange-500 dark:text-orange-300'>
+            Only expenses for the current month are considered in the budget overview.
+          </p>
+        )}
       </div>
     </div>
   );
