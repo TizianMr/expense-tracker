@@ -3,11 +3,16 @@ import { Budget } from '@prisma/client';
 import { Filter, FilterWithPagination, ListResult } from '~/interfaces';
 
 export type CreateBudget = Pick<Budget, 'title' | 'amount'>;
+type DeleteBudget = Pick<Budget, 'id'>;
 type BudgetWithUsage = Budget & { totalUsedBudget: number };
 type BudgetDetails = BudgetWithUsage & { expensesByCategory: { category: string; amount: number }[] };
 
 export const createBudget = async (budget: CreateBudget): Promise<Budget> => {
   return await prisma.budget.create({ data: budget });
+};
+
+export const deleteBudget = async ({ id }: DeleteBudget) => {
+  return await prisma.budget.delete({ where: { id } });
 };
 
 // function signatures

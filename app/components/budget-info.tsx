@@ -32,11 +32,13 @@ const BudgetInfo = ({ totalAmount, usedAmount, title, id }: Props) => {
             <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{`${formatCurrency(usedAmount)} of ${formatCurrency(totalAmount)} used`}</p>
             <div className='space-x-2'>
               <Button variant='light'>Edit</Button>
-              <Button
-                color='red'
-                variant='light'>
-                Delete
-              </Button>
+              <NavLink to={`budgets/${id}/delete`}>
+                <Button
+                  color='red'
+                  variant='light'>
+                  Delete
+                </Button>
+              </NavLink>
             </div>
           </div>
         </div>
