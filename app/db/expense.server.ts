@@ -3,16 +3,16 @@ import { Budget, Expense } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import { FilterWithPagination, ListResult } from '~/interfaces';
 
+type ExpenseIdentifier = Pick<Expense, 'id'>;
 export type CreateExpense = Pick<Expense, 'title' | 'amount' | 'expenseDate' | 'category' | 'budgetId'>;
 export type UpdateExpense = Pick<Expense, 'id'> & CreateExpense;
 export type ExpenseWithBudget = Omit<Expense, 'budgetId'> & { budget: Pick<Budget, 'id' | 'title'> | null };
-type DeleteExpense = Pick<Expense, 'id'>;
 
 export const createExpense = async (expense: CreateExpense): Promise<Expense> => {
   return await prisma.expense.create({ data: expense });
 };
 
-export const deleteExpense = async ({ id }: DeleteExpense) => {
+export const deleteExpense = async ({ id }: ExpenseIdentifier) => {
   return await prisma.expense.delete({ where: { id } });
 };
 
@@ -83,6 +83,6 @@ export const fetchExpenses = async ({
   };
 };
 
-export const fetchExpenseById = async (id: string): Promise<Expense | null> => {
+export const fetchExpenseById = async ({ id }: ExpenseIdentifier): Promise<Expense | null> => {
   return await prisma.expense.findUnique({ where: { id } });
 };

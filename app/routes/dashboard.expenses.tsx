@@ -104,7 +104,7 @@ const ExpenseDialogRoot = () => {
             loading={isSubmitting}
             variant='primary'
             onClick={handleSubmit}>
-            Create
+            {`${isEdit ? 'Edit' : 'Create'}`}
           </Button>
         </div>
       </DialogPanel>

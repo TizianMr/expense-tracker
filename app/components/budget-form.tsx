@@ -1,12 +1,12 @@
-import { Budget } from '@prisma/client';
 import { TextInput } from '@tremor/react';
 
 import CurrencyInput from './ui/currency-input';
+import { BudgetDetails } from '~/db/budget.server';
 import { BudgetFormErrors } from '~/routes/dashboard.budgets';
 
 type Props = {
   errors: BudgetFormErrors;
-  budget?: Budget;
+  budget?: BudgetDetails;
 };
 
 const BudgetForm = ({ errors, budget }: Props) => {
@@ -33,6 +33,7 @@ const BudgetForm = ({ errors, budget }: Props) => {
 
       <CurrencyInput
         required
+        defaultValue={budget?.amount.toString() ?? ''}
         error={!!errors.amount}
         errorMessage={errors.amount}
         label='Amount'

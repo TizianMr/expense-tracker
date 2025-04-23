@@ -2,17 +2,22 @@ import { Budget } from '@prisma/client';
 
 import { Filter, FilterWithPagination, ListResult } from '~/interfaces';
 
+type BudgetIdentifier = Pick<Budget, 'id'>;
 export type CreateBudget = Pick<Budget, 'title' | 'amount'>;
-type DeleteBudget = Pick<Budget, 'id'>;
+export type UpdateBudget = Pick<Budget, 'id'> & CreateBudget;
 type BudgetWithUsage = Budget & { totalUsedBudget: number };
-type BudgetDetails = BudgetWithUsage & { expensesByCategory: { category: string; amount: number }[] };
+export type BudgetDetails = BudgetWithUsage & { expensesByCategory: { category: string; amount: number }[] };
 
 export const createBudget = async (budget: CreateBudget): Promise<Budget> => {
   return await prisma.budget.create({ data: budget });
 };
 
-export const deleteBudget = async ({ id }: DeleteBudget) => {
+export const deleteBudget = async ({ id }: BudgetIdentifier) => {
   return await prisma.budget.delete({ where: { id } });
+};
+
+export const updateBudget = async ({ id, ...updatedBudget }: UpdateBudget) => {
+  return await prisma.budget.update({ where: { id }, data: updatedBudget });
 };
 
 // function signatures
@@ -77,7 +82,7 @@ export async function fetchBudgets(
   return budgetsWithRemaining;
 }
 
-export const fetchBudgetById = async (id: string): Promise<BudgetDetails | null> => {
+export const fetchBudgetById = async ({ id }: BudgetIdentifier): Promise<BudgetDetails | null> => {
   const budgetDetails = await prisma.$transaction([
     prisma.budget.findUnique({ where: { id } }),
     prisma.expense.findMany({ where: { budgetId: id } }),
