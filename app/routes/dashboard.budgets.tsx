@@ -54,10 +54,15 @@ const BudgetDialogRoot = () => {
       errors['amount'] = 'Amount is required.';
     }
 
+    const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
+    if (isNaN(Number(convertedAmount))) {
+      errors['amount'] = 'Amount is not a valid number.';
+    }
+
     if (Object.keys(errors).length > 0) {
       setErrors(errors);
     } else {
-      fetcher.submit(formData, { method: 'post', action });
+      fetcher.submit(formData, { method: isEdit ? 'put' : 'post', action });
       handleClose();
     }
   };
@@ -94,7 +99,7 @@ const BudgetDialogRoot = () => {
             loading={isSubmitting}
             variant='primary'
             onClick={handleSubmit}>
-            Create
+            {`${isEdit ? 'Edit' : 'Create'}`}
           </Button>
         </div>
       </DialogPanel>

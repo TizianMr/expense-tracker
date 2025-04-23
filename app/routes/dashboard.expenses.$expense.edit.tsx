@@ -14,7 +14,7 @@ export const loader = async ({ params }: LoaderFunctionArgs) => {
   const expenseId = params.expense as string;
 
   const [expense, budgets] = await Promise.all([
-    await fetchExpenseById(expenseId),
+    await fetchExpenseById({ id: expenseId }),
     await fetchBudgets({
       sortBy: 'id',
       sortDirection: SortDirection.ASC,

@@ -40,7 +40,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
           : []),
       ],
     }),
-    await fetchBudgetById(budgetId),
+    await fetchBudgetById({ id: budgetId }),
   ]);
 
   return { expenses, budget };
