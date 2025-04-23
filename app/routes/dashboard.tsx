@@ -1,14 +1,16 @@
 import { Expense } from '@prisma/client';
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { NavLink, Outlet, useLoaderData } from '@remix-run/react';
-import { RiAddLine, RiQuestionLine } from '@remixicon/react';
+import { RiAddLine, RiBarChartFill, RiQuestionLine } from '@remixicon/react';
 import { Button, Card, Icon, Legend } from '@tremor/react';
 import qs from 'qs';
 
 import BudgetInfo from '~/components/budget-info';
 import { ExpenseTable } from '~/components/expense-table';
+import LoadingSpinner from '~/components/ui/loading-spinner';
 import Pagination from '~/components/ui/pagination';
 import { Tooltip } from '~/components/ui/tooltip';
+import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { QueryParams, SortDirection } from '~/interfaces';
@@ -42,6 +44,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 const Dashboard = () => {
   const { expenses, budgets } = useLoaderData<typeof loader>();
+  const { isLoadingLongerThanDelay: dataIsLoading } = useDelayedLoading();
 
   return (
     <>
@@ -94,14 +97,31 @@ const Dashboard = () => {
             </NavLink>
           </div>
           <div className='space-y-6 mt-5'>
-            {budgets.items.map(budget => (
-              <BudgetInfo
-                key={budget.id}
-                remainingAmount={budget.remainingBudget}
-                title={budget.title}
-                totalAmount={budget.amount}
-              />
-            ))}
+            {dataIsLoading ? (
+              <LoadingSpinner />
+            ) : budgets.items.length ? (
+              budgets.items.map(budget => (
+                <BudgetInfo
+                  key={budget.id}
+                  remainingAmount={budget.remainingBudget}
+                  title={budget.title}
+                  totalAmount={budget.amount}
+                />
+              ))
+            ) : (
+              <div className='text-center'>
+                <RiBarChartFill
+                  aria-hidden={true}
+                  className='mx-auto h-7 w-7 text-tremor-content-subtle dark:text-dark-tremor-content-subtle'
+                />
+                <p className='mt-2 text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>
+                  No data to show
+                </p>
+                <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'>
+                  Get started by creating your first budget
+                </p>
+              </div>
+            )}
           </div>
           <div className='mt-6'>
             <Pagination
