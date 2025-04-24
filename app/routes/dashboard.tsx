@@ -6,6 +6,7 @@ import qs from 'qs';
 
 import BudgetInfo from '~/components/budget-info';
 import { ExpenseTable } from '~/components/expense-table';
+import Statistics from '~/components/statistics';
 import LoadingSpinner from '~/components/ui/loading-spinner';
 import Pagination from '~/components/ui/pagination';
 import { Tooltip } from '~/components/ui/tooltip';
@@ -47,6 +48,11 @@ const Dashboard = () => {
 
   return (
     <>
+      <div className='flex'>
+        <Card className='flex flex-col mx-auto w-[80vw] h-[35vh]'>
+          <Statistics />
+        </Card>
+      </div>
       <div className='flex justify-content-center'>
         <Card className='flex flex-col mx-auto w-[80vw] h-[40vh]'>
           <div className='flex items-center justify-between'>
