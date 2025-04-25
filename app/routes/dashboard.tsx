@@ -10,6 +10,7 @@ import Statistics from '~/components/statistics';
 import LoadingSpinner from '~/components/ui/loading-spinner';
 import Pagination from '~/components/ui/pagination';
 import { Tooltip } from '~/components/ui/tooltip';
+import UserDropdown from '~/components/user-dropdown';
 import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
 import { sessionStorage } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
@@ -56,6 +57,7 @@ const Dashboard = () => {
 
   return (
     <>
+      <UserDropdown />
       <div className='flex'>
         <Card className='flex flex-col mx-auto w-[80vw] h-[35vh]'>
           <Statistics statistics={statistics} />
