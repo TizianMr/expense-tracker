@@ -1,5 +1,8 @@
+import { useSearchParams } from '@remix-run/react';
 import { BarChart, DonutChart, List, ListItem, Tab, TabGroup, TabList } from '@tremor/react';
+import qs from 'qs';
 
+import { QueryParams, StatisticPeriod } from '~/interfaces';
 import { cx, formatCurrency } from '~/utils/helpers';
 
 const chartdata = [
@@ -22,17 +25,32 @@ const data = [
 const valueFormatter = (number: number) => formatCurrency(number);
 
 const Statistics = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const handleTabChange = (idx: number) => {
+    const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
+    const tabValues = [StatisticPeriod.WEEK, StatisticPeriod.MONTH, StatisticPeriod.YEAR];
+    const updated = {
+      ...nestedParams,
+      statistics: tabValues[idx],
+    };
+
+    setSearchParams(qs.stringify(updated), { preventScrollReset: true });
+  };
+
   return (
     <>
       <div className='flex items-center justify-between pb-6'>
         <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
           Statistics
         </h1>
-        <TabGroup className='flex justify-end'>
+        <TabGroup
+          className='flex justify-end'
+          onIndexChange={handleTabChange}>
           <TabList variant='solid'>
-            <Tab value='1'>Week</Tab>
-            <Tab value='2'>Month</Tab>
-            <Tab value='3'>Year</Tab>
+            <Tab>Week</Tab>
+            <Tab>Month</Tab>
+            <Tab>Year</Tab>
           </TabList>
         </TabGroup>
       </div>

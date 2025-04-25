@@ -5,6 +5,12 @@ export enum SortDirection {
   DESC = 'desc',
 }
 
+export enum StatisticPeriod {
+  WEEK = 'week',
+  MONTH = 'month',
+  YEAR = 'year',
+}
+
 export interface Filter<T> {
   sortBy: keyof T;
   sortDirection: SortDirection;
@@ -50,6 +56,7 @@ export interface QueryParams {
   expense?: ExpenseQuery;
   budget?: BudgetQuery;
   budgetDetails?: BudgetDetailsQuery;
+  statistics?: StatisticPeriod;
 }
 
 /*************TABLE*************/

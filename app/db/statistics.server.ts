@@ -10,11 +10,12 @@ import {
   addWeeks,
 } from 'date-fns';
 
+import { StatisticPeriod } from '~/interfaces';
 import { EXPENSE_CATEGORIES, MONTHS, WEEKDAYS } from '~/utils/constants';
 import { getCalenderWeek, getMonth, getWeekday } from '~/utils/helpers';
 
 type Statistics = {
-  period: 'week' | 'month' | 'year';
+  period: StatisticPeriod;
   expensesByCategory: {
     totalUsed: number;
     categories: {
@@ -29,20 +30,20 @@ type Statistics = {
   }[];
 };
 
-export const fetchStatistics = async (period: 'week' | 'month' | 'year'): Promise<Statistics> => {
+export const fetchStatistics = async (period: StatisticPeriod): Promise<Statistics> => {
   let startDate: Date;
   let endDate: Date;
 
   switch (period) {
-    case 'week':
+    case StatisticPeriod.WEEK:
       startDate = startOfWeek(new Date(), { weekStartsOn: 1 });
       endDate = endOfWeek(new Date(), { weekStartsOn: 1 });
       break;
-    case 'month':
+    case StatisticPeriod.MONTH:
       startDate = startOfMonth(new Date());
       endDate = endOfMonth(new Date());
       break;
-    case 'year':
+    case StatisticPeriod.YEAR:
       startDate = startOfYear(new Date());
       endDate = endOfYear(new Date());
       break;
@@ -103,9 +104,21 @@ const calculateExpensesByCategory = (expenses: Pick<Expense, 'amount' | 'expense
 
 const calculateExpensesByPeriod = (
   expenses: Pick<Expense, 'amount' | 'expenseDate' | 'category'>[],
-  period: 'week' | 'month' | 'year',
+  period: StatisticPeriod,
 ) => {
-  const timePeriod = period === 'week' ? WEEKDAYS : period === 'month' ? getCalendarWeeksOfCurrentMonth() : MONTHS;
+  let timePeriod: string[];
+
+  switch (period) {
+    case StatisticPeriod.WEEK:
+      timePeriod = WEEKDAYS;
+      break;
+    case StatisticPeriod.MONTH:
+      timePeriod = getCalendarWeeksOfCurrentMonth();
+      break;
+    default:
+      timePeriod = MONTHS;
+  }
+
   const expensesByPeriod = timePeriod.map(period => ({
     name: period,
     amount: 0,
@@ -113,9 +126,9 @@ const calculateExpensesByPeriod = (
 
   expenses.forEach(expense => {
     const timeUnit =
-      period === 'week'
+      period === StatisticPeriod.WEEK
         ? getWeekday(expense.expenseDate)
-        : period === 'month'
+        : period === StatisticPeriod.MONTH
           ? getCalenderWeek(expense.expenseDate)
           : getMonth(expense.expenseDate);
 

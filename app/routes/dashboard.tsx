@@ -14,7 +14,7 @@ import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { fetchStatistics } from '~/db/statistics.server';
-import { QueryParams, SortDirection } from '~/interfaces';
+import { QueryParams, SortDirection, StatisticPeriod } from '~/interfaces';
 import { BUDGET_PAGE_SIZE, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 
 // TODO: loader shouldn't be triggered when dialog is opened
@@ -39,7 +39,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       sortDirection: SortDirection.ASC,
     }),
     // statistics
-    await fetchStatistics('week'),
+    await fetchStatistics(parsedQueryParams.statistics || StatisticPeriod.WEEK),
   ]);
 
   return { expenses, budgets, statistics };
