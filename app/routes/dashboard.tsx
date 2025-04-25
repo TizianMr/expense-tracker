@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
-import { NavLink, Outlet, useLoaderData } from '@remix-run/react';
+import { NavLink, Outlet, redirect, useLoaderData } from '@remix-run/react';
 import { RiAddLine, RiBarChartFill, RiQuestionLine } from '@remixicon/react';
 import { Button, Card, Icon, Legend } from '@tremor/react';
 import qs from 'qs';
@@ -11,6 +11,7 @@ import LoadingSpinner from '~/components/ui/loading-spinner';
 import Pagination from '~/components/ui/pagination';
 import { Tooltip } from '~/components/ui/tooltip';
 import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
+import { sessionStorage } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { fetchStatistics } from '~/db/statistics.server';
@@ -19,6 +20,10 @@ import { BUDGET_PAGE_SIZE, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 
 // TODO: loader shouldn't be triggered when dialog is opened
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const session = await sessionStorage.getSession(request.headers.get('cookie'));
+  const user = session.get('user');
+  if (!user) throw redirect('/login');
+
   const url = new URL(request.url);
   const query = url.searchParams;
   const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
