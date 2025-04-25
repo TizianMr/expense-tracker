@@ -13,6 +13,7 @@ import { Tooltip } from '~/components/ui/tooltip';
 import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
+import { fetchStatistics } from '~/db/statistics.server';
 import { QueryParams, SortDirection } from '~/interfaces';
 import { BUDGET_PAGE_SIZE, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 
@@ -22,7 +23,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const query = url.searchParams;
   const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
 
-  const [expenses, budgets] = await Promise.all([
+  const [expenses, budgets, statistics] = await Promise.all([
     // expenses
     fetchExpenses({
       page: Number(parsedQueryParams.expense?.page) || 1,
@@ -37,14 +38,18 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       sortBy: 'id',
       sortDirection: SortDirection.ASC,
     }),
+    // statistics
+    await fetchStatistics('week'),
   ]);
 
-  return { expenses, budgets };
+  return { expenses, budgets, statistics };
 };
 
 const Dashboard = () => {
-  const { expenses, budgets } = useLoaderData<typeof loader>();
+  const { expenses, budgets, statistics } = useLoaderData<typeof loader>();
   const { isLoadingLongerThanDelay: isDataLoading } = useDelayedLoading();
+
+  console.log(statistics);
 
   return (
     <>
