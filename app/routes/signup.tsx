@@ -1,7 +1,56 @@
-import { NavLink } from '@remix-run/react';
-import { TextInput } from '@tremor/react';
+import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-run/react';
+import { Button, TextInput } from '@tremor/react';
+
+import { authenticator, createUser, EMAIL_PASSWORD_STRATEGY, sessionStorage } from '~/db/auth.server';
+
+export async function loader({ request }: LoaderFunctionArgs) {
+  const session = await sessionStorage.getSession(request.headers.get('cookie'));
+  const user = session.get('user');
+
+  if (user) return redirect('/dashboard');
+
+  return null;
+}
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const formData = await request.clone().formData();
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  if (!email || !password) {
+    return { error: 'E-Mail and password are required' };
+  }
+
+  try {
+    await createUser({ password, email });
+
+    const user = await authenticator.authenticate(EMAIL_PASSWORD_STRATEGY, request);
+
+    const session = await sessionStorage.getSession(request.headers.get('cookie'));
+
+    session.set('user', user);
+
+    return redirect('/dashboard', {
+      headers: {
+        'Set-Cookie': await sessionStorage.commitSession(session),
+      },
+    });
+  } catch (error) {
+    // Return validation errors or authentication errors
+    if (error instanceof Error) {
+      return { error: error.message };
+    }
+
+    // Re-throw any other errors (including redirects)
+    throw error;
+  }
+};
 
 const SignUpPage = () => {
+  const data = useActionData<typeof action>();
+  const { state } = useNavigation();
+
   return (
     <>
       <div className='flex min-h-screen flex-1 flex-col justify-center px-4 py-10 lg:px-6'>
@@ -15,8 +64,7 @@ const SignUpPage = () => {
           <h3 className='text-center text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
             Sign up
           </h3>
-          <form
-            action='#'
+          <Form
             className='mt-6 space-y-4'
             method='post'>
             <div>
@@ -49,12 +97,16 @@ const SignUpPage = () => {
                 type='password'
               />
             </div>
-            <button
+            <Button
               className='mt-4 w-full whitespace-nowrap rounded-tremor-default bg-tremor-brand py-2 text-center text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-tremor-brand-emphasis dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis'
+              loading={state === 'submitting'}
               type='submit'>
               Sign up
-            </button>
-          </form>
+            </Button>
+          </Form>
+          {data?.error && (
+            <p className='mt-2 text-tremor-label text-center text-red-500 dark:text-red-300'>{data.error}</p>
+          )}
           <p className='mt-4 text-tremor-label text-tremor-content dark:text-dark-tremor-content text-center'>
             Already having an account?{' '}
             <span className='underline underline-offset-4'>

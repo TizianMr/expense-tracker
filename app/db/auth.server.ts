@@ -9,6 +9,8 @@ type AuthUser = {
   email: string;
 };
 
+export const EMAIL_PASSWORD_STRATEGY = 'email-password-strategy';
+
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
     name: '__session',
@@ -33,6 +35,7 @@ authenticator.use(
 
     return await login({ password, email });
   }),
+  EMAIL_PASSWORD_STRATEGY,
 );
 
 export const createUser = async ({ password, email }: Pick<User, 'password' | 'email'>) => {
