@@ -14,7 +14,7 @@ import { StatisticPeriod } from '~/interfaces';
 import { EXPENSE_CATEGORIES, MONTHS, WEEKDAYS } from '~/utils/constants';
 import { getCalenderWeek, getMonth, getWeekday } from '~/utils/helpers';
 
-type Statistics = {
+export type Statistics = {
   period: StatisticPeriod;
   expensesByCategory: {
     totalUsed: number;

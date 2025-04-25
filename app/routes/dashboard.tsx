@@ -55,7 +55,7 @@ const Dashboard = () => {
     <>
       <div className='flex'>
         <Card className='flex flex-col mx-auto w-[80vw] h-[35vh]'>
-          <Statistics />
+          <Statistics statistics={statistics} />
         </Card>
       </div>
       <div className='flex justify-content-center'>
