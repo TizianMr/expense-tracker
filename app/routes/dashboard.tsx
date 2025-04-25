@@ -49,8 +49,6 @@ const Dashboard = () => {
   const { expenses, budgets, statistics } = useLoaderData<typeof loader>();
   const { isLoadingLongerThanDelay: isDataLoading } = useDelayedLoading();
 
-  console.log(statistics);
-
   return (
     <>
       <div className='flex'>

@@ -4,6 +4,7 @@ import qs from 'qs';
 
 import { Statistics as StatisticsType } from '~/db/statistics.server';
 import { QueryParams, StatisticPeriod } from '~/interfaces';
+import { EXPENSE_CATEGORIES } from '~/utils/constants';
 import { cx, formatCurrency } from '~/utils/helpers';
 
 const valueFormatter = (number: number) => formatCurrency(number);
@@ -15,9 +16,15 @@ type Props = {
 const Statistics = ({ statistics }: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
 
+  const categoryColors = statistics.expensesByCategory.categories.map(expense => {
+    const category = EXPENSE_CATEGORIES.find(cat => cat.value === expense.category);
+    return category ? category.color : 'gray';
+  });
+
   const handleTabChange = (idx: number) => {
     const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
-    const tabValues = [StatisticPeriod.WEEK, StatisticPeriod.MONTH, StatisticPeriod.YEAR];
+    const tabValues = Object.values(StatisticPeriod);
+
     const updated = {
       ...nestedParams,
       statistics: tabValues[idx],
@@ -36,9 +43,9 @@ const Statistics = ({ statistics }: Props) => {
           className='flex justify-end'
           onIndexChange={handleTabChange}>
           <TabList variant='solid'>
-            <Tab>Week</Tab>
-            <Tab>Month</Tab>
-            <Tab>Year</Tab>
+            {Object.values(StatisticPeriod).map(period => (
+              <Tab key={period}>{period.charAt(0).toUpperCase() + period.slice(1)}</Tab>
+            ))}
           </TabList>
         </TabGroup>
       </div>
@@ -59,7 +66,7 @@ const Statistics = ({ statistics }: Props) => {
         <div className='flex flex-col w-[40%] self-center'>
           <DonutChart
             category='amount'
-            colors={['cyan', 'blue', 'indigo', 'violet']}
+            colors={categoryColors}
             data={statistics.expensesByCategory.categories}
             index='category'
             valueFormatter={valueFormatter}
@@ -68,14 +75,14 @@ const Statistics = ({ statistics }: Props) => {
             <span>Category</span> <span>Amount / Share</span>
           </p>
           <List className='mt-2'>
-            {statistics.expensesByCategory.categories.map(item => (
+            {statistics.expensesByCategory.categories.map((item, idx) => (
               <ListItem
                 className='space-x-6'
                 key={item.category}>
                 <div className='flex items-center space-x-2.5 truncate'>
                   <span
                     aria-hidden={true}
-                    className={cx('bg-orange-500', 'size-2.5 shrink-0 rounded-sm')}
+                    className={cx(`bg-${categoryColors[idx]}-500`, 'size-2.5 shrink-0 rounded-sm')}
                   />
                   <span className='truncate dark:text-dark-tremor-content-emphasis'> {item.category} </span>
                 </div>
