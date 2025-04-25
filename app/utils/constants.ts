@@ -16,3 +16,20 @@ export const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
   month: 'long',
   day: 'numeric',
 };
+
+export const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+export const MONTHS = [
+  'January',
+  'February',
+  'March',
+  'April',
+  'May',
+  'June',
+  'July',
+  'August',
+  'September',
+  'October',
+  'November',
+  'December',
+];

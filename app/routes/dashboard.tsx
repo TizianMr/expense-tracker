@@ -6,13 +6,15 @@ import qs from 'qs';
 
 import BudgetInfo from '~/components/budget-info';
 import { ExpenseTable } from '~/components/expense-table';
+import Statistics from '~/components/statistics';
 import LoadingSpinner from '~/components/ui/loading-spinner';
 import Pagination from '~/components/ui/pagination';
 import { Tooltip } from '~/components/ui/tooltip';
 import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
-import { QueryParams, SortDirection } from '~/interfaces';
+import { fetchStatistics } from '~/db/statistics.server';
+import { QueryParams, SortDirection, StatisticPeriod } from '~/interfaces';
 import { BUDGET_PAGE_SIZE, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 
 // TODO: loader shouldn't be triggered when dialog is opened
@@ -21,7 +23,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const query = url.searchParams;
   const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
 
-  const [expenses, budgets] = await Promise.all([
+  const [expenses, budgets, statistics] = await Promise.all([
     // expenses
     fetchExpenses({
       page: Number(parsedQueryParams.expense?.page) || 1,
@@ -36,17 +38,24 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
       sortBy: 'id',
       sortDirection: SortDirection.ASC,
     }),
+    // statistics
+    await fetchStatistics(parsedQueryParams.statistics || StatisticPeriod.WEEK),
   ]);
 
-  return { expenses, budgets };
+  return { expenses, budgets, statistics };
 };
 
 const Dashboard = () => {
-  const { expenses, budgets } = useLoaderData<typeof loader>();
+  const { expenses, budgets, statistics } = useLoaderData<typeof loader>();
   const { isLoadingLongerThanDelay: isDataLoading } = useDelayedLoading();
 
   return (
     <>
+      <div className='flex'>
+        <Card className='flex flex-col mx-auto w-[80vw] h-[35vh]'>
+          <Statistics statistics={statistics} />
+        </Card>
+      </div>
       <div className='flex justify-content-center'>
         <Card className='flex flex-col mx-auto w-[80vw] h-[40vh]'>
           <div className='flex items-center justify-between'>

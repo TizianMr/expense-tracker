@@ -1,4 +1,4 @@
-import { NavLink } from '@remix-run/react';
+import { useNavigate } from '@remix-run/react';
 import { Button, ProgressCircle } from '@tremor/react';
 
 import { formatCurrency } from '~/utils/helpers';
@@ -11,40 +11,59 @@ type Props = {
 };
 
 const BudgetInfo = ({ totalAmount, usedAmount, title, id }: Props) => {
+  const navigate = useNavigate();
   const usedBudgetInPercentage = (100 * usedAmount) / totalAmount;
   const color = usedBudgetInPercentage >= 90 ? 'red' : usedBudgetInPercentage <= 60 ? 'emerald' : 'yellow';
 
+  const handleRowClick = () => {
+    navigate(`budgets/${id}`, { preventScrollReset: true });
+  };
+
   return (
     <div>
-      <NavLink to={`budgets/${id}`}>
-        <div className='flex justify-start space-x-5 items-center hover:hover:bg-gray-100 p-2 rounded-lg'>
-          <ProgressCircle
-            color={color}
-            size='lg'
-            strokeWidth={9}
-            value={usedBudgetInPercentage}>
-            <span className='text-xs font-medium text-slate-700'>{Math.round(usedBudgetInPercentage)}%</span>
-          </ProgressCircle>
-          <div>
-            <p className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium'>
-              {title}
-            </p>
-            <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{`${formatCurrency(usedAmount)} of ${formatCurrency(totalAmount)} used`}</p>
-            <div className='space-x-2'>
-              <NavLink to={`budgets/${id}/edit`}>
-                <Button variant='light'>Edit</Button>
-              </NavLink>
-              <NavLink to={`budgets/${id}/delete`}>
-                <Button
-                  color='red'
-                  variant='light'>
-                  Delete
-                </Button>
-              </NavLink>
-            </div>
+      <div
+        className='flex justify-start space-x-5 items-center hover:hover:bg-gray-100 p-2 rounded-lg'
+        role='button'
+        tabIndex={0}
+        onClick={handleRowClick}
+        onKeyDown={e => {
+          if (e.key === 'Enter' || e.key === ' ') {
+            handleRowClick();
+          }
+        }}>
+        <ProgressCircle
+          color={color}
+          size='lg'
+          strokeWidth={9}
+          value={usedBudgetInPercentage}>
+          <span className='text-xs font-medium text-slate-700'>{Math.round(usedBudgetInPercentage)}%</span>
+        </ProgressCircle>
+        <div>
+          <p className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium'>
+            {title}
+          </p>
+          <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{`${formatCurrency(usedAmount)} of ${formatCurrency(totalAmount)} used`}</p>
+          <div className='space-x-2'>
+            <Button
+              variant='light'
+              onClick={e => {
+                e.stopPropagation();
+                navigate(`budgets/${id}/edit`, { preventScrollReset: true });
+              }}>
+              Edit
+            </Button>
+            <Button
+              color='red'
+              variant='light'
+              onClick={e => {
+                e.stopPropagation();
+                navigate(`budgets/${id}/delete`, { preventScrollReset: true });
+              }}>
+              Delete
+            </Button>
           </div>
         </div>
-      </NavLink>
+      </div>
     </div>
   );
 };
