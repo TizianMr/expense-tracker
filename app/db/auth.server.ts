@@ -59,13 +59,13 @@ export const login = async ({ password, email }: Pick<User, 'password' | 'email'
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) {
-    throw new Error('User with this email does not exist');
+    throw new Error('Mail or password are not correct');
   }
 
-  const isValidPassword = await verify(user.password, password);
+  const isValidPassword = await verify(user?.password, password);
 
   if (!isValidPassword) {
-    throw new Error('Passwort is not valid');
+    throw new Error('Mail or password are not correct');
   }
 
   return {
