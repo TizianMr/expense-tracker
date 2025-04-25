@@ -1,3 +1,4 @@
+import { useSubmit } from '@remix-run/react';
 import { RiArrowDownSLine, RiLogoutCircleLine, RiUserLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
 
@@ -10,6 +11,8 @@ import {
 } from './ui/dropdown';
 
 const UserDropdown = () => {
+  const submit = useSubmit();
+
   return (
     <div className='flex justify-end p-5'>
       <DropdownMenu>
@@ -40,7 +43,7 @@ const UserDropdown = () => {
 
           <DropdownMenuSeparator />
 
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => submit(null, { action: '/logout', method: 'post', replace: true })}>
             <span className='flex items-center gap-x-2'>
               <RiLogoutCircleLine className='size-4 text-red-500' /> <span className='text-red-500'>Logout</span>
             </span>
