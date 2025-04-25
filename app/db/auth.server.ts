@@ -4,10 +4,9 @@ import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 
-type AuthUser = {
-  id: string;
-  email: string;
-};
+type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName'>;
+type LoginInfo = Pick<User, 'password' | 'email'>;
+type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'>;
 
 export const EMAIL_PASSWORD_STRATEGY = 'email-password-strategy';
 
@@ -38,7 +37,7 @@ authenticator.use(
   EMAIL_PASSWORD_STRATEGY,
 );
 
-export const createUser = async ({ password, email }: Pick<User, 'password' | 'email'>) => {
+export const createUser = async ({ password, email, firstName, lastName }: CreateUser) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (user) {
@@ -49,13 +48,15 @@ export const createUser = async ({ password, email }: Pick<User, 'password' | 'e
 
   const newUser = {
     email,
+    firstName,
+    lastName,
     password: hashedPassword,
   };
 
   return await prisma.user.create({ data: newUser });
 };
 
-export const login = async ({ password, email }: Pick<User, 'password' | 'email'>): Promise<AuthUser> => {
+export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> => {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user) {
@@ -71,5 +72,7 @@ export const login = async ({ password, email }: Pick<User, 'password' | 'email'
   return {
     id: user.id,
     email: user.email,
+    lastName: user.lastName,
+    firstName: user.firstName,
   };
 };

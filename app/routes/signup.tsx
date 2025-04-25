@@ -17,13 +17,15 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.clone().formData();
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
+  const firstName = formData.get('firstname') as string;
+  const lastName = formData.get('lastname') as string;
 
-  if (!email || !password) {
-    return { error: 'E-Mail and password are required' };
+  if (!email || !password || !firstName || !lastName) {
+    return { error: 'Required fields need to be filled' };
   }
 
   try {
-    await createUser({ password, email });
+    await createUser({ password, email, firstName, lastName });
 
     const user = await authenticator.authenticate(EMAIL_PASSWORD_STRATEGY, request);
 
@@ -69,9 +71,37 @@ const SignUpPage = () => {
             method='post'>
             <div>
               <label
-                className='text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                htmlFor='firstname'>
+                First name <span className='text-red-500'>*</span>
+              </label>
+              <TextInput
+                autoComplete='given-name'
+                className='mt-2'
+                id='firstname'
+                name='firstname'
+                placeholder='John'
+              />
+            </div>
+            <div>
+              <label
+                className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                htmlFor='lastname'>
+                Last name <span className='text-red-500'>*</span>
+              </label>
+              <TextInput
+                autoComplete='family-name'
+                className='mt-2'
+                id='lastname'
+                name='lastname'
+                placeholder='Doe'
+              />
+            </div>
+            <div>
+              <label
+                className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
                 htmlFor='email'>
-                Email
+                Email <span className='text-red-500'>*</span>
               </label>
               <TextInput
                 autoComplete='email'
@@ -84,9 +114,9 @@ const SignUpPage = () => {
             </div>
             <div>
               <label
-                className='text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
                 htmlFor='password'>
-                Password
+                Password <span className='text-red-500'>*</span>
               </label>
               <TextInput
                 autoComplete='password'
