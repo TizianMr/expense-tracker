@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
-import { useLoaderData, useSearchParams } from '@remix-run/react';
+import { redirect, useLoaderData, useSearchParams } from '@remix-run/react';
 import { RiErrorWarningLine } from '@remixicon/react';
 import { Dialog, DialogPanel, Divider, Button, Callout, DonutChart, EventProps } from '@tremor/react';
 import qs from 'qs';
@@ -7,6 +7,7 @@ import { useState } from 'react';
 
 import { ExpenseTable } from '~/components/expense-table';
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
+import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgetById } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { QueryParams, SortDirection } from '~/interfaces';
@@ -14,33 +15,39 @@ import { EXPENSE_CATEGORIES, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 import { formatCurrency } from '~/utils/helpers';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
+
   const budgetId = params.budget as string;
   const url = new URL(request.url);
   const query = url.searchParams;
   const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
 
   const [expenses, budget] = await Promise.all([
-    await fetchExpenses({
-      sortBy: parsedQueryParams.budgetDetails?.sortBy || 'expenseDate',
-      sortDirection: parsedQueryParams.budgetDetails?.sortDirection || SortDirection.ASC,
-      page: Number(parsedQueryParams.budgetDetails?.page) || 1,
-      pageSize: EXPENSE_PAGE_SIZE,
-      filter: [
-        { filterBy: 'budgetId', filterValue: budgetId },
-        ...(parsedQueryParams.budgetDetails?.filter
-          ? [
-              {
-                filterBy: parsedQueryParams.budgetDetails.filter.filterBy,
-                filterValue:
-                  parsedQueryParams.budgetDetails.filter.filterValue === 'No category'
-                    ? null
-                    : parsedQueryParams.budgetDetails.filter.filterValue,
-              },
-            ]
-          : []),
-      ],
-    }),
-    await fetchBudgetById({ id: budgetId }),
+    await fetchExpenses(
+      {
+        sortBy: parsedQueryParams.budgetDetails?.sortBy || 'expenseDate',
+        sortDirection: parsedQueryParams.budgetDetails?.sortDirection || SortDirection.ASC,
+        page: Number(parsedQueryParams.budgetDetails?.page) || 1,
+        pageSize: EXPENSE_PAGE_SIZE,
+        filter: [
+          { filterBy: 'budgetId', filterValue: budgetId },
+          ...(parsedQueryParams.budgetDetails?.filter
+            ? [
+                {
+                  filterBy: parsedQueryParams.budgetDetails.filter.filterBy,
+                  filterValue:
+                    parsedQueryParams.budgetDetails.filter.filterValue === 'No category'
+                      ? null
+                      : parsedQueryParams.budgetDetails.filter.filterValue,
+                },
+              ]
+            : []),
+        ],
+      },
+      user.id,
+    ),
+    await fetchBudgetById(budgetId, user.id),
   ]);
 
   return { expenses, budget };

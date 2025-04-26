@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
-import { NavLink, Outlet, useLoaderData } from '@remix-run/react';
+import { NavLink, Outlet, redirect, useLoaderData } from '@remix-run/react';
 import { RiAddLine, RiBarChartFill, RiQuestionLine } from '@remixicon/react';
 import { Button, Card, Icon, Legend } from '@tremor/react';
 import qs from 'qs';
@@ -10,7 +10,9 @@ import Statistics from '~/components/statistics';
 import LoadingSpinner from '~/components/ui/loading-spinner';
 import Pagination from '~/components/ui/pagination';
 import { Tooltip } from '~/components/ui/tooltip';
+import UserDropdown from '~/components/user-dropdown';
 import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
+import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { fetchStatistics } from '~/db/statistics.server';
@@ -19,38 +21,48 @@ import { BUDGET_PAGE_SIZE, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 
 // TODO: loader shouldn't be triggered when dialog is opened
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
+
   const url = new URL(request.url);
   const query = url.searchParams;
   const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
 
   const [expenses, budgets, statistics] = await Promise.all([
     // expenses
-    fetchExpenses({
-      page: Number(parsedQueryParams.expense?.page) || 1,
-      pageSize: EXPENSE_PAGE_SIZE,
-      sortBy: parsedQueryParams.expense?.sortBy || 'expenseDate',
-      sortDirection: parsedQueryParams.expense?.sortDirection || SortDirection.DESC,
-    }),
+    fetchExpenses(
+      {
+        page: Number(parsedQueryParams.expense?.page) || 1,
+        pageSize: EXPENSE_PAGE_SIZE,
+        sortBy: parsedQueryParams.expense?.sortBy || 'expenseDate',
+        sortDirection: parsedQueryParams.expense?.sortDirection || SortDirection.DESC,
+      },
+      user.id,
+    ),
     // budgets
-    await fetchBudgets({
-      page: Number(parsedQueryParams.budget?.page) || 1,
-      pageSize: BUDGET_PAGE_SIZE,
-      sortBy: 'id',
-      sortDirection: SortDirection.ASC,
-    }),
+    await fetchBudgets(
+      {
+        page: Number(parsedQueryParams.budget?.page) || 1,
+        pageSize: BUDGET_PAGE_SIZE,
+        sortBy: 'id',
+        sortDirection: SortDirection.ASC,
+      },
+      user.id,
+    ),
     // statistics
-    await fetchStatistics(parsedQueryParams.statistics || StatisticPeriod.WEEK),
+    await fetchStatistics(parsedQueryParams.statistics || StatisticPeriod.WEEK, user.id),
   ]);
 
-  return { expenses, budgets, statistics };
+  return { expenses, budgets, statistics, user };
 };
 
 const Dashboard = () => {
-  const { expenses, budgets, statistics } = useLoaderData<typeof loader>();
+  const { expenses, budgets, statistics, user } = useLoaderData<typeof loader>();
   const { isLoadingLongerThanDelay: isDataLoading } = useDelayedLoading();
 
   return (
     <>
+      <UserDropdown userInfo={user} />
       <div className='flex'>
         <Card className='flex flex-col mx-auto w-[80vw] h-[35vh]'>
           <Statistics statistics={statistics} />

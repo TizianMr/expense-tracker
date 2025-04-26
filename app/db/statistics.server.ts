@@ -30,7 +30,7 @@ export type Statistics = {
   }[];
 };
 
-export const fetchStatistics = async (period: StatisticPeriod): Promise<Statistics> => {
+export const fetchStatistics = async (period: StatisticPeriod, userId: string): Promise<Statistics> => {
   let startDate: Date;
   let endDate: Date;
 
@@ -55,6 +55,7 @@ export const fetchStatistics = async (period: StatisticPeriod): Promise<Statisti
         gte: startDate,
         lte: endDate,
       },
+      createdByUserId: userId,
     },
     select: {
       amount: true,

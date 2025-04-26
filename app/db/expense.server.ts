@@ -3,33 +3,34 @@ import { Budget, Expense } from '@prisma/client';
 import { prisma } from '../utils/prisma.server';
 import { FilterWithPagination, ListResult } from '~/interfaces';
 
-type ExpenseIdentifier = Pick<Expense, 'id'>;
 export type CreateExpense = Pick<Expense, 'title' | 'amount' | 'expenseDate' | 'category' | 'budgetId'>;
 export type UpdateExpense = Pick<Expense, 'id'> & CreateExpense;
-export type ExpenseWithBudget = Omit<Expense, 'budgetId'> & { budget: Pick<Budget, 'id' | 'title'> | null };
-
-export const createExpense = async (expense: CreateExpense): Promise<Expense> => {
-  return await prisma.expense.create({ data: expense });
+export type ExpenseWithBudget = Omit<Expense, 'budgetId' | 'createdByUserId'> & {
+  budget: Pick<Budget, 'id' | 'title'> | null;
 };
 
-export const deleteExpense = async ({ id }: ExpenseIdentifier) => {
-  return await prisma.expense.delete({ where: { id } });
+export const createExpense = async (expense: CreateExpense, userId: string): Promise<Expense> => {
+  return await prisma.expense.create({ data: { ...expense, createdByUserId: userId } });
 };
 
-export const updateExpense = async ({ id, ...updatedExpense }: UpdateExpense) => {
-  return await prisma.expense.update({ where: { id }, data: updatedExpense });
+export const deleteExpense = async (id: string, userId: string) => {
+  return await prisma.expense.delete({ where: { id, createdByUserId: userId } });
 };
 
-export const fetchExpenses = async ({
-  page,
-  pageSize,
-  sortBy,
-  sortDirection,
-  filter,
-}: FilterWithPagination<Expense>): Promise<ListResult<ExpenseWithBudget>> => {
+export const updateExpense = async (expense: UpdateExpense, userId: string) => {
+  const { id, ...updatedExpense } = expense;
+  return await prisma.expense.update({ where: { id, createdByUserId: userId }, data: updatedExpense });
+};
+
+export const fetchExpenses = async (
+  filterOptions: FilterWithPagination<Expense>,
+  userId: string,
+): Promise<ListResult<ExpenseWithBudget>> => {
+  const { page, pageSize, sortBy, sortDirection, filter } = filterOptions;
   const expenses = await prisma.$transaction([
     prisma.expense.count({
       where: {
+        createdByUserId: userId,
         AND:
           (filter ?? []).map(filter => ({
             [filter.filterBy]:
@@ -41,6 +42,7 @@ export const fetchExpenses = async ({
     }),
     prisma.expense.findMany({
       where: {
+        createdByUserId: userId,
         AND:
           (filter ?? []).map(filter => ({
             [filter.filterBy]:
@@ -62,7 +64,7 @@ export const fetchExpenses = async ({
         category: true,
         createdAt: true,
         updatedAt: true,
-        Budget: {
+        budget: {
           select: {
             id: true,
             title: true,
@@ -73,9 +75,9 @@ export const fetchExpenses = async ({
   ]);
 
   return {
-    items: expenses[1].map(({ Budget, ...expense }) => ({
+    items: expenses[1].map(({ budget, ...expense }) => ({
       ...expense,
-      budget: Budget ? { id: Budget.id, title: Budget.title } : null,
+      budget: budget ? { id: budget.id, title: budget.title } : null,
     })),
     page,
     pageSize,
@@ -83,6 +85,6 @@ export const fetchExpenses = async ({
   };
 };
 
-export const fetchExpenseById = async ({ id }: ExpenseIdentifier): Promise<Expense | null> => {
-  return await prisma.expense.findUnique({ where: { id } });
+export const fetchExpenseById = async (id: string, userId: string): Promise<Expense | null> => {
+  return await prisma.expense.findUnique({ where: { id, createdByUserId: userId } });
 };

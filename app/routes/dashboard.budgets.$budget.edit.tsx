@@ -1,21 +1,28 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { useLoaderData, useOutletContext } from '@remix-run/react';
+import { redirect, useLoaderData, useOutletContext } from '@remix-run/react';
 import { RiErrorWarningLine } from '@remixicon/react';
 import { Callout } from '@tremor/react';
 
 import { BudgetFormErrors } from './dashboard.budgets';
 import BudgetForm from '~/components/budget-form';
+import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgetById, updateBudget, UpdateBudget } from '~/db/budget.server';
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const budgetId = params.budget as string;
 
-  const budget = await fetchBudgetById({ id: budgetId });
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
+
+  const budget = await fetchBudgetById(budgetId, user.id);
 
   return budget;
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
+
   const formData = await request.formData();
 
   const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
@@ -26,7 +33,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     title: formData.get('title') as string,
   };
 
-  const updatedExpense = await updateBudget(budget);
+  const updatedExpense = await updateBudget(budget, user.id);
   return updatedExpense;
 };
 

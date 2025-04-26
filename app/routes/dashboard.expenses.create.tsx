@@ -1,23 +1,33 @@
 import { Category } from '@prisma/client';
-import { ActionFunctionArgs } from '@remix-run/node';
-import { useLoaderData, useOutletContext } from '@remix-run/react';
+import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { redirect, useLoaderData, useOutletContext } from '@remix-run/react';
 
 import { ExpenseFormErrors } from './dashboard.expenses';
 import ExpenseForm from '~/components/expense-form';
+import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { createExpense, CreateExpense } from '~/db/expense.server';
 import { SortDirection } from '~/interfaces';
 
-export const loader = async () => {
-  const budgets = await fetchBudgets({
-    sortBy: 'id',
-    sortDirection: SortDirection.ASC,
-  });
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
+
+  const budgets = await fetchBudgets(
+    {
+      sortBy: 'id',
+      sortDirection: SortDirection.ASC,
+    },
+    user.id,
+  );
 
   return budgets;
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
+
   const formData = await request.formData();
 
   const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
@@ -30,7 +40,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     budgetId: formData.get('budget') as string,
   };
 
-  const createdExpense = await createExpense(expenseData);
+  const createdExpense = await createExpense(expenseData, user.id);
   return createdExpense;
 };
 

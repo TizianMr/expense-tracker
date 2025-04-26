@@ -1,30 +1,40 @@
 import { Category } from '@prisma/client';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { useLoaderData, useOutletContext } from '@remix-run/react';
+import { redirect, useLoaderData, useOutletContext } from '@remix-run/react';
 import { RiErrorWarningLine } from '@remixicon/react';
 import { Callout } from '@tremor/react';
 
 import { ExpenseFormErrors } from './dashboard.expenses';
 import { fetchExpenseById, updateExpense, UpdateExpense } from '../db/expense.server';
 import ExpenseForm from '~/components/expense-form';
+import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { SortDirection } from '~/interfaces';
 
-export const loader = async ({ params }: LoaderFunctionArgs) => {
+export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const expenseId = params.expense as string;
 
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
+
   const [expense, budgets] = await Promise.all([
-    await fetchExpenseById({ id: expenseId }),
-    await fetchBudgets({
-      sortBy: 'id',
-      sortDirection: SortDirection.ASC,
-    }),
+    await fetchExpenseById(expenseId, user.id),
+    await fetchBudgets(
+      {
+        sortBy: 'id',
+        sortDirection: SortDirection.ASC,
+      },
+      user.id,
+    ),
   ]);
 
   return { expense, budgets };
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
+
   const formData = await request.formData();
 
   const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
@@ -38,7 +48,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     budgetId: formData.get('budget') as string,
   };
 
-  const updatedExpense = await updateExpense(expense);
+  const updatedExpense = await updateExpense(expense, user.id);
   return updatedExpense;
 };
 
