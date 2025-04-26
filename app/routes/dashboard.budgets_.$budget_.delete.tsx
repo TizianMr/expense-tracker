@@ -1,15 +1,18 @@
 import { ActionFunctionArgs } from '@remix-run/node';
-import { Form, useActionData, useNavigate, useNavigation } from '@remix-run/react';
+import { Form, redirect, useActionData, useNavigate, useNavigation } from '@remix-run/react';
 import { Button, Dialog, DialogPanel } from '@tremor/react';
 import { useCallback, useEffect, useState } from 'react';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
+import { getLoggedInUser } from '~/db/auth.server';
 import { deleteBudget } from '~/db/budget.server';
 
-export const action = async ({ params }: ActionFunctionArgs) => {
+export const action = async ({ params, request }: ActionFunctionArgs) => {
   const budgetId = params.budget as string;
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
 
-  await deleteBudget({ id: budgetId });
+  await deleteBudget(budgetId, user.id);
 
   return { expenseId: budgetId };
 };

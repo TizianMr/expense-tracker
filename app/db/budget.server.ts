@@ -2,30 +2,34 @@ import { Budget } from '@prisma/client';
 
 import { Filter, FilterWithPagination, ListResult } from '~/interfaces';
 
-type BudgetIdentifier = Pick<Budget, 'id'>;
 export type CreateBudget = Pick<Budget, 'title' | 'amount'>;
 export type UpdateBudget = Pick<Budget, 'id'> & CreateBudget;
-type BudgetWithUsage = Budget & { totalUsedBudget: number };
+export type BudgetWithUsage = Omit<Budget, 'createdByUserId'> & { totalUsedBudget: number };
 export type BudgetDetails = BudgetWithUsage & { expensesByCategory: { category: string; amount: number }[] };
 
-export const createBudget = async (budget: CreateBudget): Promise<Budget> => {
-  return await prisma.budget.create({ data: budget });
+export const createBudget = async (budget: CreateBudget, userId: string): Promise<Budget> => {
+  return await prisma.budget.create({ data: { ...budget, createdByUserId: userId } });
 };
 
-export const deleteBudget = async ({ id }: BudgetIdentifier) => {
-  return await prisma.budget.delete({ where: { id } });
+export const deleteBudget = async (id: string, userId: string) => {
+  return await prisma.budget.delete({ where: { id, createdByUserId: userId } });
 };
 
-export const updateBudget = async ({ id, ...updatedBudget }: UpdateBudget) => {
-  return await prisma.budget.update({ where: { id }, data: updatedBudget });
+export const updateBudget = async (budget: UpdateBudget, userId: string) => {
+  const { id, ...updatedBudget } = budget;
+  return await prisma.budget.update({ where: { id, createdByUserId: userId }, data: updatedBudget });
 };
 
 // function signatures
-export function fetchBudgets(filter: FilterWithPagination<Budget>): Promise<ListResult<BudgetWithUsage>>;
-export function fetchBudgets(filter: Filter<Budget>): Promise<BudgetWithUsage[]>;
+export function fetchBudgets(
+  filter: FilterWithPagination<Budget>,
+  userId: string,
+): Promise<ListResult<BudgetWithUsage>>;
+export function fetchBudgets(filter: Filter<Budget>, userId: string): Promise<BudgetWithUsage[]>;
 
 export async function fetchBudgets(
   filter: Filter<Budget> | FilterWithPagination<Budget>,
+  userId: string,
 ): Promise<ListResult<BudgetWithUsage> | BudgetWithUsage[]> {
   const isPaginated = 'page' in filter && 'pageSize' in filter;
 
@@ -33,8 +37,11 @@ export async function fetchBudgets(
   const endOfMonth = new Date(new Date().getFullYear(), new Date().getMonth() + 1, 0);
 
   const budgets = await prisma.$transaction([
-    prisma.budget.count(),
+    prisma.budget.count({ where: { createdByUserId: userId } }),
     prisma.budget.findMany({
+      where: {
+        createdByUserId: userId,
+      },
       orderBy: {
         [filter.sortBy]: filter.sortDirection,
       },
@@ -82,10 +89,10 @@ export async function fetchBudgets(
   return budgetsWithRemaining;
 }
 
-export const fetchBudgetById = async ({ id }: BudgetIdentifier): Promise<BudgetDetails | null> => {
+export const fetchBudgetById = async (id: string, userId: string): Promise<BudgetDetails | null> => {
   const budgetDetails = await prisma.$transaction([
-    prisma.budget.findUnique({ where: { id } }),
-    prisma.expense.findMany({ where: { budgetId: id } }),
+    prisma.budget.findUnique({ where: { id, createdByUserId: userId } }),
+    prisma.expense.findMany({ where: { budgetId: id, createdByUserId: userId } }),
   ]);
 
   if (!budgetDetails[0]) {

@@ -37,6 +37,13 @@ authenticator.use(
   EMAIL_PASSWORD_STRATEGY,
 );
 
+export const getLoggedInUser = async (request: Request): Promise<AuthUser | null> => {
+  const session = await sessionStorage.getSession(request.headers.get('cookie'));
+  const user = session.get('user');
+
+  return user;
+};
+
 export const createUser = async ({ password, email, firstName, lastName }: CreateUser) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
@@ -59,13 +66,7 @@ export const createUser = async ({ password, email, firstName, lastName }: Creat
 export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> => {
   const user = await prisma.user.findUnique({ where: { email } });
 
-  if (!user) {
-    throw new Error('Mail or password are not correct');
-  }
-
-  const isValidPassword = await verify(user?.password, password);
-
-  if (!isValidPassword) {
+  if (!user || !(await verify(user.password, password))) {
     throw new Error('Mail or password are not correct');
   }
 

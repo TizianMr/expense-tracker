@@ -12,7 +12,7 @@ import Pagination from '~/components/ui/pagination';
 import { Tooltip } from '~/components/ui/tooltip';
 import UserDropdown from '~/components/user-dropdown';
 import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
-import { sessionStorage } from '~/db/auth.server';
+import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { fetchStatistics } from '~/db/statistics.server';
@@ -21,8 +21,7 @@ import { BUDGET_PAGE_SIZE, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 
 // TODO: loader shouldn't be triggered when dialog is opened
 export const loader = async ({ request }: LoaderFunctionArgs) => {
-  const session = await sessionStorage.getSession(request.headers.get('cookie'));
-  const user = session.get('user');
+  const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
   const url = new URL(request.url);
@@ -31,21 +30,27 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const [expenses, budgets, statistics] = await Promise.all([
     // expenses
-    fetchExpenses({
-      page: Number(parsedQueryParams.expense?.page) || 1,
-      pageSize: EXPENSE_PAGE_SIZE,
-      sortBy: parsedQueryParams.expense?.sortBy || 'expenseDate',
-      sortDirection: parsedQueryParams.expense?.sortDirection || SortDirection.DESC,
-    }),
+    fetchExpenses(
+      {
+        page: Number(parsedQueryParams.expense?.page) || 1,
+        pageSize: EXPENSE_PAGE_SIZE,
+        sortBy: parsedQueryParams.expense?.sortBy || 'expenseDate',
+        sortDirection: parsedQueryParams.expense?.sortDirection || SortDirection.DESC,
+      },
+      user.id,
+    ),
     // budgets
-    await fetchBudgets({
-      page: Number(parsedQueryParams.budget?.page) || 1,
-      pageSize: BUDGET_PAGE_SIZE,
-      sortBy: 'id',
-      sortDirection: SortDirection.ASC,
-    }),
+    await fetchBudgets(
+      {
+        page: Number(parsedQueryParams.budget?.page) || 1,
+        pageSize: BUDGET_PAGE_SIZE,
+        sortBy: 'id',
+        sortDirection: SortDirection.ASC,
+      },
+      user.id,
+    ),
     // statistics
-    await fetchStatistics(parsedQueryParams.statistics || StatisticPeriod.WEEK),
+    await fetchStatistics(parsedQueryParams.statistics || StatisticPeriod.WEEK, user.id),
   ]);
 
   return { expenses, budgets, statistics };

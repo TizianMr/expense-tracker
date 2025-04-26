@@ -2,11 +2,10 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-run/react';
 import { Button, TextInput } from '@tremor/react';
 
-import { authenticator, EMAIL_PASSWORD_STRATEGY, sessionStorage } from '~/db/auth.server';
+import { authenticator, EMAIL_PASSWORD_STRATEGY, getLoggedInUser, sessionStorage } from '~/db/auth.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
-  const session = await sessionStorage.getSession(request.headers.get('cookie'));
-  const user = session.get('user');
+  const user = await getLoggedInUser(request);
 
   if (user) return redirect('/dashboard');
 
