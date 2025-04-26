@@ -4,7 +4,7 @@ import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 
-type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName'>;
+export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName'>;
 type LoginInfo = Pick<User, 'password' | 'email'>;
 type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'>;
 

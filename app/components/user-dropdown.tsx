@@ -9,8 +9,13 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from './ui/dropdown';
+import { AuthUser } from '~/db/auth.server';
 
-const UserDropdown = () => {
+type Props = {
+  userInfo: AuthUser;
+};
+
+const UserDropdown = ({ userInfo }: Props) => {
   const submit = useSubmit();
 
   return (
@@ -25,9 +30,9 @@ const UserDropdown = () => {
                 <RiUserLine />
               </span>
               <div className='truncate'>
-                <p className='text-tremor-default text-left truncate'>Max Muster</p>
+                <p className='text-tremor-default text-left truncate'>{`${userInfo.firstName} ${userInfo.lastName}`}</p>
                 <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content truncate'>
-                  max.muster@example.com
+                  {userInfo.email}
                 </p>
               </div>
               <RiArrowDownSLine className='shrink-0' />

@@ -53,16 +53,16 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     await fetchStatistics(parsedQueryParams.statistics || StatisticPeriod.WEEK, user.id),
   ]);
 
-  return { expenses, budgets, statistics };
+  return { expenses, budgets, statistics, user };
 };
 
 const Dashboard = () => {
-  const { expenses, budgets, statistics } = useLoaderData<typeof loader>();
+  const { expenses, budgets, statistics, user } = useLoaderData<typeof loader>();
   const { isLoadingLongerThanDelay: isDataLoading } = useDelayedLoading();
 
   return (
     <>
-      <UserDropdown />
+      <UserDropdown userInfo={user} />
       <div className='flex'>
         <Card className='flex flex-col mx-auto w-[80vw] h-[35vh]'>
           <Statistics statistics={statistics} />
