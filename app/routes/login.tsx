@@ -66,9 +66,9 @@ const LoginPage = () => {
             method='post'>
             <div>
               <label
-                className='text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
                 htmlFor='email'>
-                Email
+                Email <span className='text-red-500'>*</span>
               </label>
               <TextInput
                 autoComplete='email'
@@ -81,9 +81,9 @@ const LoginPage = () => {
             </div>
             <div>
               <label
-                className='text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
                 htmlFor='password'>
-                Password
+                Password <span className='text-red-500'>*</span>
               </label>
               <TextInput
                 autoComplete='password'
