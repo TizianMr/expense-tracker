@@ -1,3 +1,5 @@
+import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
+import { Form, redirect, useSearchParams } from '@remix-run/react';
 import { RiUserLine } from '@remixicon/react';
 import {
   Button,
@@ -11,13 +13,64 @@ import {
   TabPanels,
   TextInput,
 } from '@tremor/react';
+import qs from 'qs';
 import { useState } from 'react';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
+import { getLoggedInUser } from '~/db/auth.server';
+import { updateMailAddress, updatePassword } from '~/db/user.server';
+import { QueryParams } from '~/interfaces';
+
+const TAB_VALUES = [
+  { label: 'Change Email', value: 'email' },
+  { label: 'Change Password', value: 'password' },
+];
+
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const url = new URL(request.url);
+
+  if (!url.searchParams.has('tab')) {
+    url.searchParams.set('tab', TAB_VALUES[0].value);
+    return redirect(url.toString());
+  }
+
+  return null; // continue to render the page
+};
+
+export const action = async ({ request }: ActionFunctionArgs) => {
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
+
+  const formData = await request.formData();
+  const url = new URL(request.url);
+  const query = url.searchParams;
+  const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
+
+  if (parsedQueryParams.tab === 'email') {
+    const mail = formData.get('new-email') as string;
+    await updateMailAddress(user.id, mail);
+  } else if (parsedQueryParams.tab === 'password') {
+    const oldPwd = formData.get('old-password') as string;
+    const newPwd = formData.get('new-password') as string;
+    await updatePassword(user.id, oldPwd, newPwd);
+  }
+
+  return null;
+};
 
 const AccountSettings = () => {
   const [open, setIsOpen] = useState(true);
+  const [searchParams, setSearchParams] = useSearchParams();
   const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
+  const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
+
+  const handleTabChange = (idx: number) => {
+    const updatedSearchParams = {
+      tab: TAB_VALUES[idx].value,
+    };
+
+    setSearchParams(qs.stringify(updatedSearchParams), { preventScrollReset: true });
+  };
 
   const handleClose = () => {
     setIsOpen(false);
@@ -48,96 +101,107 @@ const AccountSettings = () => {
             </div>
           </div>
 
-          <TabGroup defaultIndex={0}>
+          <TabGroup
+            defaultIndex={TAB_VALUES.findIndex(tab => tab.value === nestedParams.tab)}
+            onIndexChange={handleTabChange}>
             <TabList variant='line'>
-              <Tab>Change Email</Tab>
-              <Tab>Change Password</Tab>
+              {TAB_VALUES.map(tab => (
+                <Tab
+                  key={tab.value}
+                  value={tab.value}>
+                  {tab.label}
+                </Tab>
+              ))}
             </TabList>
             <TabPanels>
               <TabPanel>
-                <div className='space-y-4'>
-                  <div>
-                    <label
-                      className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
-                      htmlFor='password'>
-                      New Email <span className='text-red-500'>*</span>
-                    </label>
-                    <TextInput
-                      autoComplete='email'
-                      className='mt-2'
-                      id='password'
-                      name='password'
-                      placeholder='john@company.com'
-                      type='email'
-                    />
+                <Form method='post'>
+                  <div className='space-y-4'>
+                    <div>
+                      <label
+                        className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                        htmlFor='new-email'>
+                        New Email <span className='text-red-500'>*</span>
+                      </label>
+                      <TextInput
+                        autoComplete='email'
+                        className='mt-2'
+                        id='new-email'
+                        name='new-email'
+                        placeholder='john@company.com'
+                        type='email'
+                      />
+                    </div>
+                    <div>
+                      <label
+                        className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                        htmlFor='confirm-email'>
+                        Confirm new Email <span className='text-red-500'>*</span>
+                      </label>
+                      <TextInput
+                        autoComplete='email'
+                        className='mt-2'
+                        id='confirm-email'
+                        name='confirm-email'
+                        placeholder='john@company.com'
+                        type='email'
+                      />
+                    </div>
+                    <Button className='w-full'>Change</Button>
                   </div>
-                  <div>
-                    <label
-                      className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
-                      htmlFor='password'>
-                      Confirm new Email <span className='text-red-500'>*</span>
-                    </label>
-                    <TextInput
-                      autoComplete='email'
-                      className='mt-2'
-                      id='password'
-                      name='password'
-                      placeholder='john@company.com'
-                      type='email'
-                    />
-                  </div>
-                  <Button className='w-full'>Change</Button>
-                </div>
+                </Form>
               </TabPanel>
               <TabPanel>
-                <div className='space-y-4'>
-                  <div>
-                    <label
-                      className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
-                      htmlFor='password'>
-                      Old password <span className='text-red-500'>*</span>
-                    </label>
-                    <TextInput
-                      autoComplete='password'
-                      className='mt-2'
-                      id='password'
-                      name='password'
-                      placeholder='password'
-                      type='password'
-                    />
+                <Form>
+                  <div className='space-y-4'>
+                    <div>
+                      <label
+                        className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                        htmlFor='old-password'>
+                        Old password <span className='text-red-500'>*</span>
+                      </label>
+                      <TextInput
+                        autoComplete='password'
+                        className='mt-2'
+                        id='old-password'
+                        name='old-password'
+                        placeholder='password'
+                        type='password'
+                      />
+                    </div>
+                    <div>
+                      <label
+                        className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                        htmlFor='new-password'>
+                        New password <span className='text-red-500'>*</span>
+                      </label>
+                      <TextInput
+                        autoComplete='password'
+                        className='mt-2'
+                        id='new-password'
+                        name='new-password'
+                        placeholder='password'
+                        type='password'
+                      />
+                    </div>
+                    <div>
+                      <label
+                        className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
+                        htmlFor='confirm-password'>
+                        Confirm new password <span className='text-red-500'>*</span>
+                      </label>
+                      <TextInput
+                        autoComplete='password'
+                        className='mt-2'
+                        id='confirm-password'
+                        name='confirm-password'
+                        placeholder='password'
+                        type='password'
+                      />
+                    </div>
+                    <Button className='w-full'>Change</Button>
                   </div>
-                  <div>
-                    <label
-                      className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
-                      htmlFor='password'>
-                      New password <span className='text-red-500'>*</span>
-                    </label>
-                    <TextInput
-                      autoComplete='password'
-                      className='mt-2'
-                      id='password'
-                      name='password'
-                      placeholder='password'
-                      type='password'
-                    />
-                  </div>
-                  <div>
-                    <label
-                      className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
-                      htmlFor='password'>
-                      Confirm new password <span className='text-red-500'>*</span>
-                    </label>
-                    <TextInput
-                      autoComplete='password'
-                      className='mt-2'
-                      id='password'
-                      name='password'
-                      placeholder='password'
-                      type='password'
-                    />
-                  </div>
-                  <Button className='w-full'>Change</Button>
-                </div>
+                </Form>
               </TabPanel>
             </TabPanels>
           </TabGroup>
