@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { Form, redirect, useLoaderData, useSearchParams } from '@remix-run/react';
+import { Form, redirect, useActionData, useLoaderData, useSearchParams } from '@remix-run/react';
 import { RiUserLine } from '@remixicon/react';
 import {
   Button,
@@ -20,6 +20,17 @@ import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser } from '~/db/auth.server';
 import { updateMailAddress, updatePassword } from '~/db/user.server';
 import { QueryParams } from '~/interfaces';
+
+type ChangeMailErrors = {
+  newMail?: string;
+  confirmedMail?: string;
+};
+
+type ChangePwdErrors = {
+  oldPwd?: string;
+  newPwd?: string;
+  confirmedPwd?: string;
+};
 
 const TAB_VALUES = [
   { label: 'Change Email', value: 'email' },
@@ -50,11 +61,55 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
 
   if (parsedQueryParams.tab === 'email') {
-    const mail = formData.get('new-email') as string;
-    await updateMailAddress(user.id, mail);
+    const errors: ChangeMailErrors = {};
+    const newMail = formData.get('new-email') as string;
+    const confirmedMail = formData.get('confirm-email') as string;
+
+    if (newMail !== confirmedMail) {
+      errors.newMail = 'Mail addresses are not identical.';
+      errors.confirmedMail = 'Mail addresses are not identical.';
+    }
+
+    if (!newMail) {
+      errors.newMail = 'This input is required.';
+    }
+
+    if (!confirmedMail) {
+      errors.confirmedMail = 'This input is required.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return { errors };
+    }
+
+    await updateMailAddress(user.id, newMail);
   } else if (parsedQueryParams.tab === 'password') {
+    const errors: ChangePwdErrors = {};
     const oldPwd = formData.get('old-password') as string;
     const newPwd = formData.get('new-password') as string;
+    const confirmedPwd = formData.get('new-password') as string;
+
+    if (!oldPwd) {
+      errors.oldPwd = 'This input is required.';
+    }
+
+    if (!newPwd) {
+      errors.newPwd = 'This input is required.';
+    }
+
+    if (!confirmedPwd) {
+      errors.confirmedPwd = 'This input is required.';
+    }
+
+    if (confirmedPwd !== newPwd) {
+      errors.newPwd = 'Passwords are not identical.';
+      errors.confirmedPwd = 'Passwords are not identical.';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      return { errors };
+    }
+
     await updatePassword(user.id, oldPwd, newPwd);
   }
 
@@ -63,6 +118,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 const AccountSettings = () => {
   const { user } = useLoaderData<typeof loader>();
+  const actionData = useActionData<typeof action>();
   const [open, setIsOpen] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
@@ -119,7 +175,7 @@ const AccountSettings = () => {
             </TabList>
             <TabPanels>
               <TabPanel>
-                <Form method='post'>
+                <Form method='put'>
                   <div className='space-y-4'>
                     <div>
                       <label
@@ -130,6 +186,8 @@ const AccountSettings = () => {
                       <TextInput
                         autoComplete='email'
                         className='mt-2'
+                        error={!!(actionData?.errors as ChangeMailErrors)?.newMail}
+                        errorMessage={(actionData?.errors as ChangeMailErrors)?.newMail}
                         id='new-email'
                         name='new-email'
                         placeholder='john@company.com'
@@ -145,18 +203,24 @@ const AccountSettings = () => {
                       <TextInput
                         autoComplete='email'
                         className='mt-2'
+                        error={!!(actionData?.errors as ChangeMailErrors)?.confirmedMail}
+                        errorMessage={(actionData?.errors as ChangeMailErrors)?.confirmedMail}
                         id='confirm-email'
                         name='confirm-email'
                         placeholder='john@company.com'
                         type='email'
                       />
                     </div>
-                    <Button className='w-full'>Change</Button>
+                    <Button
+                      className='w-full'
+                      type='submit'>
+                      Change
+                    </Button>
                   </div>
                 </Form>
               </TabPanel>
               <TabPanel>
-                <Form>
+                <Form method='put'>
                   <div className='space-y-4'>
                     <div>
                       <label
@@ -167,6 +231,8 @@ const AccountSettings = () => {
                       <TextInput
                         autoComplete='password'
                         className='mt-2'
+                        error={!!(actionData?.errors as ChangePwdErrors)?.oldPwd}
+                        errorMessage={(actionData?.errors as ChangePwdErrors)?.oldPwd}
                         id='old-password'
                         name='old-password'
                         placeholder='password'
@@ -182,6 +248,8 @@ const AccountSettings = () => {
                       <TextInput
                         autoComplete='password'
                         className='mt-2'
+                        error={!!(actionData?.errors as ChangePwdErrors)?.newPwd}
+                        errorMessage={(actionData?.errors as ChangePwdErrors)?.newPwd}
                         id='new-password'
                         name='new-password'
                         placeholder='password'
@@ -197,13 +265,19 @@ const AccountSettings = () => {
                       <TextInput
                         autoComplete='password'
                         className='mt-2'
+                        error={!!(actionData?.errors as ChangePwdErrors)?.confirmedPwd}
+                        errorMessage={(actionData?.errors as ChangePwdErrors)?.confirmedPwd}
                         id='confirm-password'
                         name='confirm-password'
                         placeholder='password'
                         type='password'
                       />
                     </div>
-                    <Button className='w-full'>Change</Button>
+                    <Button
+                      className='w-full'
+                      type='submit'>
+                      Change
+                    </Button>
                   </div>
                 </Form>
               </TabPanel>
