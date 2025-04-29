@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { Form, redirect, useSearchParams } from '@remix-run/react';
+import { Form, redirect, useLoaderData, useSearchParams } from '@remix-run/react';
 import { RiUserLine } from '@remixicon/react';
 import {
   Button,
@@ -27,6 +27,9 @@ const TAB_VALUES = [
 ];
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
+  const user = await getLoggedInUser(request);
+  if (!user) throw redirect('/login');
+
   const url = new URL(request.url);
 
   if (!url.searchParams.has('tab')) {
@@ -34,7 +37,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return redirect(url.toString());
   }
 
-  return null; // continue to render the page
+  return { user }; // continue to render the page
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -59,6 +62,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 const AccountSettings = () => {
+  const { user } = useLoaderData<typeof loader>();
   const [open, setIsOpen] = useState(true);
   const [searchParams, setSearchParams] = useSearchParams();
   const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
@@ -94,9 +98,9 @@ const AccountSettings = () => {
               <RiUserLine />
             </span>
             <div className='truncate text-center'>
-              <p className='text-tremor-default text-tremor-content-strong truncate'>Max Muster</p>
+              <p className='text-tremor-default text-tremor-content-strong truncate'>{`${user.firstName} ${user.lastName}`}</p>
               <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content truncate'>
-                max.muster@gmail.com
+                {user.email}
               </p>
             </div>
           </div>
