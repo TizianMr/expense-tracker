@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { Form, redirect, useActionData, useLoaderData, useSearchParams } from '@remix-run/react';
+import { redirect, useActionData, useFetcher, useLoaderData, useSearchParams } from '@remix-run/react';
 import { RiUserLine } from '@remixicon/react';
 import {
   Button,
@@ -14,10 +14,10 @@ import {
   TextInput,
 } from '@tremor/react';
 import qs from 'qs';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
-import { getLoggedInUser } from '~/db/auth.server';
+import { getLoggedInUser, sessionStorage } from '~/db/auth.server';
 import { updateMailAddress, updatePassword } from '~/db/user.server';
 import { QueryParams } from '~/interfaces';
 
@@ -82,7 +82,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return { errors };
     }
 
-    await updateMailAddress(user.id, newMail);
+    const updatedUser = await updateMailAddress(user.id, newMail);
+
+    const session = await sessionStorage.getSession(request.headers.get('cookie'));
+    session.set('user', updatedUser);
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Set-Cookie': await sessionStorage.commitSession(session),
+      },
+    });
   } else if (parsedQueryParams.tab === 'password') {
     const errors: ChangePwdErrors = {};
     const oldPwd = formData.get('old-password') as string;
@@ -110,7 +120,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       return { errors };
     }
 
-    await updatePassword(user.id, oldPwd, newPwd);
+    const updatedUser = await updatePassword(user.id, oldPwd, newPwd);
+
+    const session = await sessionStorage.getSession(request.headers.get('cookie'));
+    session.set('user', updatedUser);
+
+    return new Response(JSON.stringify({ success: true }), {
+      headers: {
+        'Content-Type': 'application/json',
+        'Set-Cookie': await sessionStorage.commitSession(session),
+      },
+    });
   }
 
   return null;
@@ -120,6 +140,10 @@ const AccountSettings = () => {
   const { user } = useLoaderData<typeof loader>();
   const actionData = useActionData<typeof action>();
   const [open, setIsOpen] = useState(true);
+  const fetcher = useFetcher<{
+    success?: boolean;
+    errors?: ChangeMailErrors | ChangePwdErrors;
+  }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
   const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
@@ -132,10 +156,16 @@ const AccountSettings = () => {
     setSearchParams(qs.stringify(updatedSearchParams), { preventScrollReset: true });
   };
 
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
     triggerDelayedNavigation(); // delay navigation to allow dialog to close with animation
-  };
+  }, [triggerDelayedNavigation]);
+
+  useEffect(() => {
+    if (fetcher.state === 'idle' && fetcher.data?.success) {
+      handleClose();
+    }
+  }, [fetcher.data, fetcher.state, handleClose]);
 
   return (
     <Dialog
@@ -175,7 +205,7 @@ const AccountSettings = () => {
             </TabList>
             <TabPanels>
               <TabPanel>
-                <Form method='put'>
+                <fetcher.Form method='put'>
                   <div className='space-y-4'>
                     <div>
                       <label
@@ -213,14 +243,15 @@ const AccountSettings = () => {
                     </div>
                     <Button
                       className='w-full'
+                      loading={fetcher.state === 'submitting'}
                       type='submit'>
                       Change
                     </Button>
                   </div>
-                </Form>
+                </fetcher.Form>
               </TabPanel>
               <TabPanel>
-                <Form method='put'>
+                <fetcher.Form method='put'>
                   <div className='space-y-4'>
                     <div>
                       <label
@@ -275,11 +306,12 @@ const AccountSettings = () => {
                     </div>
                     <Button
                       className='w-full'
+                      loading={fetcher.state === 'submitting'}
                       type='submit'>
                       Change
                     </Button>
                   </div>
-                </Form>
+                </fetcher.Form>
               </TabPanel>
             </TabPanels>
           </TabGroup>

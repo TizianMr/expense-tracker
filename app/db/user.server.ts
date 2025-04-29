@@ -1,7 +1,14 @@
 import { hash, verify } from 'argon2';
 
 export const updateMailAddress = async (id: string, newMail: string) => {
-  return await prisma.user.update({ where: { id }, data: { email: newMail } });
+  const updatedUser = await prisma.user.update({ where: { id }, data: { email: newMail } });
+
+  return {
+    id: updatedUser.id,
+    email: updatedUser.email,
+    lastName: updatedUser.lastName,
+    firstName: updatedUser.firstName,
+  };
 };
 
 export const updatePassword = async (id: string, oldPassword: string, newPassword: string) => {
@@ -13,5 +20,12 @@ export const updatePassword = async (id: string, oldPassword: string, newPasswor
 
   const hashedPassword = await hash(newPassword);
 
-  return await prisma.user.update({ where: { id }, data: { password: hashedPassword } });
+  const updatedUser = await prisma.user.update({ where: { id }, data: { password: hashedPassword } });
+
+  return {
+    id: updatedUser.id,
+    email: updatedUser.email,
+    lastName: updatedUser.lastName,
+    firstName: updatedUser.firstName,
+  };
 };
