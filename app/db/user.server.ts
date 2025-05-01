@@ -1,6 +1,7 @@
 import { hash, verify } from 'argon2';
 
 export const updateMailAddress = async (id: string, newMail: string) => {
+  // TODO: mail is already taken
   const updatedUser = await prisma.user.update({ where: { id }, data: { email: newMail } });
 
   return {

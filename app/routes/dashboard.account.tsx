@@ -1,32 +1,23 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { redirect, useFetcher, useLoaderData, useSearchParams } from '@remix-run/react';
+import { redirect, useLoaderData, useSearchParams } from '@remix-run/react';
 import { RiUserLine } from '@remixicon/react';
-import {
-  Button,
-  Dialog,
-  DialogPanel,
-  Divider,
-  Tab,
-  TabGroup,
-  TabList,
-  TabPanel,
-  TabPanels,
-  TextInput,
-} from '@tremor/react';
+import { Button, Dialog, DialogPanel, Divider, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react';
 import qs from 'qs';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
+import ChangeMailForm from '~/components/change-mail-form';
+import ChangePasswordForm from '~/components/change-password-form';
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser, sessionStorage } from '~/db/auth.server';
 import { updateMailAddress, updatePassword } from '~/db/user.server';
 import { QueryParams } from '~/interfaces';
 
-type ChangeMailErrors = {
+export type ChangeMailFormErrors = {
   newMail?: string;
   confirmedMail?: string;
 };
 
-type ChangePwdErrors = {
+export type ChangePwdFormErrors = {
   oldPwd?: string;
   newPwd?: string;
   confirmedPwd?: string;
@@ -48,7 +39,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return redirect(url.toString());
   }
 
-  return { user }; // continue to render the page
+  return { user };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -61,7 +52,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
 
   if (parsedQueryParams.tab === 'email') {
-    const clientErrors: ChangeMailErrors = {};
+    const clientErrors: ChangeMailFormErrors = {};
     const newMail = formData.get('new-email') as string;
     const confirmedMail = formData.get('confirm-email') as string;
 
@@ -79,7 +70,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
 
     if (Object.keys(clientErrors).length > 0) {
-      return { errors: clientErrors };
+      return { clientErrors };
     }
 
     try {
@@ -95,13 +86,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         },
       });
     } catch (error) {
-      // Return validation errors
       if (error instanceof Error) {
         return { serverError: error.message };
       }
     }
   } else if (parsedQueryParams.tab === 'password') {
-    const clientErrors: ChangePwdErrors = {};
+    const clientErrors: ChangePwdFormErrors = {};
     const oldPwd = formData.get('old-password') as string;
     const newPwd = formData.get('new-password') as string;
     const confirmedPwd = formData.get('new-password') as string;
@@ -124,7 +114,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
 
     if (Object.keys(clientErrors).length > 0) {
-      return { errors: clientErrors };
+      return { clientErrors };
     }
 
     try {
@@ -140,7 +130,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
         },
       });
     } catch (error) {
-      // Return validation errors
       if (error instanceof Error) {
         return { serverError: error.message };
       }
@@ -153,11 +142,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 const AccountSettings = () => {
   const { user } = useLoaderData<typeof loader>();
   const [open, setIsOpen] = useState(true);
-  const fetcher = useFetcher<{
-    success?: boolean;
-    clientErrors?: ChangeMailErrors | ChangePwdErrors;
-    serverError?: string;
-  }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
   const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
@@ -174,12 +158,6 @@ const AccountSettings = () => {
     setIsOpen(false);
     triggerDelayedNavigation(); // delay navigation to allow dialog to close with animation
   }, [triggerDelayedNavigation]);
-
-  useEffect(() => {
-    if (fetcher.state === 'idle' && fetcher.data?.success) {
-      handleClose();
-    }
-  }, [fetcher.data, fetcher.state, handleClose]);
 
   return (
     <Dialog
@@ -219,123 +197,10 @@ const AccountSettings = () => {
             </TabList>
             <TabPanels>
               <TabPanel>
-                <fetcher.Form method='put'>
-                  <div className='space-y-4'>
-                    <div>
-                      <label
-                        className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
-                        htmlFor='new-email'>
-                        New Email <span className='text-red-500'>*</span>
-                      </label>
-                      <TextInput
-                        autoComplete='email'
-                        className='mt-2'
-                        error={!!(fetcher.data?.clientErrors as ChangeMailErrors)?.newMail}
-                        errorMessage={(fetcher.data?.clientErrors as ChangeMailErrors)?.newMail}
-                        id='new-email'
-                        name='new-email'
-                        placeholder='john@company.com'
-                        type='email'
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
-                        htmlFor='confirm-email'>
-                        Confirm new Email <span className='text-red-500'>*</span>
-                      </label>
-                      <TextInput
-                        autoComplete='email'
-                        className='mt-2'
-                        error={!!(fetcher.data?.clientErrors as ChangeMailErrors)?.confirmedMail}
-                        errorMessage={(fetcher.data?.clientErrors as ChangeMailErrors)?.confirmedMail}
-                        id='confirm-email'
-                        name='confirm-email'
-                        placeholder='john@company.com'
-                        type='email'
-                      />
-                    </div>
-                    <Button
-                      className='w-full'
-                      loading={fetcher.state === 'submitting'}
-                      type='submit'>
-                      Change
-                    </Button>
-                    {fetcher.data?.serverError && (
-                      <p className='mt-2 text-tremor-label text-center text-red-500 dark:text-red-300'>
-                        {fetcher.data.serverError}
-                      </p>
-                    )}
-                  </div>
-                </fetcher.Form>
+                <ChangeMailForm onSuccess={handleClose} />
               </TabPanel>
               <TabPanel>
-                <fetcher.Form method='put'>
-                  <div className='space-y-4'>
-                    <div>
-                      <label
-                        className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
-                        htmlFor='old-password'>
-                        Old password <span className='text-red-500'>*</span>
-                      </label>
-                      <TextInput
-                        autoComplete='password'
-                        className='mt-2'
-                        error={!!(fetcher.data?.clientErrors as ChangePwdErrors)?.oldPwd}
-                        errorMessage={(fetcher.data?.clientErrors as ChangePwdErrors)?.oldPwd}
-                        id='old-password'
-                        name='old-password'
-                        placeholder='password'
-                        type='password'
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
-                        htmlFor='new-password'>
-                        New password <span className='text-red-500'>*</span>
-                      </label>
-                      <TextInput
-                        autoComplete='password'
-                        className='mt-2'
-                        error={!!(fetcher.data?.clientErrors as ChangePwdErrors)?.newPwd}
-                        errorMessage={(fetcher.data?.clientErrors as ChangePwdErrors)?.newPwd}
-                        id='new-password'
-                        name='new-password'
-                        placeholder='password'
-                        type='password'
-                      />
-                    </div>
-                    <div>
-                      <label
-                        className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
-                        htmlFor='confirm-password'>
-                        Confirm new password <span className='text-red-500'>*</span>
-                      </label>
-                      <TextInput
-                        autoComplete='password'
-                        className='mt-2'
-                        error={!!(fetcher.data?.clientErrors as ChangePwdErrors)?.confirmedPwd}
-                        errorMessage={(fetcher.data?.clientErrors as ChangePwdErrors)?.confirmedPwd}
-                        id='confirm-password'
-                        name='confirm-password'
-                        placeholder='password'
-                        type='password'
-                      />
-                    </div>
-                    <Button
-                      className='w-full'
-                      loading={fetcher.state === 'submitting'}
-                      type='submit'>
-                      Change
-                    </Button>
-                    {fetcher.data?.serverError && (
-                      <p className='mt-2 text-tremor-label text-center text-red-500 dark:text-red-300'>
-                        {fetcher.data.serverError}
-                      </p>
-                    )}
-                  </div>
-                </fetcher.Form>
+                <ChangePasswordForm onSuccess={handleClose} />
               </TabPanel>
             </TabPanels>
           </TabGroup>
