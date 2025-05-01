@@ -181,10 +181,24 @@ const AccountSettings = () => {
                 });
               }}>
               <label
-                className='group relative hidden h-20 w-20 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden sm:flex dark:border-gray-800 dark:bg-gray-950 hover:bg-gray-300 cursor-pointer duration-300 ease-in-out'
+                className='group relative hidden h-20 w-20 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden sm:flex dark:border-gray-800 dark:bg-gray-950 hover:bg-gray-600 cursor-pointer duration-300 ease-in-out'
                 htmlFor='profile-pic'>
-                <RiPencilLine className='absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out' />
-                <RiUserLine className='group-hover:opacity-50 transition-opacity duration-300 ease-in-out' />
+                <RiPencilLine
+                  className='absolute inset-0 m-auto opacity-0 group-hover:opacity-100 duration-300 ease-in-out z-10'
+                  color='white'
+                />
+
+                {user.profilePicture ? (
+                  <span className='group-hover:opacity-50 duration-300 ease-in-out'>
+                    <img
+                      alt='avatar'
+                      src={user.profilePicture}
+                    />
+                  </span>
+                ) : (
+                  <RiUserLine className='group-hover:opacity-50 duration-300 ease-in-out' />
+                )}
+
                 <input
                   accept='image/*'
                   className='hidden'

@@ -4,7 +4,7 @@ import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 
-export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName'>;
+export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'>;
 type LoginInfo = Pick<User, 'password' | 'email'>;
 type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'>;
 
@@ -75,5 +75,6 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
     email: user.email,
     lastName: user.lastName,
     firstName: user.firstName,
+    profilePicture: user.profilePicture,
   };
 };
