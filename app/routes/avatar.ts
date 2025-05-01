@@ -8,7 +8,8 @@ export const action: ActionFunction = async ({ request }) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
-  const imageUrl = await uploadAvatar(request);
+  const avatarS3Key = user.profilePicture?.split('/')[user.profilePicture?.split('/').length - 1];
+  const imageUrl = await uploadAvatar(request, avatarS3Key);
 
   const updatedUser = await updateAvatar(user.id, imageUrl);
 

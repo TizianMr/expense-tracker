@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 
-import { S3 } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
 import { createId } from '@paralleldrive/cuid2';
 import { unstable_parseMultipartFormData, UploadHandler } from '@remix-run/node';
@@ -30,7 +30,12 @@ const uploadHandler: UploadHandler = async ({ name, data, filename }) => {
   return Location;
 };
 
-export async function uploadAvatar(request: Request) {
+export async function uploadAvatar(request: Request, oldImgKey?: string) {
+  if (oldImgKey) {
+    const command = new DeleteObjectCommand({ Bucket: process.env.BUCKET_NAME, Key: oldImgKey });
+    await s3.send(command);
+  }
+
   const formData = await unstable_parseMultipartFormData(request, uploadHandler);
   const file = formData.get('profile-pic')?.toString() || '';
 
