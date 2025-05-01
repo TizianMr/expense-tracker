@@ -35,3 +35,14 @@ export const updatePassword = async (id: string, oldPassword: string, newPasswor
     firstName: updatedUser.firstName,
   };
 };
+
+export const updateAvatar = async (id: string, imageUrl: string) => {
+  const updatedUser = await prisma.user.update({ where: { id }, data: { profilePicture: imageUrl } });
+
+  return {
+    id: updatedUser.id,
+    email: updatedUser.email,
+    lastName: updatedUser.lastName,
+    firstName: updatedUser.firstName,
+  };
+};

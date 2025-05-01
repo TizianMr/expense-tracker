@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { redirect, useLoaderData, useSearchParams } from '@remix-run/react';
+import { Form, redirect, useLoaderData, useSearchParams, useSubmit } from '@remix-run/react';
 import { RiPencilLine, RiUserLine } from '@remixicon/react';
 import { Button, Dialog, DialogPanel, Divider, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react';
 import qs from 'qs';
@@ -142,6 +142,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 const AccountSettings = () => {
   const { user } = useLoaderData<typeof loader>();
   const [open, setIsOpen] = useState(true);
+  const submit = useSubmit();
   const [searchParams, setSearchParams] = useSearchParams();
   const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
   const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
@@ -170,26 +171,29 @@ const AccountSettings = () => {
         </h3>
         <div className='flex'>
           <div className='w-[60%] flex flex-col space-y-2 justify-center items-center pt-4'>
-            <label
-              className='group relative hidden h-20 w-20 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden sm:flex dark:border-gray-800 dark:bg-gray-950 hover:bg-gray-300 cursor-pointer duration-300 ease-in-out'
-              htmlFor='profile-picture'>
-              <RiPencilLine className='absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out' />
-              <RiUserLine className='group-hover:opacity-50 transition-opacity duration-300 ease-in-out' />
-              <input
-                accept='image/*'
-                className='hidden'
-                id='profile-picture'
-                type='file'
-                onChange={e => {
-                  const file = e.target.files?.[0];
-                  if (file) {
-                    // trigger action for updloading a file
-                    console.log('Selected file:', file);
-                    // Handle the file upload logic here
-                  }
-                }}
-              />
-            </label>
+            <Form
+              method='post'
+              onChange={e => {
+                submit(e.currentTarget, {
+                  action: '/avatar',
+                  encType: 'multipart/form-data',
+                  navigate: false,
+                });
+              }}>
+              <label
+                className='group relative hidden h-20 w-20 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden sm:flex dark:border-gray-800 dark:bg-gray-950 hover:bg-gray-300 cursor-pointer duration-300 ease-in-out'
+                htmlFor='profile-pic'>
+                <RiPencilLine className='absolute inset-0 m-auto opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out' />
+                <RiUserLine className='group-hover:opacity-50 transition-opacity duration-300 ease-in-out' />
+                <input
+                  accept='image/*'
+                  className='hidden'
+                  id='profile-pic'
+                  name='profile-pic'
+                  type='file'
+                />
+              </label>
+            </Form>
             <div className='truncate text-center'>
               <p className='text-tremor-default text-tremor-content-strong truncate'>{`${user.firstName} ${user.lastName}`}</p>
               <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content truncate'>
