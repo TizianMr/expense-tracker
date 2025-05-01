@@ -86,7 +86,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const clientErrors: ChangePwdFormErrors = {};
     const oldPwd = formData.get('old-password') as string;
     const newPwd = formData.get('new-password') as string;
-    const confirmedPwd = formData.get('new-password') as string;
+    const confirmedPwd = formData.get('confirm-password') as string;
 
     if (!oldPwd) {
       clientErrors.oldPwd = 'This input is required.';

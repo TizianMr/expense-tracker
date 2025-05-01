@@ -39,7 +39,7 @@ const DeleteUserDialog = () => {
           Delete User?
         </h1>
         <p className='mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>
-          Once deleted, you cannot restore your account.
+          Once deleted, you cannot restore your account. All expenses and budgets will be lost.
         </p>
         <div className='mt-8 flex items-center justify-end space-x-2'>
           <Button
