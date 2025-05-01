@@ -1,7 +1,8 @@
 import { Readable } from 'stream';
 
-import { DeleteObjectCommand, S3 } from '@aws-sdk/client-s3';
+import { DeleteObjectCommand, GetObjectCommand, S3 } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { getSignedUrl } from '@aws-sdk/s3-request-presigner';
 import { createId } from '@paralleldrive/cuid2';
 import { unstable_parseMultipartFormData, UploadHandler } from '@remix-run/node';
 
@@ -18,7 +19,7 @@ const uploadHandler: UploadHandler = async ({ name, data, filename }) => {
     return undefined;
   }
 
-  const { Location } = await new Upload({
+  const { Key } = await new Upload({
     client: s3,
     params: {
       Bucket: process.env.BUCKET_NAME || '',
@@ -27,7 +28,14 @@ const uploadHandler: UploadHandler = async ({ name, data, filename }) => {
     },
   }).done();
 
-  return Location;
+  const command = new GetObjectCommand({
+    Bucket: process.env.BUCKET_NAME || '',
+    Key,
+  });
+
+  const url = await getSignedUrl(s3, command);
+
+  return url;
 };
 
 export async function uploadAvatar(request: Request, oldImgKey?: string) {
