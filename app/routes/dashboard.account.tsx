@@ -1,5 +1,5 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { redirect, useActionData, useFetcher, useLoaderData, useSearchParams } from '@remix-run/react';
+import { redirect, useFetcher, useLoaderData, useSearchParams } from '@remix-run/react';
 import { RiUserLine } from '@remixicon/react';
 import {
   Button,
@@ -61,76 +61,90 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
 
   if (parsedQueryParams.tab === 'email') {
-    const errors: ChangeMailErrors = {};
+    const clientErrors: ChangeMailErrors = {};
     const newMail = formData.get('new-email') as string;
     const confirmedMail = formData.get('confirm-email') as string;
 
     if (newMail !== confirmedMail) {
-      errors.newMail = 'Mail addresses are not identical.';
-      errors.confirmedMail = 'Mail addresses are not identical.';
+      clientErrors.newMail = 'Mail addresses are not identical.';
+      clientErrors.confirmedMail = 'Mail addresses are not identical.';
     }
 
     if (!newMail) {
-      errors.newMail = 'This input is required.';
+      clientErrors.newMail = 'This input is required.';
     }
 
     if (!confirmedMail) {
-      errors.confirmedMail = 'This input is required.';
+      clientErrors.confirmedMail = 'This input is required.';
     }
 
-    if (Object.keys(errors).length > 0) {
-      return { errors };
+    if (Object.keys(clientErrors).length > 0) {
+      return { errors: clientErrors };
     }
 
-    const updatedUser = await updateMailAddress(user.id, newMail);
+    try {
+      const updatedUser = await updateMailAddress(user.id, newMail);
 
-    const session = await sessionStorage.getSession(request.headers.get('cookie'));
-    session.set('user', updatedUser);
+      const session = await sessionStorage.getSession(request.headers.get('cookie'));
+      session.set('user', updatedUser);
 
-    return new Response(JSON.stringify({ success: true }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': await sessionStorage.commitSession(session),
-      },
-    });
+      return new Response(JSON.stringify({ success: true }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Set-Cookie': await sessionStorage.commitSession(session),
+        },
+      });
+    } catch (error) {
+      // Return validation errors
+      if (error instanceof Error) {
+        return { serverError: error.message };
+      }
+    }
   } else if (parsedQueryParams.tab === 'password') {
-    const errors: ChangePwdErrors = {};
+    const clientErrors: ChangePwdErrors = {};
     const oldPwd = formData.get('old-password') as string;
     const newPwd = formData.get('new-password') as string;
     const confirmedPwd = formData.get('new-password') as string;
 
     if (!oldPwd) {
-      errors.oldPwd = 'This input is required.';
+      clientErrors.oldPwd = 'This input is required.';
     }
 
     if (!newPwd) {
-      errors.newPwd = 'This input is required.';
+      clientErrors.newPwd = 'This input is required.';
     }
 
     if (!confirmedPwd) {
-      errors.confirmedPwd = 'This input is required.';
+      clientErrors.confirmedPwd = 'This input is required.';
     }
 
     if (confirmedPwd !== newPwd) {
-      errors.newPwd = 'Passwords are not identical.';
-      errors.confirmedPwd = 'Passwords are not identical.';
+      clientErrors.newPwd = 'Passwords are not identical.';
+      clientErrors.confirmedPwd = 'Passwords are not identical.';
     }
 
-    if (Object.keys(errors).length > 0) {
-      return { errors };
+    if (Object.keys(clientErrors).length > 0) {
+      return { errors: clientErrors };
     }
 
-    const updatedUser = await updatePassword(user.id, oldPwd, newPwd);
+    try {
+      const updatedUser = await updatePassword(user.id, oldPwd, newPwd);
 
-    const session = await sessionStorage.getSession(request.headers.get('cookie'));
-    session.set('user', updatedUser);
+      const session = await sessionStorage.getSession(request.headers.get('cookie'));
+      session.set('user', updatedUser);
 
-    return new Response(JSON.stringify({ success: true }), {
-      headers: {
-        'Content-Type': 'application/json',
-        'Set-Cookie': await sessionStorage.commitSession(session),
-      },
-    });
+      return new Response(JSON.stringify({ success: true }), {
+        headers: {
+          'Content-Type': 'application/json',
+          'Set-Cookie': await sessionStorage.commitSession(session),
+        },
+      });
+    } catch (error) {
+      // Return validation errors
+      if (error instanceof Error) {
+        return { serverError: error.message };
+      }
+    }
   }
 
   return null;
@@ -138,11 +152,11 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 const AccountSettings = () => {
   const { user } = useLoaderData<typeof loader>();
-  const actionData = useActionData<typeof action>();
   const [open, setIsOpen] = useState(true);
   const fetcher = useFetcher<{
     success?: boolean;
-    errors?: ChangeMailErrors | ChangePwdErrors;
+    clientErrors?: ChangeMailErrors | ChangePwdErrors;
+    serverError?: string;
   }>();
   const [searchParams, setSearchParams] = useSearchParams();
   const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
@@ -216,8 +230,8 @@ const AccountSettings = () => {
                       <TextInput
                         autoComplete='email'
                         className='mt-2'
-                        error={!!(actionData?.errors as ChangeMailErrors)?.newMail}
-                        errorMessage={(actionData?.errors as ChangeMailErrors)?.newMail}
+                        error={!!(fetcher.data?.clientErrors as ChangeMailErrors)?.newMail}
+                        errorMessage={(fetcher.data?.clientErrors as ChangeMailErrors)?.newMail}
                         id='new-email'
                         name='new-email'
                         placeholder='john@company.com'
@@ -233,8 +247,8 @@ const AccountSettings = () => {
                       <TextInput
                         autoComplete='email'
                         className='mt-2'
-                        error={!!(actionData?.errors as ChangeMailErrors)?.confirmedMail}
-                        errorMessage={(actionData?.errors as ChangeMailErrors)?.confirmedMail}
+                        error={!!(fetcher.data?.clientErrors as ChangeMailErrors)?.confirmedMail}
+                        errorMessage={(fetcher.data?.clientErrors as ChangeMailErrors)?.confirmedMail}
                         id='confirm-email'
                         name='confirm-email'
                         placeholder='john@company.com'
@@ -247,6 +261,11 @@ const AccountSettings = () => {
                       type='submit'>
                       Change
                     </Button>
+                    {fetcher.data?.serverError && (
+                      <p className='mt-2 text-tremor-label text-center text-red-500 dark:text-red-300'>
+                        {fetcher.data.serverError}
+                      </p>
+                    )}
                   </div>
                 </fetcher.Form>
               </TabPanel>
@@ -262,8 +281,8 @@ const AccountSettings = () => {
                       <TextInput
                         autoComplete='password'
                         className='mt-2'
-                        error={!!(actionData?.errors as ChangePwdErrors)?.oldPwd}
-                        errorMessage={(actionData?.errors as ChangePwdErrors)?.oldPwd}
+                        error={!!(fetcher.data?.clientErrors as ChangePwdErrors)?.oldPwd}
+                        errorMessage={(fetcher.data?.clientErrors as ChangePwdErrors)?.oldPwd}
                         id='old-password'
                         name='old-password'
                         placeholder='password'
@@ -279,8 +298,8 @@ const AccountSettings = () => {
                       <TextInput
                         autoComplete='password'
                         className='mt-2'
-                        error={!!(actionData?.errors as ChangePwdErrors)?.newPwd}
-                        errorMessage={(actionData?.errors as ChangePwdErrors)?.newPwd}
+                        error={!!(fetcher.data?.clientErrors as ChangePwdErrors)?.newPwd}
+                        errorMessage={(fetcher.data?.clientErrors as ChangePwdErrors)?.newPwd}
                         id='new-password'
                         name='new-password'
                         placeholder='password'
@@ -296,8 +315,8 @@ const AccountSettings = () => {
                       <TextInput
                         autoComplete='password'
                         className='mt-2'
-                        error={!!(actionData?.errors as ChangePwdErrors)?.confirmedPwd}
-                        errorMessage={(actionData?.errors as ChangePwdErrors)?.confirmedPwd}
+                        error={!!(fetcher.data?.clientErrors as ChangePwdErrors)?.confirmedPwd}
+                        errorMessage={(fetcher.data?.clientErrors as ChangePwdErrors)?.confirmedPwd}
                         id='confirm-password'
                         name='confirm-password'
                         placeholder='password'
@@ -310,6 +329,11 @@ const AccountSettings = () => {
                       type='submit'>
                       Change
                     </Button>
+                    {fetcher.data?.serverError && (
+                      <p className='mt-2 text-tremor-label text-center text-red-500 dark:text-red-300'>
+                        {fetcher.data.serverError}
+                      </p>
+                    )}
                   </div>
                 </fetcher.Form>
               </TabPanel>
