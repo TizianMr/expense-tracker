@@ -1,17 +1,25 @@
 import { ActionFunction, redirect } from '@remix-run/node';
 
 import { getLoggedInUser, updateSession } from '~/db/auth.server';
-import { uploadAvatar } from '~/db/s3.server';
+import { getSignedAvatarUrl, uploadAvatar } from '~/db/s3.server';
 import { updateAvatar } from '~/db/user.server';
+import { getS3ObjectKey } from '~/utils/helpers';
 
 export const action: ActionFunction = async ({ request }) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
-  const avatarS3Key = user.profilePicture?.split('/')[user.profilePicture?.split('/').length - 1];
+  let avatarS3Key: string | undefined;
+  if (user.profilePicture) {
+    avatarS3Key = getS3ObjectKey(user.profilePicture);
+  }
+
   const imageUrl = await uploadAvatar(request, avatarS3Key);
 
   const updatedUser = await updateAvatar(user.id, imageUrl);
 
-  return await updateSession(request, updatedUser);
+  return await updateSession(request, {
+    ...user,
+    profilePicture: await getSignedAvatarUrl(getS3ObjectKey(updatedUser.profilePicture)),
+  });
 };

@@ -4,6 +4,9 @@ import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 
+import { getSignedAvatarUrl } from './s3.server';
+import { getS3ObjectKey } from '~/utils/helpers';
+
 export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'>;
 type LoginInfo = Pick<User, 'password' | 'email'>;
 type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'>;
@@ -82,11 +85,16 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
     throw new Error('Mail or password are not correct');
   }
 
+  let signedAvatarUrl: string | null = null;
+  if (user.profilePicture) {
+    signedAvatarUrl = await getSignedAvatarUrl(getS3ObjectKey(user.profilePicture));
+  }
+
   return {
     id: user.id,
     email: user.email,
     lastName: user.lastName,
     firstName: user.firstName,
-    profilePicture: user.profilePicture,
+    profilePicture: signedAvatarUrl,
   };
 };

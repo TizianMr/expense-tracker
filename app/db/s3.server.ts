@@ -19,7 +19,7 @@ const uploadHandler: UploadHandler = async ({ name, data, filename }) => {
     return undefined;
   }
 
-  const { Key } = await new Upload({
+  const { Location } = await new Upload({
     client: s3,
     params: {
       Bucket: process.env.BUCKET_NAME || '',
@@ -28,24 +28,32 @@ const uploadHandler: UploadHandler = async ({ name, data, filename }) => {
     },
   }).done();
 
-  const command = new GetObjectCommand({
-    Bucket: process.env.BUCKET_NAME || '',
-    Key,
-  });
-
-  const url = await getSignedUrl(s3, command);
-
-  return url;
+  return Location;
 };
 
-export async function uploadAvatar(request: Request, oldImgKey?: string) {
+export const uploadAvatar = async (request: Request, oldImgKey?: string) => {
   if (oldImgKey) {
-    const command = new DeleteObjectCommand({ Bucket: process.env.BUCKET_NAME, Key: oldImgKey });
-    await s3.send(command);
+    deleteAvatar(oldImgKey);
   }
 
   const formData = await unstable_parseMultipartFormData(request, uploadHandler);
   const file = formData.get('profile-pic')?.toString() || '';
 
   return file;
-}
+};
+
+export const deleteAvatar = async (imgKey: string) => {
+  const command = new DeleteObjectCommand({ Bucket: process.env.BUCKET_NAME, Key: imgKey });
+  await s3.send(command);
+};
+
+export const getSignedAvatarUrl = async (imgKey: string) => {
+  const command = new GetObjectCommand({
+    Bucket: process.env.BUCKET_NAME || '',
+    Key: imgKey,
+  });
+
+  const url = await getSignedUrl(s3, command, { expiresIn: 3600 * 5 }); // 5 hours
+
+  return url;
+};

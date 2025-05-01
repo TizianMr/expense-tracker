@@ -76,7 +76,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     try {
       const updatedUser = await updateMailAddress(user.id, newMail);
 
-      return await updateSession(request, updatedUser);
+      return await updateSession(request, { ...user, ...updatedUser });
     } catch (error) {
       if (error instanceof Error) {
         return { serverError: error.message };
@@ -110,9 +110,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     }
 
     try {
-      const updatedUser = await updatePassword(user.id, oldPwd, newPwd);
-
-      return await updateSession(request, updatedUser);
+      await updatePassword(user.id, oldPwd, newPwd);
     } catch (error) {
       if (error instanceof Error) {
         return { serverError: error.message };
@@ -128,7 +126,7 @@ const AccountSettings = () => {
   const [open, setIsOpen] = useState(true);
   const submit = useSubmit();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
+  const { triggerDelayedNavigation } = useDelayedNavigation();
   const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
 
   const handleTabChange = (idx: number) => {
@@ -141,7 +139,7 @@ const AccountSettings = () => {
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
-    triggerDelayedNavigation(); // delay navigation to allow dialog to close with animation
+    triggerDelayedNavigation('/dashboard'); // delay navigation to allow dialog to close with animation
   }, [triggerDelayedNavigation]);
 
   return (
@@ -198,6 +196,15 @@ const AccountSettings = () => {
                 {user.email}
               </p>
             </div>
+            <Button
+              color='red'
+              variant='light'
+              onClick={() => {
+                setIsOpen(false);
+                triggerDelayedNavigation('delete');
+              }}>
+              Delete account
+            </Button>
           </div>
 
           <TabGroup

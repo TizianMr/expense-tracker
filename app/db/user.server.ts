@@ -1,8 +1,9 @@
 import { hash, verify } from 'argon2';
 
-import { AuthUser } from './auth.server';
+import { deleteAvatar } from './s3.server';
+import { getS3ObjectKey } from '~/utils/helpers';
 
-export const updateMailAddress = async (id: string, newMail: string): Promise<AuthUser> => {
+export const updateMailAddress = async (id: string, newMail: string) => {
   const userWithSameMail = await prisma.user.findUnique({ where: { email: newMail } });
 
   if (userWithSameMail) {
@@ -12,15 +13,11 @@ export const updateMailAddress = async (id: string, newMail: string): Promise<Au
   const updatedUser = await prisma.user.update({ where: { id }, data: { email: newMail } });
 
   return {
-    id: updatedUser.id,
     email: updatedUser.email,
-    lastName: updatedUser.lastName,
-    firstName: updatedUser.firstName,
-    profilePicture: updatedUser.profilePicture,
   };
 };
 
-export const updatePassword = async (id: string, oldPassword: string, newPassword: string): Promise<AuthUser> => {
+export const updatePassword = async (id: string, oldPassword: string, newPassword: string) => {
   const user = await prisma.user.findUnique({ where: { id } });
 
   if (!user || !(await verify(user.password, oldPassword))) {
@@ -28,26 +25,21 @@ export const updatePassword = async (id: string, oldPassword: string, newPasswor
   }
 
   const hashedPassword = await hash(newPassword);
+  await prisma.user.update({ where: { id }, data: { password: hashedPassword } });
+};
 
-  const updatedUser = await prisma.user.update({ where: { id }, data: { password: hashedPassword } });
+export const updateAvatar = async (id: string, imageUrl: string) => {
+  await prisma.user.update({ where: { id }, data: { profilePicture: imageUrl } });
 
   return {
-    id: updatedUser.id,
-    email: updatedUser.email,
-    lastName: updatedUser.lastName,
-    firstName: updatedUser.firstName,
-    profilePicture: updatedUser.profilePicture,
+    profilePicture: imageUrl,
   };
 };
 
-export const updateAvatar = async (id: string, imageUrl: string): Promise<AuthUser> => {
-  const updatedUser = await prisma.user.update({ where: { id }, data: { profilePicture: imageUrl } });
+export const deleteUser = async (id: string) => {
+  const deletedUser = await prisma.user.delete({ where: { id } });
 
-  return {
-    id: updatedUser.id,
-    email: updatedUser.email,
-    lastName: updatedUser.lastName,
-    firstName: updatedUser.firstName,
-    profilePicture: updatedUser.profilePicture,
-  };
+  if (deletedUser.profilePicture) {
+    await deleteAvatar(getS3ObjectKey(deletedUser.profilePicture));
+  }
 };
