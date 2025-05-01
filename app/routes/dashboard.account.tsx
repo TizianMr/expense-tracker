@@ -8,7 +8,7 @@ import { useCallback, useState } from 'react';
 import ChangeMailForm from '~/components/change-mail-form';
 import ChangePasswordForm from '~/components/change-password-form';
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
-import { getLoggedInUser, sessionStorage } from '~/db/auth.server';
+import { getLoggedInUser, updateSession } from '~/db/auth.server';
 import { updateMailAddress, updatePassword } from '~/db/user.server';
 import { QueryParams } from '~/interfaces';
 
@@ -76,15 +76,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     try {
       const updatedUser = await updateMailAddress(user.id, newMail);
 
-      const session = await sessionStorage.getSession(request.headers.get('cookie'));
-      session.set('user', updatedUser);
-
-      return new Response(JSON.stringify({ success: true }), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Set-Cookie': await sessionStorage.commitSession(session),
-        },
-      });
+      return await updateSession(request, updatedUser);
     } catch (error) {
       if (error instanceof Error) {
         return { serverError: error.message };
@@ -120,15 +112,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     try {
       const updatedUser = await updatePassword(user.id, oldPwd, newPwd);
 
-      const session = await sessionStorage.getSession(request.headers.get('cookie'));
-      session.set('user', updatedUser);
-
-      return new Response(JSON.stringify({ success: true }), {
-        headers: {
-          'Content-Type': 'application/json',
-          'Set-Cookie': await sessionStorage.commitSession(session),
-        },
-      });
+      return await updateSession(request, updatedUser);
     } catch (error) {
       if (error instanceof Error) {
         return { serverError: error.message };

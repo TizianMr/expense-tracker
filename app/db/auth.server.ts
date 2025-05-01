@@ -37,6 +37,18 @@ authenticator.use(
   EMAIL_PASSWORD_STRATEGY,
 );
 
+export const updateSession = async (request: Request, updatedUser: AuthUser): Promise<Response> => {
+  const session = await sessionStorage.getSession(request.headers.get('cookie'));
+  session.set('user', updatedUser);
+
+  return new Response(JSON.stringify({ success: true }), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Set-Cookie': await sessionStorage.commitSession(session),
+    },
+  });
+};
+
 export const getLoggedInUser = async (request: Request): Promise<AuthUser | null> => {
   const session = await sessionStorage.getSession(request.headers.get('cookie'));
   const user = session.get('user');
