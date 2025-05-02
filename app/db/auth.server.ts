@@ -4,7 +4,10 @@ import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 
-export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName'>;
+import { getSignedAvatarUrl } from './s3.server';
+import { getS3ObjectKey } from '~/utils/helpers';
+
+export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'>;
 type LoginInfo = Pick<User, 'password' | 'email'>;
 type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'>;
 
@@ -36,6 +39,18 @@ authenticator.use(
   }),
   EMAIL_PASSWORD_STRATEGY,
 );
+
+export const updateSession = async (request: Request, updatedUser: AuthUser): Promise<Response> => {
+  const session = await sessionStorage.getSession(request.headers.get('cookie'));
+  session.set('user', updatedUser);
+
+  return new Response(JSON.stringify({ success: true }), {
+    headers: {
+      'Content-Type': 'application/json',
+      'Set-Cookie': await sessionStorage.commitSession(session),
+    },
+  });
+};
 
 export const getLoggedInUser = async (request: Request): Promise<AuthUser | null> => {
   const session = await sessionStorage.getSession(request.headers.get('cookie'));
@@ -70,10 +85,16 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
     throw new Error('Mail or password are not correct');
   }
 
+  let signedAvatarUrl: string | null = null;
+  if (user.profilePicture) {
+    signedAvatarUrl = await getSignedAvatarUrl(getS3ObjectKey(user.profilePicture));
+  }
+
   return {
     id: user.id,
     email: user.email,
     lastName: user.lastName,
     firstName: user.firstName,
+    profilePicture: signedAvatarUrl,
   };
 };

@@ -24,3 +24,7 @@ export const getCalenderWeek = (date: Date): string => {
   const weekNumber = getISOWeek(date);
   return `Week ${weekNumber}`;
 };
+
+export const getS3ObjectKey = (objUrl: string) => {
+  return objUrl.split('/')[objUrl.split('/').length - 1];
+};

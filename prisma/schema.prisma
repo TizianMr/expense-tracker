@@ -30,7 +30,7 @@ model Expense {
   category        Category?
   budget          Budget?   @relation(fields: [budgetId], references: [id])
   budgetId        String?
-  user            User      @relation(fields: [createdByUserId], references: [id])
+  user            User      @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
   createdByUserId String
 }
 
@@ -41,18 +41,19 @@ model Budget {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   expenses        Expense[]
-  user            User      @relation(fields: [createdByUserId], references: [id])
+  user            User      @relation(fields: [createdByUserId], references: [id], onDelete: Cascade)
   createdByUserId String
 }
 
 model User {
-  id        String    @id @default(cuid())
-  email     String    @unique
-  password  String
-  firstName String
-  lastName  String
-  createdAt DateTime  @default(now())
-  updatedAt DateTime  @updatedAt
-  Expense   Expense[]
-  Budget    Budget[]
+  id             String    @id @default(cuid())
+  email          String    @unique
+  password       String
+  firstName      String
+  lastName       String
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+  profilePicture String?
+  Expense        Expense[]
+  Budget         Budget[]
 }

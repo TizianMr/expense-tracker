@@ -57,7 +57,7 @@ const valueFormatter = (number: number) => formatCurrency(number);
 
 const BudgetDetails = () => {
   const [open, setIsOpen] = useState(true);
-  const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
+  const { triggerDelayedNavigation } = useDelayedNavigation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { budget, expenses } = useLoaderData<typeof loader>();
 
@@ -68,7 +68,7 @@ const BudgetDetails = () => {
 
   const handleClose = () => {
     setIsOpen(false);
-    triggerDelayedNavigation(); // delay navigation to allow dialog to close with animation
+    triggerDelayedNavigation('/dashboard'); // delay navigation to allow dialog to close with animation
   };
 
   const handleValueChange = (v: EventProps) => {

@@ -57,6 +57,7 @@ export interface QueryParams {
   budget?: BudgetQuery;
   budgetDetails?: BudgetDetailsQuery;
   statistics?: StatisticPeriod;
+  tab?: string;
 }
 
 /*************TABLE*************/

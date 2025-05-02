@@ -22,12 +22,12 @@ const DeleteExpenseDialog = () => {
   const data = useActionData<typeof action>();
   const navigate = useNavigate();
   const { state } = useNavigation();
-  const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
+  const { triggerDelayedNavigation } = useDelayedNavigation();
   const [isOpen, setIsOpen] = useState(true);
 
   const handleClose = useCallback(() => {
     setIsOpen(false);
-    triggerDelayedNavigation(); // delay navigation to allow dialog to close with animation
+    triggerDelayedNavigation('/dashboard'); // delay navigation to allow dialog to close with animation
   }, [triggerDelayedNavigation]);
 
   useEffect(() => {

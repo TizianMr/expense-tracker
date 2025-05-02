@@ -15,7 +15,7 @@ const ExpenseDialogRoot = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const inOutlet = !!useOutlet();
-  const { triggerDelayedNavigation } = useDelayedNavigation('/dashboard');
+  const { triggerDelayedNavigation } = useDelayedNavigation();
 
   const pathnames = location.pathname.split('/expenses/');
   const action = pathnames[pathnames.length - 1];
@@ -37,7 +37,7 @@ const ExpenseDialogRoot = () => {
 
   const handleClose = () => {
     setIsOpen(false);
-    triggerDelayedNavigation(); // delay navigation to allow dialog to close with animation
+    triggerDelayedNavigation('/dashboard'); // delay navigation to allow dialog to close with animation
     setErrors({});
   };
 

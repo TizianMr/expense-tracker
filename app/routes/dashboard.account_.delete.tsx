@@ -1,25 +1,25 @@
 import { ActionFunctionArgs } from '@remix-run/node';
-import { Form, redirect, useActionData, useNavigate, useNavigation } from '@remix-run/react';
+import { Form, redirect, useNavigation } from '@remix-run/react';
 import { Button, Dialog, DialogPanel } from '@tremor/react';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
-import { getLoggedInUser } from '~/db/auth.server';
-import { deleteBudget } from '~/db/budget.server';
+import { getLoggedInUser, sessionStorage } from '~/db/auth.server';
+import { deleteUser } from '~/db/user.server';
 
-export const action = async ({ params, request }: ActionFunctionArgs) => {
-  const budgetId = params.budget as string;
+export const action = async ({ request }: ActionFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
-  await deleteBudget(budgetId, user.id);
+  await deleteUser(user.id);
 
-  return { expenseId: budgetId };
+  const session = await sessionStorage.getSession(request.headers.get('cookie'));
+  return redirect('/login', {
+    headers: { 'Set-Cookie': await sessionStorage.destroySession(session) },
+  });
 };
 
-const DeleteBudgetDialog = () => {
-  const data = useActionData<typeof action>();
-  const navigate = useNavigate();
+const DeleteUserDialog = () => {
   const { state } = useNavigation();
   const { triggerDelayedNavigation } = useDelayedNavigation();
   const [isOpen, setIsOpen] = useState(true);
@@ -29,12 +29,6 @@ const DeleteBudgetDialog = () => {
     triggerDelayedNavigation('/dashboard'); // delay navigation to allow dialog to close with animation
   }, [triggerDelayedNavigation]);
 
-  useEffect(() => {
-    if (data) {
-      handleClose();
-    }
-  }, [data, handleClose, navigate]);
-
   return (
     <Dialog
       open={isOpen}
@@ -42,10 +36,10 @@ const DeleteBudgetDialog = () => {
       onClose={handleClose}>
       <DialogPanel>
         <h1 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-          Delete budget?
+          Delete User?
         </h1>
         <p className='mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>
-          The budget assignment of all linked expenses will be reseted.
+          Once deleted, you cannot restore your account. All expenses and budgets will be lost.
         </p>
         <div className='mt-8 flex items-center justify-end space-x-2'>
           <Button
@@ -68,4 +62,4 @@ const DeleteBudgetDialog = () => {
   );
 };
 
-export default DeleteBudgetDialog;
+export default DeleteUserDialog;
