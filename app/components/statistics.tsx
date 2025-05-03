@@ -55,7 +55,7 @@ const Statistics = ({ statistics }: Props) => {
           showAnimation
           categories={['amount']}
           className='h-[90%]'
-          colors={['blue']}
+          colors={['emerald']}
           data={statistics.expensesByPeriod}
           index='name'
           noDataText='No expenses to show'
