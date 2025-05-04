@@ -147,12 +147,12 @@ const AccountSettings = () => {
       static
       open={open}
       onClose={handleClose}>
-      <DialogPanel className='w-[40vw] big-dialog'>
+      <DialogPanel className='lg:w-[40vw] big-dialog'>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
           Account Settings
         </h3>
-        <div className='flex'>
-          <div className='w-[60%] flex flex-col space-y-2 justify-center items-center pt-4'>
+        <div className='flex lg:flex-row flex-col'>
+          <div className='lg:w-[60%] flex flex-col space-y-2 justify-center items-center pt-4'>
             <Form
               method='post'
               onChange={e => {
@@ -163,7 +163,7 @@ const AccountSettings = () => {
                 });
               }}>
               <label
-                className='group relative hidden h-20 w-20 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden sm:flex dark:border-gray-800 dark:bg-gray-950 hover:bg-gray-600 cursor-pointer duration-300 ease-in-out'
+                className='group relative h-20 w-20 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden flex dark:border-gray-800 dark:bg-gray-950 hover:bg-gray-600 cursor-pointer duration-300 ease-in-out'
                 htmlFor='profile-pic'>
                 <RiPencilLine
                   className='absolute inset-0 m-auto opacity-0 group-hover:opacity-100 duration-300 ease-in-out z-10'
