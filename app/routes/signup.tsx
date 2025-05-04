@@ -55,11 +55,11 @@ const SignUpPage = () => {
   return (
     <>
       <div className='flex min-h-screen flex-1 flex-col justify-center px-4 py-10 lg:px-6'>
-        <div className='sm:mx-auto sm:w-full sm:max-w-sm'>
+        <div className='sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center flex-1'>
           <img
             alt='Expense tracker logo'
             className='mx-auto'
-            src='logo-horizontal.png'
+            src='/logo-horizontal.png'
             width='200rem'
           />
           <h3 className='text-center text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
@@ -143,6 +143,14 @@ const SignUpPage = () => {
             </span>
           </p>
         </div>
+
+        <a
+          className='text-center w-full text-tremor-content-subtle underline'
+          href='https://github.com/TizianMr/expense-tracker'
+          rel='noreferrer'
+          target='_blank'>
+          Link to github repository
+        </a>
       </div>
     </>
   );

@@ -61,7 +61,7 @@ const Dashboard = () => {
   const { isLoadingLongerThanDelay: isDataLoading } = useDelayedLoading();
 
   return (
-    <div className='container m-auto grid lg:grid-cols-[max-content_1fr] lg:grid-rows-[4vh,45vh,45vh] grid-rows-[4vh_auto_auto_auto] gap-4'>
+    <div className='container m-auto grid lg:grid-cols-[max-content_1fr] lg:grid-rows-[4vh,45vh,45vh,2vh] grid-rows-[4vh_auto_auto_auto] gap-4'>
       <div className='flex justify-end md:justify-between col-span-5 pt-4'>
         <img
           alt='Expense tracker logo'
@@ -160,6 +160,13 @@ const Dashboard = () => {
         </div>
       </Card>
       <Outlet />
+      <a
+        className='text-center col-span-5 text-tremor-content-subtle underline'
+        href='https://github.com/TizianMr/expense-tracker'
+        rel='noreferrer'
+        target='_blank'>
+        Link to github repository
+      </a>
     </div>
   );
 };
