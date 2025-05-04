@@ -61,21 +61,21 @@ const Dashboard = () => {
   const { isLoadingLongerThanDelay: isDataLoading } = useDelayedLoading();
 
   return (
-    <div className='container m-auto grid grid-cols-[max-content_1fr] grid-rows-[4vh,45vh,45vh] gap-4'>
-      <div className='flex justify-between col-span-5 pt-4'>
+    <div className='container m-auto grid lg:grid-cols-[max-content_1fr] lg:grid-rows-[4vh,45vh,45vh] grid-rows-[4vh_auto_auto_auto] gap-4'>
+      <div className='flex justify-end md:justify-between col-span-5 pt-4'>
         <img
           alt='Expense tracker logo'
-          className='h-full w-auto object-contain'
+          className='hidden h-full w-auto object-contain md:block'
           src='logo-horizontal.png'
         />
         <UserDropdown userInfo={user} />
       </div>
 
-      <Card className='col-span-4'>
+      <Card className='lg:col-span-4 col-span-5'>
         <Statistics statistics={statistics} />
       </Card>
 
-      <Card className='flex flex-col mx-auto col-span-4'>
+      <Card className='flex flex-col lg:col-span-4 col-span-5 min-w-0'>
         <div className='flex items-center justify-between'>
           <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
             Expenses
@@ -91,7 +91,7 @@ const Dashboard = () => {
         />
       </Card>
 
-      <Card className='col-span-1 row-start-2 col-start-5 row-span-2 flex flex-col'>
+      <Card className='lg:col-span-1 lg:row-start-2 lg:col-start-5 lg:row-span-2 col-span-5 row-start-3 flex flex-col'>
         <div className='flex items-center justify-between'>
           <div className='flex items-center'>
             <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
@@ -122,8 +122,8 @@ const Dashboard = () => {
             <Button icon={RiAddLine}>Create budget</Button>
           </NavLink>
         </div>
-        <div className='flex flex-col mx-auto h-full mt-12'>
-          <div className='flex flex-col flex-grow space-y-6'>
+        <div className='flex flex-col mx-auto h-full w-full lg:mt-12 mt-6'>
+          <div className='flex flex-col flex-grow justify-center lg:justify-start lg:space-y-6'>
             {isDataLoading ? (
               <LoadingSpinner />
             ) : budgets.items.length ? (
@@ -151,7 +151,7 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-          <div>
+          <div className='w-full'>
             <Pagination
               paginationState={{ totalItems: budgets.totalItems, page: budgets.page, pageSize: budgets.pageSize }}
               searchParamKey='budget'

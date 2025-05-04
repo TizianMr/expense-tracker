@@ -94,7 +94,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
         </span>{' '}
         of <span className='font-semibold text-gray-900 dark:text-gray-50'>{totalItems}</span>
       </p>{' '}
-      <div className='flex items-center gap-x-6 lg:gap-x-8'>
+      <div className='flex items-center sm:w-auto w-full justify-center gap-x-6 lg:gap-x-8'>
         <div className='flex items-center gap-x-1.5'>
           {paginationButtons.map((button, index) => (
             <Button

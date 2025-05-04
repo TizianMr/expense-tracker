@@ -26,7 +26,7 @@ const UserDropdown = ({ userInfo }: Props) => {
             <div className='flex space-x-2 justify-end items-center'>
               <span
                 aria-hidden='true'
-                className='hidden h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden sm:flex dark:border-gray-800 dark:bg-gray-950 object-contain'>
+                className='hidden h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden md:flex dark:border-gray-800 dark:bg-gray-950 object-contain'>
                 {userInfo.profilePicture ? (
                   <img
                     alt='avatar'

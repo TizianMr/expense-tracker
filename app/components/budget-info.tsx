@@ -22,7 +22,7 @@ const BudgetInfo = ({ totalAmount, usedAmount, title, id }: Props) => {
   return (
     <div>
       <div
-        className='flex justify-start space-x-5 items-center hover:hover:bg-gray-100 p-2 rounded-lg'
+        className='flex lg:flex-row flex-col text-center lg:text-left justify-start lg:space-x-5 items-center hover:hover:bg-gray-100 p-2 rounded-lg'
         role='button'
         tabIndex={0}
         onClick={handleRowClick}
