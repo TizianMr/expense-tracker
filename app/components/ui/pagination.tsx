@@ -86,7 +86,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
   ];
 
   return (
-    <div className='flex items-center justify-between'>
+    <div className='flex items-center justify-between gap-2'>
       <p className='hidden text-sm tabular-nums text-gray-500 sm:block'>
         Showing{' '}
         <span className='font-semibold text-gray-900 dark:text-gray-50'>

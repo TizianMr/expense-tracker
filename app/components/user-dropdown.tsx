@@ -19,11 +19,11 @@ const UserDropdown = ({ userInfo }: Props) => {
   const submit = useSubmit();
 
   return (
-    <div className='flex justify-end p-5'>
+    <div className='flex justify-end'>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button variant='light'>
-            <div className='flex space-x-2 justify-end items-center w-[16rem]'>
+            <div className='flex space-x-2 justify-end items-center'>
               <span
                 aria-hidden='true'
                 className='hidden h-12 w-12 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden sm:flex dark:border-gray-800 dark:bg-gray-950 object-contain'>
