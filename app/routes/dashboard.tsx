@@ -66,7 +66,7 @@ const Dashboard = () => {
         <img
           alt='Expense tracker logo'
           className='hidden h-full w-auto object-contain md:block'
-          src='logo-horizontal.png'
+          src='/logo-horizontal.png'
         />
         <UserDropdown userInfo={user} />
       </div>
