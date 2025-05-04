@@ -35,7 +35,7 @@ const Statistics = ({ statistics }: Props) => {
 
   return (
     <>
-      <div className='flex items-center justify-between pb-6'>
+      <div className='flex items-center justify-between'>
         <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
           Statistics
         </h1>
@@ -50,20 +50,19 @@ const Statistics = ({ statistics }: Props) => {
         </TabGroup>
       </div>
 
-      <div className='flex space-x-20 w-full h-full items-center'>
+      <div className='flex lg:flex-row flex-col lg:space-x-20 lg:space-y-0 space-y-10 lg:pt-0 pt-4 w-full h-full items-center'>
         <BarChart
           showAnimation
           categories={['amount']}
-          className='h-[90%]'
-          colors={['blue']}
+          className='lg:h-[90%]'
+          colors={['emerald']}
           data={statistics.expensesByPeriod}
           index='name'
           noDataText='No expenses to show'
           showLegend={false}
           valueFormatter={valueFormatter}
-          yAxisWidth={48}
         />
-        <div className='flex flex-col w-[40%] self-center'>
+        <div className='flex flex-col md:w-[40%] self-center'>
           <DonutChart
             category='amount'
             colors={categoryColors}

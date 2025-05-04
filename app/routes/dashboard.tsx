@@ -61,63 +61,69 @@ const Dashboard = () => {
   const { isLoadingLongerThanDelay: isDataLoading } = useDelayedLoading();
 
   return (
-    <>
-      <UserDropdown userInfo={user} />
-      <div className='flex'>
-        <Card className='flex flex-col mx-auto w-[80vw] h-[35vh]'>
-          <Statistics statistics={statistics} />
-        </Card>
+    <div className='container m-auto grid lg:grid-cols-[max-content_1fr] lg:grid-rows-[4vh,45vh,45vh] grid-rows-[4vh_auto_auto_auto] gap-4'>
+      <div className='flex justify-end md:justify-between col-span-5 pt-4'>
+        <img
+          alt='Expense tracker logo'
+          className='hidden h-full w-auto object-contain md:block'
+          src='logo-horizontal.png'
+        />
+        <UserDropdown userInfo={user} />
       </div>
-      <div className='flex justify-content-center'>
-        <Card className='flex flex-col mx-auto w-[80vw] h-[40vh]'>
-          <div className='flex items-center justify-between'>
-            <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
-              Expenses
-            </h1>
-            <NavLink to='expenses/create'>
-              <Button icon={RiAddLine}>Create expense</Button>
-            </NavLink>
-          </div>
-          <ExpenseTable
-            expenses={expenses.items}
-            paginationState={{ totalItems: expenses.totalItems, page: expenses.page, pageSize: expenses.pageSize }}
-            searchParamKey='expense'
-          />
-        </Card>
-      </div>
-      <div className='flex justify-content-center'>
-        <Card className='mx-auto w-[25vw]'>
-          <div className='flex items-center justify-between'>
-            <div className='flex items-center'>
-              <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
-                Budgets
-              </h1>
-              <Tooltip
-                className='w-[20rem]'
-                content={
-                  <Legend
-                    categories={[
-                      'No worries! You are well within your budget.',
-                      "Heads up! You're nearing your budget limit.",
-                      "Alert! You've nearly maxed out your budget.",
-                    ]}
-                    className='tooltip-legend-white'
-                    colors={['emerald', 'orange', 'red']}
-                  />
-                }
-                showArrow={false}>
-                <Icon
-                  icon={RiQuestionLine}
-                  size='sm'
-                />
-              </Tooltip>
-            </div>
 
-            <NavLink to='budgets/create'>
-              <Button icon={RiAddLine}>Create budget</Button>
-            </NavLink>
+      <Card className='lg:col-span-4 col-span-5'>
+        <Statistics statistics={statistics} />
+      </Card>
+
+      <Card className='flex flex-col lg:col-span-4 col-span-5 min-w-0'>
+        <div className='flex items-center justify-between'>
+          <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
+            Expenses
+          </h1>
+          <NavLink to='expenses/create'>
+            <Button icon={RiAddLine}>Create expense</Button>
+          </NavLink>
+        </div>
+        <ExpenseTable
+          expenses={expenses.items}
+          paginationState={{ totalItems: expenses.totalItems, page: expenses.page, pageSize: expenses.pageSize }}
+          searchParamKey='expense'
+        />
+      </Card>
+
+      <Card className='lg:col-span-1 lg:row-start-2 lg:col-start-5 lg:row-span-2 col-span-5 row-start-3 flex flex-col'>
+        <div className='flex items-center justify-between'>
+          <div className='flex items-center'>
+            <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
+              Budgets
+            </h1>
+            <Tooltip
+              className='w-[20rem]'
+              content={
+                <Legend
+                  categories={[
+                    'No worries! You are well within your budget.',
+                    "Heads up! You're nearing your budget limit.",
+                    "Alert! You've nearly maxed out your budget.",
+                  ]}
+                  className='tooltip-legend-white'
+                  colors={['emerald', 'orange', 'red']}
+                />
+              }
+              showArrow={false}>
+              <Icon
+                icon={RiQuestionLine}
+                size='sm'
+              />
+            </Tooltip>
           </div>
-          <div className='space-y-6 mt-5'>
+
+          <NavLink to='budgets/create'>
+            <Button icon={RiAddLine}>Create budget</Button>
+          </NavLink>
+        </div>
+        <div className='flex flex-col mx-auto h-full w-full lg:mt-12 mt-6'>
+          <div className='flex flex-col flex-grow justify-center lg:justify-start lg:space-y-6'>
             {isDataLoading ? (
               <LoadingSpinner />
             ) : budgets.items.length ? (
@@ -145,16 +151,16 @@ const Dashboard = () => {
               </div>
             )}
           </div>
-          <div className='mt-6'>
+          <div className='w-full'>
             <Pagination
               paginationState={{ totalItems: budgets.totalItems, page: budgets.page, pageSize: budgets.pageSize }}
               searchParamKey='budget'
             />
           </div>
-        </Card>
-      </div>
+        </div>
+      </Card>
       <Outlet />
-    </>
+    </div>
   );
 };
 

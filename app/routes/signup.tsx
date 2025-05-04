@@ -59,8 +59,8 @@ const SignUpPage = () => {
           <img
             alt='Expense tracker logo'
             className='mx-auto'
-            src='logo.png'
-            width='150rem'
+            src='logo-horizontal.png'
+            width='200rem'
           />
           <h3 className='text-center text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
             Sign up

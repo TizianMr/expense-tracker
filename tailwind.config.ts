@@ -18,11 +18,11 @@ export default {
         // light mode
         'tremor': {
           brand: {
-            faint: colors.blue[50],
-            muted: colors.blue[200],
-            subtle: colors.blue[400],
-            DEFAULT: colors.blue[500],
-            emphasis: colors.blue[700],
+            faint: colors.emerald[50],
+            muted: colors.emerald[200],
+            subtle: colors.emerald[400],
+            DEFAULT: colors.emerald[500],
+            emphasis: colors.emerald[700],
             inverted: colors.white,
           },
           background: {
@@ -49,11 +49,11 @@ export default {
         'dark-tremor': {
           brand: {
             faint: '#0B1229',
-            muted: colors.blue[950],
-            subtle: colors.blue[800],
-            DEFAULT: colors.blue[500],
-            emphasis: colors.blue[400],
-            inverted: colors.blue[950],
+            muted: colors.emerald[950],
+            subtle: colors.emerald[800],
+            DEFAULT: colors.emerald[500],
+            emphasis: colors.emerald[400],
+            inverted: colors.emerald[950],
           },
           background: {
             muted: '#131A2B',
