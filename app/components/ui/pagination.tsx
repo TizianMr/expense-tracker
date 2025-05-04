@@ -62,7 +62,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
 
         setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
-      disabled: Number(currentPage) == Math.ceil(totalItems / pageSize),
+      disabled: Number(currentPage) >= Math.ceil(totalItems / pageSize),
       srText: 'Next page',
       mobileView: '',
     },
@@ -79,7 +79,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
 
         setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
-      disabled: currentPage === Math.ceil(totalItems / pageSize),
+      disabled: currentPage >= Math.ceil(totalItems / pageSize),
       srText: 'Last page',
       mobileView: 'hidden sm:block',
     },
