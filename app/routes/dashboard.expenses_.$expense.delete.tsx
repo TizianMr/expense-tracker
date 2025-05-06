@@ -1,6 +1,6 @@
 import { Prisma } from '@prisma/client';
 import { ActionFunctionArgs } from '@remix-run/node';
-import { Form, redirect, useActionData, useNavigate, useNavigation } from '@remix-run/react';
+import { Form, redirect, useActionData, useNavigation } from '@remix-run/react';
 import { Button, Dialog, DialogPanel } from '@tremor/react';
 import { useCallback, useEffect, useState } from 'react';
 
@@ -27,7 +27,6 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
 const DeleteExpenseDialog = () => {
   const data = useActionData<typeof action>();
-  const navigate = useNavigate();
   const { state } = useNavigation();
   const { triggerDelayedNavigation } = useDelayedNavigation();
   const [isOpen, setIsOpen] = useState(true);
@@ -38,10 +37,12 @@ const DeleteExpenseDialog = () => {
   }, [triggerDelayedNavigation]);
 
   useEffect(() => {
-    if (data && !data.serverError) {
-      handleClose();
+    if (data && !data.serverError && state !== 'submitting') {
+      if (isOpen) {
+        handleClose();
+      }
     }
-  }, [data, handleClose, navigate]);
+  }, [data, handleClose, isOpen, state]);
 
   return (
     <Dialog

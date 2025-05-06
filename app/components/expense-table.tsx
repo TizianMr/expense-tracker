@@ -5,7 +5,8 @@ import { ExpenseDropdown } from './expense-dropdown';
 import LoadingSpinner from './ui/loading-spinner';
 import Pagination from './ui/pagination';
 import TableHeader from './ui/table-header';
-import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
+import { useDelayedNavigationLoading } from '~/customHooks/useDelayedNavigationLoading';
+import { useDelayedQueryParamLoading } from '~/customHooks/useDelayedQueryParamLoading';
 import { ExpenseWithBudget } from '~/db/expense.server';
 import { SortDirection, TablePaginationState, TableState, ThDef } from '~/interfaces';
 import { DATE_OPTIONS, EXPENSE_CATEGORIES } from '~/utils/constants';
@@ -19,7 +20,8 @@ type Props = {
 };
 
 export function ExpenseTable({ expenses, paginationState, excludeColumns, searchParamKey }: Props) {
-  const { isLoadingLongerThanDelay: dataIsLoading } = useDelayedLoading();
+  const dataIsLoading = useDelayedQueryParamLoading('expense');
+  const isLoadingFromExpenseMutation = useDelayedNavigationLoading('expenses');
   const [tableState, setTableState] = useState<Omit<TableState, 'paginationState'>>({
     sortBy: null,
     sortDirection: null,
@@ -93,7 +95,7 @@ export function ExpenseTable({ expenses, paginationState, excludeColumns, search
           </TableRow>
         </TableHead>
         <TableBody>
-          {dataIsLoading ? (
+          {dataIsLoading || isLoadingFromExpenseMutation ? (
             <TableRow>
               <TableCell
                 className='w-full'

@@ -11,7 +11,8 @@ import LoadingSpinner from '~/components/ui/loading-spinner';
 import Pagination from '~/components/ui/pagination';
 import { Tooltip } from '~/components/ui/tooltip';
 import UserDropdown from '~/components/user-dropdown';
-import { useDelayedLoading } from '~/customHooks/useDelayedLoading';
+import { useDelayedNavigationLoading } from '~/customHooks/useDelayedNavigationLoading';
+import { useDelayedQueryParamLoading } from '~/customHooks/useDelayedQueryParamLoading';
 import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
@@ -19,7 +20,6 @@ import { fetchStatistics } from '~/db/statistics.server';
 import { QueryParams, SortDirection, StatisticPeriod } from '~/interfaces';
 import { BUDGET_PAGE_SIZE, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 
-// TODO: loader shouldn't be triggered when dialog is opened
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
@@ -58,7 +58,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 const Dashboard = () => {
   const { expenses, budgets, statistics, user } = useLoaderData<typeof loader>();
-  const { isLoadingLongerThanDelay: isDataLoading } = useDelayedLoading();
+  const isDataLoading = useDelayedQueryParamLoading('budget');
+  const loading = useDelayedNavigationLoading('budgets');
+  const expenseDialogIsLoading = useDelayedNavigationLoading('dashboard', 'expenses');
+  const budgetDialogIsLoading = useDelayedNavigationLoading('dashboard', 'budgets');
 
   return (
     <div className='container m-auto grid lg:grid-cols-[max-content_1fr] lg:grid-rows-[4vh,45vh,45vh,2vh] grid-rows-[4vh_auto_auto_auto] gap-4'>
@@ -80,8 +83,14 @@ const Dashboard = () => {
           <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
             Expenses
           </h1>
-          <NavLink to='expenses/create'>
-            <Button icon={RiAddLine}>Create expense</Button>
+          <NavLink
+            preventScrollReset
+            to='expenses/create'>
+            <Button
+              icon={RiAddLine}
+              loading={expenseDialogIsLoading}>
+              Create expense
+            </Button>
           </NavLink>
         </div>
         <ExpenseTable
@@ -118,13 +127,19 @@ const Dashboard = () => {
             </Tooltip>
           </div>
 
-          <NavLink to='budgets/create'>
-            <Button icon={RiAddLine}>Create budget</Button>
+          <NavLink
+            preventScrollReset
+            to='budgets/create'>
+            <Button
+              icon={RiAddLine}
+              loading={budgetDialogIsLoading}>
+              Create budget
+            </Button>
           </NavLink>
         </div>
         <div className='flex flex-col mx-auto h-full w-full lg:mt-12 mt-6'>
           <div className='flex flex-col flex-grow justify-center lg:justify-start lg:space-y-6'>
-            {isDataLoading ? (
+            {isDataLoading || loading ? (
               <LoadingSpinner />
             ) : budgets.items.length ? (
               budgets.items.map(budget => (
