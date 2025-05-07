@@ -1,5 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-run/react';
+import { RiGithubFill } from '@remixicon/react';
 import { Button, TextInput } from '@tremor/react';
 
 import { authenticator, createUser, EMAIL_PASSWORD_STRATEGY, getLoggedInUser, sessionStorage } from '~/db/auth.server';
@@ -145,11 +146,12 @@ const SignUpPage = () => {
         </div>
 
         <a
-          className='text-center w-full text-tremor-content-subtle underline'
+          aria-label='Github repository link'
+          className='justify-self-center col-span-5 text-tremor-content-subtle hover:text-tremor-content-strong duration-300 ease-in-out underline'
           href='https://github.com/TizianMr/expense-tracker'
           rel='noreferrer'
           target='_blank'>
-          Link to github repository
+          <RiGithubFill />
         </a>
       </div>
     </>

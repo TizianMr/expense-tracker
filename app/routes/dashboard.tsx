@@ -1,6 +1,6 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { NavLink, Outlet, redirect, useLoaderData } from '@remix-run/react';
-import { RiAddLine, RiBarChartFill, RiQuestionLine } from '@remixicon/react';
+import { RiAddLine, RiBarChartFill, RiGithubFill, RiQuestionLine } from '@remixicon/react';
 import { Button, Card, Icon, Legend } from '@tremor/react';
 import qs from 'qs';
 
@@ -176,11 +176,12 @@ const Dashboard = () => {
       </Card>
       <Outlet />
       <a
-        className='text-center col-span-5 text-tremor-content-subtle underline'
+        aria-label='Github repository link'
+        className='justify-self-center col-span-5 text-tremor-content-subtle hover:text-tremor-content-strong duration-300 ease-in-out underline'
         href='https://github.com/TizianMr/expense-tracker'
         rel='noreferrer'
         target='_blank'>
-        Link to github repository
+        <RiGithubFill />
       </a>
     </div>
   );
