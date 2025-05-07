@@ -1,8 +1,8 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-run/react';
-import { RiGithubFill } from '@remixicon/react';
 import { Button, TextInput } from '@tremor/react';
 
+import GitHubLink from '~/components/ui/github-link';
 import { authenticator, EMAIL_PASSWORD_STRATEGY, getLoggedInUser, sessionStorage } from '~/db/auth.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -113,14 +113,7 @@ const LoginPage = () => {
           </p>
         </div>
 
-        <a
-          aria-label='Github repository link'
-          className='justify-self-center col-span-5 text-tremor-content-subtle hover:text-tremor-content-strong duration-300 ease-in-out underline'
-          href='https://github.com/TizianMr/expense-tracker'
-          rel='noreferrer'
-          target='_blank'>
-          <RiGithubFill />
-        </a>
+        <GitHubLink />
       </div>
     </>
   );

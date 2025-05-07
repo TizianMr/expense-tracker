@@ -1,9 +1,9 @@
 import { Expense } from '@prisma/client';
 import { DatePicker, SearchSelect, SearchSelectItem, TextInput } from '@tremor/react';
 
-import { ExpenseFormErrors } from '../routes/dashboard.expenses';
-import { EXPENSE_CATEGORIES } from '../utils/constants';
-import CurrencyInput from './ui/currency-input';
+import { ExpenseFormErrors } from '../../../routes/dashboard.expenses';
+import { EXPENSE_CATEGORIES } from '../../../utils/constants';
+import CurrencyInput from '../../ui/currency-input';
 import { useControlledInput } from '~/customHooks/useControlledInput';
 import { BudgetWithUsage } from '~/db/budget.server';
 

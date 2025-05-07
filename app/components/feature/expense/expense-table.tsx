@@ -2,9 +2,9 @@ import { Badge, Table, TableBody, TableCell, TableHead, TableRow } from '@tremor
 import { useState } from 'react';
 
 import { ExpenseDropdown } from './expense-dropdown';
-import LoadingSpinner from './ui/loading-spinner';
-import Pagination from './ui/pagination';
-import TableHeader from './ui/table-header';
+import LoadingSpinner from '../../ui/loading-spinner';
+import Pagination from '../../ui/pagination';
+import TableHeader from '../../ui/table-header';
 import { useDelayedNavigationLoading } from '~/customHooks/useDelayedNavigationLoading';
 import { useDelayedQueryParamLoading } from '~/customHooks/useDelayedQueryParamLoading';
 import { ExpenseWithBudget } from '~/db/expense.server';

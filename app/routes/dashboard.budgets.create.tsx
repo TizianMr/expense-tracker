@@ -3,7 +3,7 @@ import { redirect, useOutletContext } from '@remix-run/react';
 
 import { BudgetFormErrors } from './dashboard.budgets';
 import { createBudget, CreateBudget } from '../db/budget.server';
-import BudgetForm from '~/components/budget-form';
+import BudgetForm from '~/components/feature/budget/budget-form';
 import { getLoggedInUser } from '~/db/auth.server';
 
 export const action = async ({ request }: ActionFunctionArgs) => {

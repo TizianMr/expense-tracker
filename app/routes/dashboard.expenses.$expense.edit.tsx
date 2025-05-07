@@ -6,7 +6,7 @@ import { Callout } from '@tremor/react';
 
 import { ExpenseFormErrors } from './dashboard.expenses';
 import { fetchExpenseById, updateExpense, UpdateExpense } from '../db/expense.server';
-import ExpenseForm from '~/components/expense-form';
+import ExpenseForm from '~/components/feature/expense/expense-form';
 import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { SortDirection } from '~/interfaces';

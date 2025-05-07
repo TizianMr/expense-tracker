@@ -1,18 +1,13 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
-import { NavLink, Outlet, redirect, useLoaderData } from '@remix-run/react';
-import { RiAddLine, RiBarChartFill, RiGithubFill, RiQuestionLine } from '@remixicon/react';
-import { Button, Card, Icon, Legend } from '@tremor/react';
+import { Outlet, redirect, useLoaderData } from '@remix-run/react';
+import { Card } from '@tremor/react';
 import qs from 'qs';
 
-import BudgetInfo from '~/components/budget-info';
-import { ExpenseTable } from '~/components/expense-table';
-import Statistics from '~/components/statistics';
-import LoadingSpinner from '~/components/ui/loading-spinner';
-import Pagination from '~/components/ui/pagination';
-import { Tooltip } from '~/components/ui/tooltip';
-import UserDropdown from '~/components/user-dropdown';
-import { useDelayedNavigationLoading } from '~/customHooks/useDelayedNavigationLoading';
-import { useDelayedQueryParamLoading } from '~/customHooks/useDelayedQueryParamLoading';
+import Budgets from '~/components/feature/budget/budgets';
+import Expenses from '~/components/feature/expense/expenses';
+import Statistics from '~/components/feature/statistics/statistics';
+import UserDropdown from '~/components/feature/user-mgmt/user-dropdown';
+import GitHubLink from '~/components/ui/github-link';
 import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
@@ -58,10 +53,6 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 const Dashboard = () => {
   const { expenses, budgets, statistics, user } = useLoaderData<typeof loader>();
-  const isDataLoading = useDelayedQueryParamLoading('budget');
-  const loading = useDelayedNavigationLoading('budgets');
-  const expenseDialogIsLoading = useDelayedNavigationLoading('dashboard', 'expenses');
-  const budgetDialogIsLoading = useDelayedNavigationLoading('dashboard', 'budgets');
 
   return (
     <div className='container m-auto grid lg:grid-cols-[max-content_1fr] grid-rows-[auto_auto_auto_2vh] gap-4'>
@@ -79,110 +70,14 @@ const Dashboard = () => {
       </Card>
 
       <Card className='flex flex-col lg:col-span-4 col-span-5 min-w-0 min-h-[33rem]'>
-        <div className='flex items-center justify-between'>
-          <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
-            Expenses
-          </h1>
-          <NavLink
-            preventScrollReset
-            to='expenses/create'>
-            <Button
-              icon={RiAddLine}
-              loading={expenseDialogIsLoading}>
-              Create expense
-            </Button>
-          </NavLink>
-        </div>
-        <ExpenseTable
-          expenses={expenses.items}
-          paginationState={{ totalItems: expenses.totalItems, page: expenses.page, pageSize: expenses.pageSize }}
-          searchParamKey='expense'
-        />
+        <Expenses expenses={expenses} />
       </Card>
 
       <Card className='lg:col-span-1 lg:row-start-2 lg:col-start-5 lg:row-span-2 col-span-5 row-start-3 flex flex-col'>
-        <div className='flex items-center justify-between'>
-          <div className='flex items-center'>
-            <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
-              Budgets
-            </h1>
-            <Tooltip
-              className='w-[20rem]'
-              content={
-                <Legend
-                  categories={[
-                    'No worries! You are well within your budget.',
-                    "Heads up! You're nearing your budget limit.",
-                    "Alert! You've nearly maxed out your budget.",
-                  ]}
-                  className='tooltip-legend-white'
-                  colors={['emerald', 'orange', 'red']}
-                />
-              }
-              showArrow={false}>
-              <Icon
-                icon={RiQuestionLine}
-                size='sm'
-              />
-            </Tooltip>
-          </div>
-
-          <NavLink
-            preventScrollReset
-            to='budgets/create'>
-            <Button
-              icon={RiAddLine}
-              loading={budgetDialogIsLoading}>
-              Create budget
-            </Button>
-          </NavLink>
-        </div>
-        <div className='flex flex-col mx-auto h-full w-full mt-6'>
-          <div className='flex flex-col flex-grow justify-center lg:justify-start lg:space-y-6'>
-            {isDataLoading || loading ? (
-              <LoadingSpinner />
-            ) : budgets.items.length ? (
-              budgets.items.map(budget => (
-                <BudgetInfo
-                  id={budget.id}
-                  key={budget.id}
-                  title={budget.title}
-                  totalAmount={budget.amount}
-                  usedAmount={budget.totalUsedBudget}
-                />
-              ))
-            ) : (
-              <div className='text-center'>
-                <RiBarChartFill
-                  aria-hidden={true}
-                  className='mx-auto h-7 w-7 text-tremor-content-subtle dark:text-dark-tremor-content-subtle'
-                />
-                <p className='mt-2 text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-                  No data to show
-                </p>
-                <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'>
-                  Get started by creating your first budget
-                </p>
-              </div>
-            )}
-          </div>
-          <div className='w-full'>
-            <Pagination
-              paginationState={{ totalItems: budgets.totalItems, page: budgets.page, pageSize: budgets.pageSize }}
-              searchParamKey='budget'
-            />
-          </div>
-        </div>
+        <Budgets budgets={budgets} />
       </Card>
       <Outlet />
-      <a
-        aria-label='Github repository link'
-        className='justify-self-center col-span-5 text-tremor-content-subtle hover:text-tremor-content-strong duration-300 ease-in-out underline'
-        href='https://github.com/TizianMr/expense-tracker'
-        rel='noreferrer'
-        target='_blank'>
-        <RiGithubFill />
-      </a>
+      <GitHubLink />
     </div>
   );
 };

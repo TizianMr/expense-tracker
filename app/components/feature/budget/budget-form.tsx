@@ -1,6 +1,6 @@
 import { TextInput } from '@tremor/react';
 
-import CurrencyInput from './ui/currency-input';
+import CurrencyInput from '../../ui/currency-input';
 import { BudgetDetails } from '~/db/budget.server';
 import { BudgetFormErrors } from '~/routes/dashboard.budgets';
 

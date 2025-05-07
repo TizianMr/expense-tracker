@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from './ui/dropdown';
+} from '../../ui/dropdown';
 import { AuthUser } from '~/db/auth.server';
 
 type Props = {
