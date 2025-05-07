@@ -64,11 +64,11 @@ const Dashboard = () => {
   const budgetDialogIsLoading = useDelayedNavigationLoading('dashboard', 'budgets');
 
   return (
-    <div className='container m-auto grid lg:grid-cols-[max-content_1fr] lg:grid-rows-[4vh,45vh,45vh,2vh] grid-rows-[4vh_auto_auto_auto] gap-4'>
+    <div className='container m-auto grid lg:grid-cols-[max-content_1fr] grid-rows-[auto_auto_auto_2vh] gap-4'>
       <div className='flex justify-end md:justify-between col-span-5 pt-4'>
         <img
           alt='Expense tracker logo'
-          className='hidden h-full w-auto object-contain md:block'
+          className='hidden h-10 w-auto my-auto md:block'
           src='/logo-horizontal.png'
         />
         <UserDropdown userInfo={user} />
@@ -78,7 +78,7 @@ const Dashboard = () => {
         <Statistics statistics={statistics} />
       </Card>
 
-      <Card className='flex flex-col lg:col-span-4 col-span-5 min-w-0'>
+      <Card className='flex flex-col lg:col-span-4 col-span-5 min-w-0 min-h-[33rem]'>
         <div className='flex items-center justify-between'>
           <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
             Expenses
@@ -137,7 +137,7 @@ const Dashboard = () => {
             </Button>
           </NavLink>
         </div>
-        <div className='flex flex-col mx-auto h-full w-full lg:mt-12 mt-6'>
+        <div className='flex flex-col mx-auto h-full w-full mt-6'>
           <div className='flex flex-col flex-grow justify-center lg:justify-start lg:space-y-6'>
             {isDataLoading || loading ? (
               <LoadingSpinner />
