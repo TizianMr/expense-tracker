@@ -61,7 +61,9 @@ const Budgets = ({ budgets }: Props) => {
       <div className='flex flex-col mx-auto h-full w-full mt-6'>
         <div className='flex flex-col flex-grow justify-center lg:justify-start lg:space-y-6'>
           {isDataLoading || loading ? (
-            <LoadingSpinner />
+            <div className='flex h-full w-full items-center justify-center'>
+              <LoadingSpinner />
+            </div>
           ) : budgets.items.length ? (
             budgets.items.map(budget => (
               <BudgetInfo

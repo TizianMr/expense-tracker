@@ -7,7 +7,7 @@ import { QueryParams } from '~/interfaces';
 /**
  * compares the current search params with the search params that are being loaded and returns true if they are different for more than delayInMs
  * @param key - key of the search param object to compare
- * @param delayInMs - delay in milliseconds to set the loading state to true, default is 250ms
+ * @param delayInMs - [OPTIONAL] delay in milliseconds to set the loading state to true, default is 250ms
  * @returns boolean indicating if the loading state is longer than the delay
  */
 export const useDelayedQueryParamLoading = (key: keyof QueryParams, delayInMs: number = 250) => {
