@@ -2,6 +2,7 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-run/react';
 import { Button, TextInput } from '@tremor/react';
 
+import GitHubLink from '~/components/ui/github-link';
 import { authenticator, EMAIL_PASSWORD_STRATEGY, getLoggedInUser, sessionStorage } from '~/db/auth.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
@@ -50,12 +51,12 @@ const LoginPage = () => {
 
   return (
     <>
-      <div className='flex min-h-screen flex-1 flex-col justify-center px-4 py-10 lg:px-6'>
-        <div className='sm:mx-auto sm:w-full sm:max-w-sm'>
+      <div className='flex min-h-screen flex-col px-4 py-10 lg:px-6'>
+        <div className='sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center flex-1'>
           <img
             alt='Expense tracker logo'
             className='mx-auto'
-            src='logo-horizontal.png'
+            src='/logo-horizontal.png'
             width='200rem'
           />
           <h3 className='text-center text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
@@ -111,6 +112,8 @@ const LoginPage = () => {
             </span>
           </p>
         </div>
+
+        <GitHubLink />
       </div>
     </>
   );

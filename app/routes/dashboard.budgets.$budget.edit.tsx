@@ -4,7 +4,7 @@ import { RiErrorWarningLine } from '@remixicon/react';
 import { Callout } from '@tremor/react';
 
 import { BudgetFormErrors } from './dashboard.budgets';
-import BudgetForm from '~/components/budget-form';
+import BudgetForm from '~/components/feature/budget/budget-form';
 import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgetById, updateBudget, UpdateBudget } from '~/db/budget.server';
 

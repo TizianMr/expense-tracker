@@ -5,7 +5,7 @@ import { Dialog, DialogPanel, Divider, Button, Callout, DonutChart, EventProps }
 import qs from 'qs';
 import { useState } from 'react';
 
-import { ExpenseTable } from '~/components/expense-table';
+import { ExpenseTable } from '../components/feature/expense/expense-table';
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgetById } from '~/db/budget.server';

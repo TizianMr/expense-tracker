@@ -97,7 +97,11 @@ const calculateExpensesByCategory = (expenses: Pick<Expense, 'amount' | 'expense
 
   // Calculate share per category
   expensesByCategory.forEach(expense => {
-    expense.share = Math.round(((100 * expense.amount) / totalUsed) * 10) / 10;
+    if (expense.amount === 0) {
+      expense.share = 0;
+    } else {
+      expense.share = Math.round(((100 * expense.amount) / totalUsed) * 10) / 10;
+    }
   });
 
   return { totalUsed, categories: expensesByCategory };

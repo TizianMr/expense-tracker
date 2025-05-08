@@ -8,7 +8,7 @@ export const EXPENSE_CATEGORIES = [
 ];
 
 export const EXPENSE_PAGE_SIZE = 5;
-export const BUDGET_PAGE_SIZE = 5;
+export const BUDGET_PAGE_SIZE = 6;
 
 export const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
   weekday: undefined,

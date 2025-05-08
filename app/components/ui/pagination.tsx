@@ -62,7 +62,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
 
         setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
-      disabled: Number(currentPage) == Math.ceil(totalItems / pageSize),
+      disabled: Number(currentPage) >= Math.ceil(totalItems / pageSize),
       srText: 'Next page',
       mobileView: '',
     },
@@ -79,7 +79,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
 
         setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
-      disabled: currentPage === Math.ceil(totalItems / pageSize),
+      disabled: currentPage >= Math.ceil(totalItems / pageSize),
       srText: 'Last page',
       mobileView: 'hidden sm:block',
     },
@@ -90,7 +90,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
       <p className='hidden text-sm tabular-nums text-gray-500 sm:block'>
         Showing{' '}
         <span className='font-semibold text-gray-900 dark:text-gray-50'>
-          {currentPage * pageSize - pageSize + 1}-{Math.min(currentPage * pageSize, totalItems)}
+          {totalItems === 0 ? 0 : currentPage * pageSize - pageSize + 1}-{Math.min(currentPage * pageSize, totalItems)}
         </span>{' '}
         of <span className='font-semibold text-gray-900 dark:text-gray-50'>{totalItems}</span>
       </p>{' '}

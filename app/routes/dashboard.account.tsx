@@ -5,8 +5,8 @@ import { Button, Dialog, DialogPanel, Divider, Tab, TabGroup, TabList, TabPanel,
 import qs from 'qs';
 import { useCallback, useState } from 'react';
 
-import ChangeMailForm from '~/components/change-mail-form';
-import ChangePasswordForm from '~/components/change-password-form';
+import ChangeMailForm from '~/components/feature/user-mgmt/change-mail-form';
+import ChangePasswordForm from '~/components/feature/user-mgmt/change-password-form';
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser, updateSession } from '~/db/auth.server';
 import { updateMailAddress, updatePassword } from '~/db/user.server';

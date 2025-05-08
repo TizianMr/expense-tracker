@@ -3,7 +3,7 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { redirect, useLoaderData, useOutletContext } from '@remix-run/react';
 
 import { ExpenseFormErrors } from './dashboard.expenses';
-import ExpenseForm from '~/components/expense-form';
+import ExpenseForm from '~/components/feature/expense/expense-form';
 import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { createExpense, CreateExpense } from '~/db/expense.server';
