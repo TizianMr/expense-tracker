@@ -1,7 +1,5 @@
 // Tremor Raw Dropdown Menu [v0.0.0]
 
-'use client';
-
 import * as DropdownMenuPrimitives from '@radix-ui/react-dropdown-menu';
 import { RiArrowRightSLine, RiCheckboxBlankCircleLine, RiCheckLine, RiRadioButtonFill } from '@remixicon/react';
 import * as React from 'react';
