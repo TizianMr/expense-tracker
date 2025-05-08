@@ -32,6 +32,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
+  if (user.isDemo) {
+    return redirect('/dashboard');
+  }
+
   const url = new URL(request.url);
 
   if (!url.searchParams.has('tab')) {
@@ -45,6 +49,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
+
+  if (user.isDemo) {
+    return redirect('/dashboard');
+  }
 
   const formData = await request.formData();
   const url = new URL(request.url);

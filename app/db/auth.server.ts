@@ -8,7 +8,7 @@ import { getSignedAvatarUrl } from './s3.server';
 import { prisma } from '../utils/prisma.server';
 import { getS3ObjectKey } from '~/utils/helpers';
 
-export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'>;
+export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture' | 'isDemo'>;
 type LoginInfo = Pick<User, 'password' | 'email'>;
 type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'>;
 
@@ -97,5 +97,6 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
     lastName: user.lastName,
     firstName: user.firstName,
     profilePicture: signedAvatarUrl,
+    isDemo: user.isDemo,
   };
 };

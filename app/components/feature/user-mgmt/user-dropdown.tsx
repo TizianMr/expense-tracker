@@ -48,13 +48,13 @@ const UserDropdown = ({ userInfo }: Props) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <NavLink to='account'>
-            <DropdownMenuItem>
+          <DropdownMenuItem disabled={userInfo.isDemo}>
+            <NavLink to='account'>
               <span className='flex items-center gap-x-2'>
                 <RiUserLine className='size-4 text-inherit' /> <span>Account Settings</span>
               </span>
-            </DropdownMenuItem>
-          </NavLink>
+            </NavLink>
+          </DropdownMenuItem>
 
           <DropdownMenuSeparator />
 

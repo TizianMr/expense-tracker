@@ -9,6 +9,10 @@ export const action: ActionFunction = async ({ request }) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
+  if (user.isDemo) {
+    return redirect('/dashboard');
+  }
+
   let avatarS3Key: string | undefined;
   if (user.profilePicture) {
     avatarS3Key = getS3ObjectKey(user.profilePicture);
