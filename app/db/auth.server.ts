@@ -5,6 +5,7 @@ import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 
 import { getSignedAvatarUrl } from './s3.server';
+import { prisma } from '../utils/prisma.server';
 import { getS3ObjectKey } from '~/utils/helpers';
 
 export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'>;

@@ -1,5 +1,6 @@
 import { Budget } from '@prisma/client';
 
+import { prisma } from '../utils/prisma.server';
 import { Filter, FilterWithPagination, ListResult } from '~/interfaces';
 
 export type CreateBudget = Pick<Budget, 'title' | 'amount'>;

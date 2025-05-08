@@ -10,6 +10,7 @@ import {
   addWeeks,
 } from 'date-fns';
 
+import { prisma } from '../utils/prisma.server';
 import { StatisticPeriod } from '~/interfaces';
 import { EXPENSE_CATEGORIES, MONTHS, WEEKDAYS } from '~/utils/constants';
 import { getCalenderWeek, getMonth, getWeekday } from '~/utils/helpers';

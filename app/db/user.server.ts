@@ -1,6 +1,7 @@
 import { hash, verify } from 'argon2';
 
 import { deleteAvatar } from './s3.server';
+import { prisma } from '../utils/prisma.server';
 import { getS3ObjectKey } from '~/utils/helpers';
 
 export const updateMailAddress = async (id: string, newMail: string) => {
