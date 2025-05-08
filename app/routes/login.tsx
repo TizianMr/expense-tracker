@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-run/react';
-import { Button, TextInput } from '@tremor/react';
+import { Button, Divider, List, ListItem, TextInput } from '@tremor/react';
 import { useTranslation } from 'react-i18next';
 
 import GitHubLink from '~/components/ui/github-link';
@@ -99,6 +99,17 @@ const LoginPage = () => {
               {t('LoginPage.submit')}
             </Button>
           </Form>
+          <Divider>Demo Credentials</Divider>
+          <List>
+            <ListItem>
+              <span className='font-semibold'>Mail address</span>
+              <span>demo@expense-tracker.com</span>
+            </ListItem>
+            <ListItem>
+              <span className='font-semibold'>Password</span>
+              <span>Dem0Passw0rd</span>
+            </ListItem>
+          </List>
           {data?.error && (
             <p className='mt-2 text-tremor-label text-center text-red-500 dark:text-red-300'>{data.error}</p>
           )}
