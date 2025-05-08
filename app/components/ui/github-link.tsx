@@ -4,7 +4,7 @@ const GitHubLink = () => {
   return (
     <a
       aria-label='Github repository link'
-      className='justify-self-center col-span-5 text-tremor-content-subtle hover:text-tremor-content-strong duration-300 ease-in-out underline'
+      className='mx-auto col-span-5 text-tremor-content-subtle hover:text-tremor-content-strong duration-300 ease-in-out underline'
       href='https://github.com/TizianMr/expense-tracker'
       rel='noreferrer'
       target='_blank'>
