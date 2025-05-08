@@ -11,6 +11,10 @@ export const action: ActionFunction = async ({ request }) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
+  if (user.isDemo) {
+    return redirect('/dashboard');
+  }
+
   const t = await i18next.getFixedT(request);
   let avatarS3Key: string | undefined;
   if (user.profilePicture) {

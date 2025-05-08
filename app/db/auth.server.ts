@@ -11,7 +11,7 @@ import { prisma } from '../utils/prisma.server';
 import { localeCookie } from '~/utils/cookies.server';
 import { getS3ObjectKey } from '~/utils/helpers';
 
-export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'> & {
+export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture' | 'isDemo'> & {
   preferences: Pick<UserPreference, 'id' | 'theme' | 'locale'>;
   isGithubUser: boolean;
 };
@@ -158,6 +158,7 @@ const emailLogin = async ({ password, email }: LoginInfo): Promise<AuthUser> => 
       theme: user.UserPreference.theme,
       locale: user.UserPreference.locale,
     },
+    isDemo: user.isDemo,
     isGithubUser: false,
   };
 };

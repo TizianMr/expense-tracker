@@ -14,6 +14,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
+  if (user.isDemo) {
+    return redirect('/dashboard');
+  }
+
   const t = await i18next.getFixedT(request);
 
   try {

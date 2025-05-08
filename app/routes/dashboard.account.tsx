@@ -31,6 +31,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
+  if (user.isDemo) {
+    return redirect('/dashboard');
+  }
+
   const TAB_VALUES = ['email', 'password'];
 
   const url = new URL(request.url);
@@ -46,6 +50,10 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 export const action = async ({ request }: ActionFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user || user.isGithubUser) throw redirect('/login');
+
+  if (user.isDemo) {
+    return redirect('/dashboard');
+  }
 
   const t = await i18next.getFixedT(request);
   const formData = await request.formData();
