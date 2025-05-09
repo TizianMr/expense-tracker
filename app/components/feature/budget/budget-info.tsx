@@ -22,7 +22,7 @@ const BudgetInfo = ({ totalAmount, usedAmount, title, id }: Props) => {
 
   return (
     <div
-      className='flex lg:flex-row flex-col text-center lg:text-left justify-start lg:space-x-5 items-center hover:hover:bg-gray-100 p-2 rounded-lg'
+      className='flex lg:flex-row flex-col text-center lg:text-left justify-start lg:space-x-5 items-center hover:bg-gray-100 dark:hover:bg-gray-800 p-2 rounded-lg'
       role='button'
       tabIndex={0}
       onClick={handleRowClick}
@@ -36,7 +36,9 @@ const BudgetInfo = ({ totalAmount, usedAmount, title, id }: Props) => {
         size='lg'
         strokeWidth={9}
         value={usedBudgetInPercentage}>
-        <span className='text-xs font-medium text-slate-700'>{Math.round(usedBudgetInPercentage)}%</span>
+        <span className='text-xs font-medium text-slate-700 dark:text-slate-500'>
+          {Math.round(usedBudgetInPercentage)}%
+        </span>
       </ProgressCircle>
       <div className='w-full min-w-0'>
         <p className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium lg:truncate max-w-full'>

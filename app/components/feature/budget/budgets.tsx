@@ -29,7 +29,7 @@ const Budgets = ({ budgets }: Props) => {
             Budgets
           </h1>
           <Tooltip
-            className='w-[20rem]'
+            className='w-[20rem] dark:bg-gray-900'
             content={
               <Legend
                 categories={[
@@ -37,8 +37,8 @@ const Budgets = ({ budgets }: Props) => {
                   "Heads up! You're nearing your budget limit.",
                   "Alert! You've nearly maxed out your budget.",
                 ]}
-                className='tooltip-legend-white'
-                colors={['emerald', 'orange', 'red']}
+                className='light:tooltip-legend-white'
+                colors={['emerald', 'yellow', 'red']}
               />
             }
             showArrow={false}>
