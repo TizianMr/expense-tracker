@@ -11,6 +11,7 @@ import {
   DropdownMenuTrigger,
 } from '../../ui/dropdown';
 import CustomNavLink from '~/components/ui/custom-navlink';
+import { Tooltip } from '~/components/ui/tooltip';
 import { AuthUser } from '~/db/auth.server';
 
 type Props = {
@@ -51,10 +52,21 @@ const UserDropdown = ({ userInfo }: Props) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <DropdownMenuItem disabled={userInfo.isDemo}>
+          {userInfo.isDemo ? (
+            <Tooltip
+              content={'Unable to access account settings in demo mode.'}
+              showArrow={false}>
+              <DropdownMenuItem disabled>
+                <span className='flex items-center gap-x-2'>
+                  <RiUserLine className='size-4 text-inherit' /> <span>Account Settings</span>
+                </span>
+              </DropdownMenuItem>
+            </Tooltip>
+          ) : (
             <NavLink to='account'>
-              <span className='flex items-center gap-x-2'>
-                <RiUserLine className='size-4 text-inherit' /> <span>{t('UserDropdown.settings')}</span>
+              <DropdownMenuItem>
+                <span className='flex items-center gap-x-2'>
+                  <RiUserLine className='size-4 text-inherit' /> <span>{t('UserDropdown.settings')}</span>
               </span>
             </DropdownMenuItem>
           </CustomNavLink>
@@ -63,9 +75,10 @@ const UserDropdown = ({ userInfo }: Props) => {
             <DropdownMenuItem>
               <span className='flex items-center gap-x-2'>
                 <RiSettings2Line className='size-4 text-inherit' /> <span>{t('UserDropdown.preferences')}</span>
-              </span>
+                </span>
+              </DropdownMenuItem>
             </NavLink>
-          </DropdownMenuItem>
+          )}
 
           <DropdownMenuSeparator />
 
