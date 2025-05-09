@@ -21,7 +21,7 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
     }
   }
 
-  return { expenseId: budgetId };
+  return { budgetId };
 };
 
 const DeleteBudgetDialog = () => {

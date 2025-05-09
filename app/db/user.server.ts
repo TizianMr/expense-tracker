@@ -1,8 +1,11 @@
+import { UserPreference } from '@prisma/client';
 import { hash, verify } from 'argon2';
 
 import { deleteAvatar } from './s3.server';
 import { prisma } from '../utils/prisma.server';
 import { getS3ObjectKey } from '~/utils/helpers';
+
+export type UpdatePreference = Pick<UserPreference, 'id' | 'theme'>;
 
 export const updateMailAddress = async (id: string, newMail: string) => {
   const userWithSameMail = await prisma.user.findUnique({ where: { email: newMail } });
@@ -43,4 +46,9 @@ export const deleteUser = async (id: string) => {
   if (deletedUser.profilePicture) {
     await deleteAvatar(getS3ObjectKey(deletedUser.profilePicture));
   }
+};
+
+export const updateUserPreferences = async (preferences: UpdatePreference) => {
+  const { id, ...updatedPreferences } = preferences;
+  return await prisma.userPreference.update({ where: { id }, data: updatedPreferences });
 };

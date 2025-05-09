@@ -1,31 +1,19 @@
+import { ColorTheme, Prisma } from '@prisma/client';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
-import { Form, redirect, useLoaderData } from '@remix-run/react';
+import { Form, redirect, useActionData, useLoaderData, useNavigation } from '@remix-run/react';
 import { RiComputerLine, RiMoonLine, RiSunLine } from '@remixicon/react';
 import { Button, Dialog, DialogPanel, Divider, Select, SelectItem } from '@tremor/react';
-import qs from 'qs';
-import { useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
-import { getLoggedInUser, updateSession } from '~/db/auth.server';
-import { updateMailAddress, updatePassword } from '~/db/user.server';
-import { QueryParams } from '~/interfaces';
-
-export type ChangeMailFormErrors = {
-  newMail?: string;
-  confirmedMail?: string;
-};
-
-export type ChangePwdFormErrors = {
-  oldPwd?: string;
-  newPwd?: string;
-  confirmedPwd?: string;
-};
+import { getLoggedInUser } from '~/db/auth.server';
+import { updateUserPreferences } from '~/db/user.server';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
-  return { user };
+  return { user, colorThemes: Object.values(ColorTheme) };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -33,136 +21,84 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (!user) throw redirect('/login');
 
   const formData = await request.formData();
-  const url = new URL(request.url);
-  const query = url.searchParams;
-  const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
+  const colorTheme = formData.get('colorTheme') as ColorTheme;
 
-  if (parsedQueryParams.tab === 'email') {
-    const clientErrors: ChangeMailFormErrors = {};
-    const newMail = formData.get('new-email') as string;
-    const confirmedMail = formData.get('confirm-email') as string;
-
-    if (newMail !== confirmedMail) {
-      clientErrors.newMail = 'Mail addresses are not identical.';
-      clientErrors.confirmedMail = 'Mail addresses are not identical.';
-    }
-
-    if (!newMail) {
-      clientErrors.newMail = 'This input is required.';
-    }
-
-    if (!confirmedMail) {
-      clientErrors.confirmedMail = 'This input is required.';
-    }
-
-    if (Object.keys(clientErrors).length > 0) {
-      return { clientErrors };
-    }
-
-    try {
-      const updatedUser = await updateMailAddress(user.id, newMail);
-
-      return await updateSession(request, { ...user, ...updatedUser });
-    } catch (error) {
-      if (error instanceof Error) {
-        return { serverError: error.message };
-      }
-    }
-  } else if (parsedQueryParams.tab === 'password') {
-    const clientErrors: ChangePwdFormErrors = {};
-    const oldPwd = formData.get('old-password') as string;
-    const newPwd = formData.get('new-password') as string;
-    const confirmedPwd = formData.get('confirm-password') as string;
-
-    if (!oldPwd) {
-      clientErrors.oldPwd = 'This input is required.';
-    }
-
-    if (!newPwd) {
-      clientErrors.newPwd = 'This input is required.';
-    }
-
-    if (!confirmedPwd) {
-      clientErrors.confirmedPwd = 'This input is required.';
-    }
-
-    if (confirmedPwd !== newPwd) {
-      clientErrors.newPwd = 'Passwords are not identical.';
-      clientErrors.confirmedPwd = 'Passwords are not identical.';
-    }
-
-    if (Object.keys(clientErrors).length > 0) {
-      return { clientErrors };
-    }
-
-    try {
-      await updatePassword(user.id, oldPwd, newPwd);
-    } catch (error) {
-      if (error instanceof Error) {
-        return { serverError: error.message };
-      }
+  try {
+    const newUserPreferences = await updateUserPreferences({
+      id: user.preferences.id,
+      theme: colorTheme,
+    });
+    return { preferences: newUserPreferences };
+  } catch (error) {
+    if (error instanceof Prisma.PrismaClientKnownRequestError) {
+      return { serverError: (error.meta?.cause as string) || 'An unknown error occurred.' };
     }
   }
-
-  return null;
 };
 
 const AccountPreferences = () => {
-  // const { user } = useLoaderData<typeof loader>();
-  const [open, setIsOpen] = useState(true);
-  const { triggerDelayedNavigation } = useDelayedNavigation();
-  const [value, setValue] = useState('');
+  const { state } = useNavigation();
+  const { user, colorThemes } = useLoaderData<typeof loader>();
+  const data = useActionData<typeof action>();
 
-  const handleClose = () => {
+  const [isOpen, setIsOpen] = useState(true);
+  const { triggerDelayedNavigation } = useDelayedNavigation();
+
+  const handleClose = useCallback(() => {
     setIsOpen(false);
     triggerDelayedNavigation('/dashboard'); // delay navigation to allow dialog to close with animation
-  };
+  }, [triggerDelayedNavigation]);
+
+  useEffect(() => {
+    if (data && !data.serverError) {
+      if (isOpen) {
+        handleClose();
+      }
+    }
+  }, [data, handleClose, isOpen]);
 
   return (
     <Dialog
       static
-      open={open}
+      open={isOpen}
       onClose={handleClose}>
       <DialogPanel className='lg:w-[40vw] big-dialog'>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong pb-4'>
           Account Preferences
         </h3>
 
-        <Form>
+        <Form method='post'>
           <label
             className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'
-            htmlFor='distance'>
+            htmlFor='color-theme'>
             Color theme
           </label>
           <Select
             className='mt-2'
-            id='distance'
-            name='distance'
-            value={value}
-            onValueChange={setValue}>
-            <SelectItem
-              icon={RiComputerLine}
-              value='1'>
-              System
-            </SelectItem>
-            <SelectItem
-              icon={RiSunLine}
-              value='2'>
-              Light
-            </SelectItem>
-            <SelectItem
-              icon={RiMoonLine}
-              value='3'>
-              Dark
-            </SelectItem>
+            defaultValue={user.preferences.theme}
+            id='color-theme'
+            name='colorTheme'>
+            {colorThemes.map(theme => (
+              <SelectItem
+                icon={theme === 'SYSTEM' ? RiComputerLine : theme === 'LIGHT' ? RiSunLine : RiMoonLine}
+                key={theme}
+                value={theme}>
+                {theme.charAt(0) + theme.slice(1).toLowerCase()}
+              </SelectItem>
+            ))}
           </Select>
 
           <Button
             className='w-full mt-4'
-            onClick={handleClose}>
+            loading={state === 'submitting'}
+            type='submit'>
             Update
           </Button>
         </Form>
+
+        {data?.serverError && (
+          <p className='mt-2 text-center text-tremor-label text-red-500 dark:text-red-300'>{data.serverError}</p>
+        )}
 
         <Divider />
         <div className='mt-8 flex items-center justify-end space-x-2'>

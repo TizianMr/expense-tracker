@@ -9,7 +9,7 @@ import { prisma } from '../utils/prisma.server';
 import { getS3ObjectKey } from '~/utils/helpers';
 
 export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'> & {
-  preferences: Pick<UserPreference, 'theme'>;
+  preferences: Pick<UserPreference, 'id' | 'theme'>;
 };
 type LoginInfo = Pick<User, 'password' | 'email'>;
 type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'>;
@@ -93,7 +93,7 @@ export const createUser = async ({ password, email, firstName, lastName }: Creat
 };
 
 export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> => {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { email }, include: { UserPreference: true } });
 
   if (!user || !(await verify(user.password, password))) {
     throw new Error('Mail or password are not correct');
@@ -105,15 +105,8 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
   }
 
   const userPreferencesFallback = {
-    theme: ColorTheme.SYSTEM,
+    theme: ColorTheme.DARK,
   };
-
-  const userPreferences = await prisma.userPreference.findUnique({
-    where: { id: user.id },
-    select: {
-      theme: true,
-    },
-  });
 
   return {
     id: user.id,
@@ -121,6 +114,9 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
     lastName: user.lastName,
     firstName: user.firstName,
     profilePicture: signedAvatarUrl,
-    preferences: { theme: userPreferences?.theme || userPreferencesFallback.theme },
+    preferences: {
+      id: user.UserPreference?.id || '',
+      theme: user.UserPreference?.theme || userPreferencesFallback.theme,
+    },
   };
 };
