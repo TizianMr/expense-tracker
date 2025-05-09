@@ -1,5 +1,5 @@
 import { NavLink, useSubmit } from '@remix-run/react';
-import { RiArrowDownSLine, RiLogoutCircleLine, RiUserLine } from '@remixicon/react';
+import { RiArrowDownSLine, RiLogoutCircleLine, RiSettings2Line, RiUserLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
 
 import {
@@ -52,6 +52,14 @@ const UserDropdown = ({ userInfo }: Props) => {
             <DropdownMenuItem>
               <span className='flex items-center gap-x-2'>
                 <RiUserLine className='size-4 text-inherit' /> <span>Account Settings</span>
+              </span>
+            </DropdownMenuItem>
+          </NavLink>
+
+          <NavLink to='account/preferences'>
+            <DropdownMenuItem>
+              <span className='flex items-center gap-x-2'>
+                <RiSettings2Line className='size-4 text-inherit' /> <span>Account Preferences</span>
               </span>
             </DropdownMenuItem>
           </NavLink>
