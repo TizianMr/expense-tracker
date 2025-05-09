@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { ColorTheme, User, UserPreference } from '@prisma/client';
 import { createCookieSessionStorage } from '@remix-run/node';
 import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
@@ -8,7 +8,9 @@ import { getSignedAvatarUrl } from './s3.server';
 import { prisma } from '../utils/prisma.server';
 import { getS3ObjectKey } from '~/utils/helpers';
 
-export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'>;
+export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'> & {
+  preferences: Pick<UserPreference, 'theme'>;
+};
 type LoginInfo = Pick<User, 'password' | 'email'>;
 type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'>;
 
@@ -76,7 +78,18 @@ export const createUser = async ({ password, email, firstName, lastName }: Creat
     password: hashedPassword,
   };
 
-  return await prisma.user.create({ data: newUser });
+  const createdUser = await prisma.user.create({
+    data: {
+      ...newUser,
+      UserPreference: {
+        create: {
+          theme: ColorTheme.SYSTEM,
+        },
+      },
+    },
+  });
+
+  return createdUser;
 };
 
 export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> => {
@@ -91,11 +104,23 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
     signedAvatarUrl = await getSignedAvatarUrl(getS3ObjectKey(user.profilePicture));
   }
 
+  const userPreferencesFallback = {
+    theme: ColorTheme.SYSTEM,
+  };
+
+  const userPreferences = await prisma.userPreference.findUnique({
+    where: { id: user.id },
+    select: {
+      theme: true,
+    },
+  });
+
   return {
     id: user.id,
     email: user.email,
     lastName: user.lastName,
     firstName: user.firstName,
     profilePicture: signedAvatarUrl,
+    preferences: { theme: userPreferences?.theme || userPreferencesFallback.theme },
   };
 };
