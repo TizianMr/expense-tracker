@@ -63,15 +63,27 @@ To configure this project with a database create a new PostgreSQL database and p
 DATABASE_URL=postgresql://USER:PASSWORD@HOST:PORT/DATABASE
 ```
 
-Next to generate all tables and your `PrismaClient` run the following command:
+Next, to generate all tables, including a demo user with the email `demo@example.com` and password `SuperPassword`, as well as some sample expenses and budgets, and to initialize your PrismaClient, run the following command:
 ```sh
 npx prisma migrate dev
+```
+
+If you wish to create a completely empty database instead, run:
+```sh
+npm run prisma:init:empty
 ```
 
 To only generate your `PrismaClient`, run:
 ```sh
 npx prisma generate
 ```
+
+To quickly fill your database with some example data, you can run:
+```sh
+npx prisma db seed
+```
+
+This populates your db with a demo user having the mail address `demo@example.com` and password `SuperPassword` along with some expenses and budgets.
 
 ### Configure Amazon S3
 
