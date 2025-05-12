@@ -61,6 +61,7 @@ const Statistics = ({ statistics }: Props) => {
           noDataText='No expenses to show'
           showLegend={false}
           valueFormatter={valueFormatter}
+          yAxisWidth={75}
         />
         <div className='flex flex-col md:w-[40%] self-center'>
           <DonutChart
