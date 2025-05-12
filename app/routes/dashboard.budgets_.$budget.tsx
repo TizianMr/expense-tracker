@@ -96,16 +96,16 @@ const BudgetDetails = () => {
       static
       open={open}
       onClose={handleClose}>
-      <DialogPanel className='w-[60vw] big-dialog'>
+      <DialogPanel className='w-[60vw] big-dialog overflow-clip'>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
           {budget?.title ?? 'Not found'}
         </h3>
         {budget ? (
-          <div className='flex flex-row h-[35vh] items-center space-x-5'>
+          <div className='flex flex-col lg:flex-row h-[50vh] items-center overflow-auto'>
             <DonutChart
               showAnimation
               category='amount'
-              className='h-[50%] w-[50%]'
+              className='lg:h-[80%] min-h-[15rem]'
               colors={categoryColors}
               data={budget.expensesByCategory}
               index='category'
@@ -114,7 +114,7 @@ const BudgetDetails = () => {
               valueFormatter={valueFormatter}
               onValueChange={v => handleValueChange(v)}
             />
-            <div className='h-full w-[50%]'>
+            <div className='lg:h-full lg:w-[60%]'>
               <ExpenseTable
                 excludeColumns={['actions', 'budget']}
                 expenses={expenses.items}
