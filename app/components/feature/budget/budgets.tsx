@@ -1,4 +1,4 @@
-import { NavLink } from '@remix-run/react';
+import { NavLink, useLocation } from '@remix-run/react';
 import { RiQuestionLine, RiAddLine, RiBarChartFill } from '@remixicon/react';
 import { Legend, Icon, Button } from '@tremor/react';
 
@@ -16,6 +16,7 @@ type Props = {
 };
 
 const Budgets = ({ budgets }: Props) => {
+  const location = useLocation();
   const isDataLoading = useDelayedQueryParamLoading('budget');
   const loading = useDelayedNavigationLoading('budgets');
   const budgetDialogIsLoading = useDelayedNavigationLoading('dashboard', 'budgets/create');
@@ -50,7 +51,7 @@ const Budgets = ({ budgets }: Props) => {
 
         <NavLink
           preventScrollReset
-          to='budgets/create'>
+          to={{ pathname: 'budgets/create', search: location.search }}>
           <Button
             icon={RiAddLine}
             loading={budgetDialogIsLoading}>

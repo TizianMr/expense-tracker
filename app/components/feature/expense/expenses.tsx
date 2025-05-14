@@ -1,4 +1,4 @@
-import { NavLink } from '@remix-run/react';
+import { NavLink, useLocation } from '@remix-run/react';
 import { RiAddLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
 
@@ -12,6 +12,7 @@ type Props = {
 };
 
 const Expenses = ({ expenses }: Props) => {
+  const location = useLocation();
   const expenseDialogIsLoading = useDelayedNavigationLoading('dashboard', 'expenses/create');
 
   return (
@@ -22,7 +23,7 @@ const Expenses = ({ expenses }: Props) => {
         </h1>
         <NavLink
           preventScrollReset
-          to='expenses/create'>
+          to={{ pathname: 'expenses/create', search: location.search }}>
           <Button
             icon={RiAddLine}
             loading={expenseDialogIsLoading}>
