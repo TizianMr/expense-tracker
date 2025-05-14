@@ -2,6 +2,8 @@ import { useSearchParams } from '@remix-run/react';
 import { BarChart, DonutChart, List, ListItem, Tab, TabGroup, TabList } from '@tremor/react';
 import qs from 'qs';
 
+import LoadingSpinner from '~/components/ui/loading-spinner';
+import { useDelayedQueryParamLoading } from '~/customHooks/useDelayedQueryParamLoading';
 import { Statistics as StatisticsType } from '~/db/statistics.server';
 import { QueryParams, StatisticPeriod } from '~/interfaces';
 import { EXPENSE_CATEGORIES } from '~/utils/constants';
@@ -14,6 +16,7 @@ type Props = {
 };
 
 const Statistics = ({ statistics }: Props) => {
+  const dataIsLoading = useDelayedQueryParamLoading('statistics');
   const [searchParams, setSearchParams] = useSearchParams();
 
   const categoryColors = statistics.expensesByCategory.categories.map(expense => {
@@ -50,55 +53,61 @@ const Statistics = ({ statistics }: Props) => {
         </TabGroup>
       </div>
 
-      <div className='flex lg:flex-row flex-col lg:space-x-20 lg:space-y-0 space-y-10 lg:pt-0 pt-4 w-full h-full items-center'>
-        <BarChart
-          showAnimation
-          categories={['amount']}
-          className='lg:h-[90%]'
-          colors={['emerald']}
-          data={statistics.expensesByPeriod}
-          index='name'
-          noDataText='No expenses to show'
-          showLegend={false}
-          valueFormatter={valueFormatter}
-          yAxisWidth={75}
-        />
-        <div className='flex flex-col md:w-[40%] self-center'>
-          <DonutChart
-            category='amount'
-            colors={categoryColors}
-            data={statistics.expensesByCategory.categories}
-            index='category'
-            valueFormatter={valueFormatter}
-          />
-          <p className='mt-8 flex items-center justify-between text-tremor-label text-tremor-content dark:text-dark-tremor-content'>
-            <span>Category</span> <span>Amount / Share</span>
-          </p>
-          <List className='mt-2'>
-            {statistics.expensesByCategory.categories.map((item, idx) => (
-              <ListItem
-                className='space-x-6'
-                key={item.category}>
-                <div className='flex items-center space-x-2.5 truncate'>
-                  <span
-                    aria-hidden={true}
-                    className={cx(`bg-${categoryColors[idx]}-500`, 'size-2.5 shrink-0 rounded-sm')}
-                  />
-                  <span className='truncate dark:text-dark-tremor-content-emphasis'> {item.category} </span>
-                </div>
-                <div className='flex items-center space-x-2'>
-                  <span className='font-medium tabular-nums text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-                    {valueFormatter(item.amount)}
-                  </span>
-                  <span className='rounded-tremor-small bg-tremor-background-subtle px-1.5 py-0.5 text-tremor-label font-medium tabular-nums text-tremor-content-emphasis dark:bg-dark-tremor-background-subtle dark:text-dark-tremor-content-emphasis'>
-                    {item.share}%
-                  </span>
-                </div>
-              </ListItem>
-            ))}
-          </List>
+      {dataIsLoading ? (
+        <div className='h-full flex justify-center items-center'>
+          <LoadingSpinner />
         </div>
-      </div>
+      ) : (
+        <div className='flex lg:flex-row flex-col lg:space-x-20 lg:space-y-0 space-y-10 lg:pt-0 pt-4 w-full h-full items-center'>
+          <BarChart
+            showAnimation
+            categories={['amount']}
+            className='lg:h-[90%]'
+            colors={['emerald']}
+            data={statistics.expensesByPeriod}
+            index='name'
+            noDataText='No expenses to show'
+            showLegend={false}
+            valueFormatter={valueFormatter}
+            yAxisWidth={75}
+          />
+          <div className='flex flex-col md:w-[40%] self-center'>
+            <DonutChart
+              category='amount'
+              colors={categoryColors}
+              data={statistics.expensesByCategory.categories}
+              index='category'
+              valueFormatter={valueFormatter}
+            />
+            <p className='mt-8 flex items-center justify-between text-tremor-label text-tremor-content dark:text-dark-tremor-content'>
+              <span>Category</span> <span>Amount / Share</span>
+            </p>
+            <List className='mt-2'>
+              {statistics.expensesByCategory.categories.map((item, idx) => (
+                <ListItem
+                  className='space-x-6'
+                  key={item.category}>
+                  <div className='flex items-center space-x-2.5 truncate'>
+                    <span
+                      aria-hidden={true}
+                      className={cx(`bg-${categoryColors[idx]}-500`, 'size-2.5 shrink-0 rounded-sm')}
+                    />
+                    <span className='truncate dark:text-dark-tremor-content-emphasis'> {item.category} </span>
+                  </div>
+                  <div className='flex items-center space-x-2'>
+                    <span className='font-medium tabular-nums text-tremor-content-strong dark:text-dark-tremor-content-strong'>
+                      {valueFormatter(item.amount)}
+                    </span>
+                    <span className='rounded-tremor-small bg-tremor-background-subtle px-1.5 py-0.5 text-tremor-label font-medium tabular-nums text-tremor-content-emphasis dark:bg-dark-tremor-background-subtle dark:text-dark-tremor-content-emphasis'>
+                      {item.share}%
+                    </span>
+                  </div>
+                </ListItem>
+              ))}
+            </List>
+          </div>
+        </div>
+      )}
     </>
   );
 };

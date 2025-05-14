@@ -65,7 +65,7 @@ const Dashboard = () => {
         <UserDropdown userInfo={user} />
       </div>
 
-      <Card className='lg:col-span-4 col-span-5'>
+      <Card className='lg:col-span-4 col-span-5 min-h-[33rem]'>
         <Statistics statistics={statistics} />
       </Card>
 
