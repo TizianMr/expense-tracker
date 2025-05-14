@@ -139,7 +139,7 @@ In the initial implementation, dialogs were controlled via a local useState vari
 
 To make dialogs independent of other components—and ensure they don't interfere with them—I decided to give each dialog its own route. This approach allows dialogs to use their own loader and action functions, eliminating the need for separate resource routes.
 
-However, this introduced the issue that when a dialog was closed, the navigation back occurred before its close animation had finished. To resolve this, I used a custom hook (`useDelayedNavigation`) to delay the navigation by the duration of the animation.
+However, this introduced the issue that when a dialog was closed, the navigation back occurred before its close animation had finished. To resolve this, I used a custom hook (`useDelayedNavigation`) to delay the navigation by the duration of the animation. When switching to the dialog routes and back again, the search params are preserved so as not to reset the state of the app.
 
 ### Pending UI
 
