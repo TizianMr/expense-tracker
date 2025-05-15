@@ -159,3 +159,4 @@ Altough this solution solves the problems this application has with pending ui i
 ## Useful Ressources
 
 * [useEncapsulation](https://kyleshevlin.com/use-encapsulation/) - This article has helped me to develop a perspective on when I should outsource extra logic to my own hooks
+* [The Complete Guide to Dark Mode with Remix ](https://www.mattstobbs.com/remix-dark-mode/) - This article helped me a lot to get started with setting up different color themes in my application

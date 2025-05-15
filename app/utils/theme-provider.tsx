@@ -56,11 +56,11 @@ function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [theme]);
 
-  // listener for when the user updates their system preference
+  // listen to updates for the system color
   useEffect(() => {
     const mediaQuery = window.matchMedia(prefersDarkMQ);
     const handleChange = () => {
-      setTheme(mediaQuery.matches ? ColorTheme.DARK : ColorTheme.LIGHT);
+      setTheme(mediaQuery.matches ? 'DARK' : 'LIGHT');
     };
     mediaQuery.addEventListener('change', handleChange);
     return () => mediaQuery.removeEventListener('change', handleChange);
