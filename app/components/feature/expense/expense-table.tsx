@@ -107,20 +107,43 @@ export function ExpenseTable({ expenses, paginationState, excludeColumns, search
           ) : expenses.length ? (
             expenses.map(expense => {
               const category = EXPENSE_CATEGORIES.find(cat => cat.value === expense.category);
+              const cellStyle = 'max-w-[2rem] truncate';
               const cellRenderers: Record<string, JSX.Element> = {
-                title: <TableCell key='title'>{expense.title}</TableCell>,
-                amount: <TableCell key='amount'>{formatCurrency(expense.amount)}</TableCell>,
+                title: (
+                  <TableCell
+                    className={cellStyle}
+                    key='title'>
+                    {expense.title}
+                  </TableCell>
+                ),
+                amount: (
+                  <TableCell
+                    className={cellStyle}
+                    key='amount'>
+                    {formatCurrency(expense.amount)}
+                  </TableCell>
+                ),
                 expenseDate: (
-                  <TableCell key='expenseDate'>
+                  <TableCell
+                    className={cellStyle}
+                    key='expenseDate'>
                     {expense.expenseDate.toLocaleDateString('en-US', DATE_OPTIONS)}
                   </TableCell>
                 ),
                 category: (
-                  <TableCell key='category'>
+                  <TableCell
+                    className={cellStyle}
+                    key='category'>
                     {expense.category ? <Badge color={category?.color}>{expense.category}</Badge> : '-'}
                   </TableCell>
                 ),
-                budget: <TableCell key='budget'>{expense.budget?.title ?? '-'}</TableCell>,
+                budget: (
+                  <TableCell
+                    className={cellStyle}
+                    key='budget'>
+                    {expense.budget?.title ?? '-'}
+                  </TableCell>
+                ),
                 actions: (
                   <TableCell key='actions'>
                     <div className='flex justify-end'>
