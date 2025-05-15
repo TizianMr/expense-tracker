@@ -1,11 +1,13 @@
-import { useNavigate } from '@remix-run/react';
+import { useLocation, useNavigate } from '@remix-run/react';
 
 export const useDelayedNavigation = (delayInMs: number = 200) => {
   const navigate = useNavigate();
+  const location = useLocation();
+
   const triggerDelayedNavigation = (to: string) => {
     setTimeout(() => {
-      navigate(to, { preventScrollReset: true });
-    }, delayInMs); // delay navigation to allow dialog to close with animation
+      navigate({ pathname: to, search: location.search }, { preventScrollReset: true });
+    }, delayInMs);
   };
 
   return {

@@ -1,4 +1,4 @@
-import { NavLink } from '@remix-run/react';
+import { NavLink, useLocation } from '@remix-run/react';
 import { RiMoreFill } from '@remixicon/react';
 import { Button } from '@tremor/react';
 
@@ -9,6 +9,7 @@ type Props = {
 };
 
 export const ExpenseDropdown = ({ expenseId }: Props) => {
+  const location = useLocation();
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -24,11 +25,15 @@ export const ExpenseDropdown = ({ expenseId }: Props) => {
       <DropdownMenuContent
         align='end'
         className='min-w-40'>
-        <NavLink to={`expenses/${expenseId}/edit`}>
+        <NavLink
+          preventScrollReset
+          to={{ pathname: `expenses/${expenseId}/edit`, search: location.search }}>
           <DropdownMenuItem>Edit</DropdownMenuItem>
         </NavLink>
 
-        <NavLink to={`expenses/${expenseId}/delete`}>
+        <NavLink
+          preventScrollReset
+          to={{ pathname: `expenses/${expenseId}/delete`, search: location.search }}>
           <DropdownMenuItem className='text-red-600 dark:text-red-500'>Delete</DropdownMenuItem>
         </NavLink>
       </DropdownMenuContent>

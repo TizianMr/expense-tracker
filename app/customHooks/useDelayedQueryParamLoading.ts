@@ -29,7 +29,7 @@ export const useDelayedQueryParamLoading = (key: keyof QueryParams, delayInMs: n
     const desiredSearchParams = qs.parse(navigation.location.search.toString().substring(1)) as QueryParams;
     const currentSearchParams = qs.parse(currentParams.toString()) as QueryParams;
 
-    if (desiredSearchParams[key] !== currentSearchParams[key]) {
+    if (JSON.stringify(desiredSearchParams[key]) !== JSON.stringify(currentSearchParams[key])) {
       timer = setTimeout(() => {
         setIsLoadingLongerThanDeplay(true);
       }, delayInMs);

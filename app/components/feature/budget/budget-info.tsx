@@ -1,4 +1,4 @@
-import { useNavigate } from '@remix-run/react';
+import { useLocation, useNavigate } from '@remix-run/react';
 import { Button, ProgressCircle } from '@tremor/react';
 
 import { formatCurrency } from '~/utils/helpers';
@@ -12,6 +12,7 @@ type Props = {
 
 const BudgetInfo = ({ totalAmount, usedAmount, title, id }: Props) => {
   const navigate = useNavigate();
+  const location = useLocation();
   const usedBudgetInPercentage = (100 * usedAmount) / totalAmount;
   const color = usedBudgetInPercentage >= 90 ? 'red' : usedBudgetInPercentage <= 60 ? 'emerald' : 'yellow';
 
@@ -48,7 +49,7 @@ const BudgetInfo = ({ totalAmount, usedAmount, title, id }: Props) => {
               variant='light'
               onClick={e => {
                 e.stopPropagation();
-                navigate(`budgets/${id}/edit`, { preventScrollReset: true });
+                navigate({ pathname: `budgets/${id}/edit`, search: location.search }, { preventScrollReset: true });
               }}>
               Edit
             </Button>
@@ -57,7 +58,7 @@ const BudgetInfo = ({ totalAmount, usedAmount, title, id }: Props) => {
               variant='light'
               onClick={e => {
                 e.stopPropagation();
-                navigate(`budgets/${id}/delete`, { preventScrollReset: true });
+                navigate({ pathname: `budgets/${id}/delete`, search: location.search }, { preventScrollReset: true });
               }}>
               Delete
             </Button>
