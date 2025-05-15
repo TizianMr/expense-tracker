@@ -73,7 +73,7 @@ const Dashboard = () => {
         <Expenses expenses={expenses} />
       </Card>
 
-      <Card className='lg:col-span-1 lg:row-start-2 lg:col-start-5 lg:row-span-2 col-span-5 row-start-3 flex flex-col'>
+      <Card className='lg:col-span-1 lg:row-start-2 lg:col-start-5 lg:row-span-2 col-span-5 row-start-3 flex flex-col lg:max-w-[22rem] max-w-full'>
         <Budgets budgets={budgets} />
       </Card>
       <Outlet />
