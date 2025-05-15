@@ -6,14 +6,17 @@ import { Button, Dialog, DialogPanel, Divider, Select, SelectItem } from '@tremo
 import { useCallback, useEffect, useState } from 'react';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
-import { getLoggedInUser } from '~/db/auth.server';
-import { updateUserPreferences } from '~/db/user.server';
+import { getLoggedInUser, updateSession } from '~/db/auth.server';
+import { fetchUserPreferences, updateUserPreferences } from '~/db/user.server';
+import { getPreferredTheme, useTheme } from '~/utils/theme-provider';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
-  return { user, colorThemes: Object.values(ColorTheme) };
+  const userPreferences = await fetchUserPreferences(user.id);
+
+  return { userPreferences, colorThemes: Object.values(ColorTheme) };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -21,13 +24,14 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (!user) throw redirect('/login');
 
   const formData = await request.formData();
-  const colorTheme = formData.get('colorTheme') as ColorTheme;
+  const colorTheme = formData.get('colorTheme') as ColorTheme | 'SYSTEM';
 
   try {
     const newUserPreferences = await updateUserPreferences({
       id: user.preferences.id,
-      theme: colorTheme,
+      theme: colorTheme === 'SYSTEM' ? null : colorTheme,
     });
+    await updateSession(request, { ...user, preferences: newUserPreferences });
     return { preferences: newUserPreferences };
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
@@ -37,8 +41,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 const AccountPreferences = () => {
+  const [, setTheme] = useTheme();
   const { state } = useNavigation();
-  const { user, colorThemes } = useLoaderData<typeof loader>();
+  const { userPreferences, colorThemes } = useLoaderData<typeof loader>();
   const data = useActionData<typeof action>();
 
   const [isOpen, setIsOpen] = useState(true);
@@ -52,10 +57,11 @@ const AccountPreferences = () => {
   useEffect(() => {
     if (data && !data.serverError) {
       if (isOpen) {
+        setTheme(data.preferences?.theme ?? getPreferredTheme());
         handleClose();
       }
     }
-  }, [data, handleClose, isOpen]);
+  }, [data, handleClose, isOpen, setTheme]);
 
   return (
     <Dialog
@@ -75,10 +81,10 @@ const AccountPreferences = () => {
           </label>
           <Select
             className='mt-2'
-            defaultValue={user.preferences.theme}
+            defaultValue={userPreferences?.theme || 'SYSTEM'}
             id='color-theme'
             name='colorTheme'>
-            {colorThemes.map(theme => (
+            {[...colorThemes, 'SYSTEM'].map(theme => (
               <SelectItem
                 icon={theme === 'SYSTEM' ? RiComputerLine : theme === 'LIGHT' ? RiSunLine : RiMoonLine}
                 key={theme}

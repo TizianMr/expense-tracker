@@ -23,7 +23,6 @@ enum Category {
 enum ColorTheme {
   LIGHT
   DARK
-  SYSTEM
 }
 
 model Expense {
@@ -68,7 +67,7 @@ model User {
 
 model UserPreference {
   id        String     @id @default(cuid())
-  theme     ColorTheme @default(SYSTEM)
+  theme     ColorTheme?
   createdAt DateTime   @default(now())
   updatedAt DateTime   @updatedAt
   User      User?

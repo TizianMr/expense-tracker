@@ -2,6 +2,9 @@ import { Links, Meta, MetaFunction, Outlet, Scripts, ScrollRestoration } from '@
 
 import './tailwind.css';
 
+import { cx } from './utils/helpers';
+import { NonFlashOfWrongThemeEls, ThemeProvider, useTheme } from './utils/theme-provider';
+
 export const meta: MetaFunction = () => {
   return [
     { title: 'Expense Tracker' },
@@ -12,10 +15,12 @@ export const meta: MetaFunction = () => {
   ];
 };
 
-export function Layout({ children }: { children: React.ReactNode }) {
+function Layout({ children }: { children: React.ReactNode }) {
+  const [theme] = useTheme();
+
   return (
     <html
-      className='antialiased'
+      className={cx('antialiased', theme?.toLowerCase())}
       lang='en'>
       <head>
         <meta charSet='utf-8' />
@@ -25,6 +30,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         />
         <Meta />
         <Links />
+        <NonFlashOfWrongThemeEls ssrTheme={Boolean(theme)} />
       </head>
       <body>
         {children}
@@ -36,5 +42,11 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+  return (
+    <ThemeProvider>
+      <Layout>
+        <Outlet />
+      </Layout>
+    </ThemeProvider>
+  );
 }

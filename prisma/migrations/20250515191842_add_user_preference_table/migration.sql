@@ -6,7 +6,7 @@
 
 */
 -- CreateEnum
-CREATE TYPE "ColorTheme" AS ENUM ('LIGHT', 'DARK', 'SYSTEM');
+CREATE TYPE "ColorTheme" AS ENUM ('LIGHT', 'DARK');
 
 -- AlterTable
 ALTER TABLE "User" ADD COLUMN     "userPreferenceId" TEXT NOT NULL;
@@ -14,7 +14,7 @@ ALTER TABLE "User" ADD COLUMN     "userPreferenceId" TEXT NOT NULL;
 -- CreateTable
 CREATE TABLE "UserPreference" (
     "id" TEXT NOT NULL,
-    "theme" "ColorTheme" NOT NULL DEFAULT 'SYSTEM',
+    "theme" "ColorTheme",
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 

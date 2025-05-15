@@ -83,7 +83,7 @@ export const createUser = async ({ password, email, firstName, lastName }: Creat
       ...newUser,
       UserPreference: {
         create: {
-          theme: ColorTheme.SYSTEM,
+          theme: null,
         },
       },
     },
