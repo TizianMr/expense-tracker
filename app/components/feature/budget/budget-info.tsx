@@ -39,7 +39,7 @@ const BudgetInfo = ({ totalAmount, usedAmount, title, id }: Props) => {
         <span className='text-xs font-medium text-slate-700'>{Math.round(usedBudgetInPercentage)}%</span>
       </ProgressCircle>
       <div className='w-full min-w-0'>
-        <p className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium truncate max-w-full'>
+        <p className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-medium lg:truncate max-w-full'>
           {title}
         </p>
         <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'>{`${formatCurrency(usedAmount)} of ${formatCurrency(totalAmount)} used`}</p>
