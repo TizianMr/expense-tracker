@@ -1,5 +1,4 @@
 import { Links, Meta, MetaFunction, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
-
 import './tailwind.css';
 
 import { cx } from './utils/helpers';
@@ -30,7 +29,7 @@ function Layout({ children }: { children: React.ReactNode }) {
         />
         <Meta />
         <Links />
-        <NonFlashOfWrongThemeEls ssrTheme={Boolean(theme)} />
+        <NonFlashOfWrongThemeEls />
       </head>
       <body>
         {children}

@@ -1,4 +1,4 @@
-// https://www.mattstobbs.com/remix-dark-mode/
+// inspriated by implementation of: https://www.mattstobbs.com/remix-dark-mode/
 
 import { ColorTheme } from '@prisma/client';
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -12,24 +12,26 @@ type ThemeContextType = [ColorTheme | null, Dispatch<SetStateAction<ColorTheme |
 
 const clientThemeCode = `
 ;(() => {
-  const theme = window.matchMedia(${JSON.stringify(prefersDarkMQ)}).matches
-    ? 'dark'
-    : 'light';
-  const cl = document.documentElement.classList;
-  const themeAlreadyApplied = cl.contains('light') || cl.contains('dark');
-  if (themeAlreadyApplied) {
-    // this script shouldn't exist if the theme is already applied!
-    console.warn(
-      "Hi there, could you let Matt know you're seeing this message? Thanks!",
-    );
-  } else {
-    cl.add(theme);
-  }
+  try {
+    var theme = localStorage.getItem('theme');
+    if (!theme) {
+      theme = window.matchMedia('${prefersDarkMQ}').matches ? 'dark' : 'light';
+    }
+    var cl = document.documentElement.classList;
+    cl.remove('light', 'dark');
+    cl.add(theme.toLowerCase());
+  } catch(e) {}
 })();
 `;
 
-function NonFlashOfWrongThemeEls({ ssrTheme }: { ssrTheme: boolean }) {
-  return <>{ssrTheme ? null : <script dangerouslySetInnerHTML={{ __html: clientThemeCode }} />}</>;
+function NonFlashOfWrongThemeEls() {
+  return (
+    <script
+      dangerouslySetInnerHTML={{
+        __html: clientThemeCode,
+      }}
+    />
+  );
 }
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
