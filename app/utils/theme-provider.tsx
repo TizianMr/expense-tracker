@@ -58,16 +58,6 @@ function ThemeProvider({ children }: { children: ReactNode }) {
     }
   }, [theme]);
 
-  // listen to updates for the system color
-  useEffect(() => {
-    const mediaQuery = window.matchMedia(prefersDarkMQ);
-    const handleChange = () => {
-      setTheme(mediaQuery.matches ? 'DARK' : 'LIGHT');
-    };
-    mediaQuery.addEventListener('change', handleChange);
-    return () => mediaQuery.removeEventListener('change', handleChange);
-  }, []);
-
   return <ThemeContext.Provider value={[theme, setTheme]}>{children}</ThemeContext.Provider>;
 }
 
