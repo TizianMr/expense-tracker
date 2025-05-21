@@ -25,6 +25,11 @@ enum ColorTheme {
   DARK
 }
 
+enum Locale {
+  en
+  de
+}
+
 model Expense {
   id              String    @id @default(cuid())
   amount          Float
@@ -66,9 +71,10 @@ model User {
 }
 
 model UserPreference {
-  id        String     @id @default(cuid())
+  id        String      @id @default(cuid())
   theme     ColorTheme?
-  createdAt DateTime   @default(now())
-  updatedAt DateTime   @updatedAt
+  locale    Locale      @default(en)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   User      User?
 }

@@ -7,6 +7,11 @@ export const EXPENSE_CATEGORIES = [
   { label: 'Other', value: Category.OTHER, color: 'cyan' },
 ];
 
+export const LOCALES = [
+  { label: 'English', value: 'en' },
+  { label: 'Deutsch', value: 'de' },
+];
+
 export const EXPENSE_PAGE_SIZE = 5;
 export const BUDGET_PAGE_SIZE = 6;
 

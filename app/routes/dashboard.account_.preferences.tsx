@@ -8,6 +8,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser, updateSession } from '~/db/auth.server';
 import { fetchUserPreferences, updateUserPreferences } from '~/db/user.server';
+import { LOCALES } from '~/utils/constants';
 import { getPreferredTheme, useTheme } from '~/utils/theme-provider';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
@@ -74,25 +75,50 @@ const AccountPreferences = () => {
         </h3>
 
         <Form method='post'>
-          <label
-            className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'
-            htmlFor='color-theme'>
-            Color theme
-          </label>
-          <Select
-            className='mt-2'
-            defaultValue={userPreferences?.theme || 'SYSTEM'}
-            id='color-theme'
-            name='colorTheme'>
-            {[...colorThemes, 'SYSTEM'].map(theme => (
-              <SelectItem
-                icon={theme === 'SYSTEM' ? RiComputerLine : theme === 'LIGHT' ? RiSunLine : RiMoonLine}
-                key={theme}
-                value={theme}>
-                {theme.charAt(0) + theme.slice(1).toLowerCase()}
-              </SelectItem>
-            ))}
-          </Select>
+          <div className='space-y-6'>
+            <div>
+              <label
+                className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'
+                htmlFor='color-theme'>
+                Color theme
+              </label>
+              <Select
+                className='mt-2'
+                defaultValue={userPreferences?.theme || 'SYSTEM'}
+                id='color-theme'
+                name='colorTheme'>
+                {[...colorThemes, 'SYSTEM'].map(theme => (
+                  <SelectItem
+                    icon={theme === 'SYSTEM' ? RiComputerLine : theme === 'LIGHT' ? RiSunLine : RiMoonLine}
+                    key={theme}
+                    value={theme}>
+                    {theme.charAt(0) + theme.slice(1).toLowerCase()}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+
+            <div>
+              <label
+                className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'
+                htmlFor='lang'>
+                Language
+              </label>
+              <Select
+                className='mt-2'
+                defaultValue={userPreferences?.locale}
+                id='lang'
+                name='locale'>
+                {LOCALES.map(locale => (
+                  <SelectItem
+                    key={locale.value}
+                    value={locale.value}>
+                    {locale.label}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+          </div>
 
           <Button
             className='w-full mt-4'
