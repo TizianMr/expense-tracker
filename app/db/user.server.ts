@@ -7,10 +7,6 @@ import { getS3ObjectKey } from '~/utils/helpers';
 
 export type UpdatePreference = Pick<UserPreference, 'id' | 'theme'>;
 
-export const fetchUserPreferences = async (id: string) => {
-  return prisma.userPreference.findFirst({ where: { User: { id } } });
-};
-
 export const updateMailAddress = async (id: string, newMail: string) => {
   const userWithSameMail = await prisma.user.findUnique({ where: { email: newMail } });
 
@@ -50,6 +46,10 @@ export const deleteUser = async (id: string) => {
   if (deletedUser.profilePicture) {
     await deleteAvatar(getS3ObjectKey(deletedUser.profilePicture));
   }
+};
+
+export const fetchUserPreferences = async (id: string) => {
+  return prisma.userPreference.findFirst({ where: { User: { id } } });
 };
 
 export const updateUserPreferences = async (preferences: UpdatePreference) => {

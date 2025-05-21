@@ -1,4 +1,4 @@
-import { NavLink, useSubmit } from '@remix-run/react';
+import { NavLink, useLocation, useSubmit } from '@remix-run/react';
 import { RiArrowDownSLine, RiLogoutCircleLine, RiSettings2Line, RiUserLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
 
@@ -17,6 +17,7 @@ type Props = {
 
 const UserDropdown = ({ userInfo }: Props) => {
   const submit = useSubmit();
+  const location = useLocation();
 
   return (
     <div className='flex justify-end'>
@@ -56,7 +57,7 @@ const UserDropdown = ({ userInfo }: Props) => {
             </DropdownMenuItem>
           </NavLink>
 
-          <NavLink to='account/preferences'>
+          <NavLink to={{ pathname: 'account/preferences', search: location.search }}>
             <DropdownMenuItem>
               <span className='flex items-center gap-x-2'>
                 <RiSettings2Line className='size-4 text-inherit' /> <span>Account Preferences</span>

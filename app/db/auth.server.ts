@@ -1,4 +1,4 @@
-import { ColorTheme, User, UserPreference } from '@prisma/client';
+import { User, UserPreference } from '@prisma/client';
 import { createCookieSessionStorage } from '@remix-run/node';
 import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
@@ -99,14 +99,14 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
     throw new Error('Mail or password are not correct');
   }
 
+  if (!user.UserPreference) {
+    throw new Error('User preference not found');
+  }
+
   let signedAvatarUrl: string | null = null;
   if (user.profilePicture) {
     signedAvatarUrl = await getSignedAvatarUrl(getS3ObjectKey(user.profilePicture));
   }
-
-  const userPreferencesFallback = {
-    theme: ColorTheme.DARK,
-  };
 
   return {
     id: user.id,
@@ -115,8 +115,8 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
     firstName: user.firstName,
     profilePicture: signedAvatarUrl,
     preferences: {
-      id: user.UserPreference?.id || '',
-      theme: user.UserPreference?.theme || userPreferencesFallback.theme,
+      id: user.UserPreference.id,
+      theme: user.UserPreference.theme,
     },
   };
 };
