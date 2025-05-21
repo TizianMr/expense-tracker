@@ -1,11 +1,12 @@
 import { User, UserPreference } from '@prisma/client';
-import { createCookieSessionStorage } from '@remix-run/node';
+import { createCookieSessionStorage, redirect } from '@remix-run/node';
 import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
 
 import { getSignedAvatarUrl } from './s3.server';
 import { prisma } from '../utils/prisma.server';
+import { localeCookie } from '~/utils/cookies.server';
 import { getS3ObjectKey } from '~/utils/helpers';
 
 export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'> & {
@@ -43,16 +44,26 @@ authenticator.use(
   EMAIL_PASSWORD_STRATEGY,
 );
 
-export const updateSession = async (request: Request, updatedUser: AuthUser): Promise<Response> => {
+export const updateSession = async (
+  request: Request,
+  updatedUser: AuthUser,
+  redirectTo?: string,
+): Promise<Response> => {
   const session = await sessionStorage.getSession(request.headers.get('cookie'));
   session.set('user', updatedUser);
 
-  return new Response(JSON.stringify({ success: true }), {
-    headers: {
-      'Content-Type': 'application/json',
-      'Set-Cookie': await sessionStorage.commitSession(session),
-    },
+  const headers = new Headers({
+    'Content-Type': 'application/json',
   });
+
+  headers.append('Set-Cookie', await sessionStorage.commitSession(session));
+  headers.append('Set-Cookie', await localeCookie.serialize(updatedUser.preferences.locale));
+
+  if (redirectTo) {
+    return redirect(redirectTo, { headers });
+  }
+
+  return new Response(JSON.stringify({ success: true }), { headers });
 };
 
 export const getLoggedInUser = async (request: Request): Promise<AuthUser | null> => {

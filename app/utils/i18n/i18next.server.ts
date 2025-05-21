@@ -4,12 +4,14 @@ import Backend from 'i18next-fs-backend';
 import { RemixI18Next } from 'remix-i18next/server';
 
 import i18n from './i18n'; // your i18n configuration file
+import { localeCookie } from '../cookies.server';
 import { getLoggedInUser } from '~/db/auth.server';
 
 const i18next = new RemixI18Next({
   detection: {
     supportedLanguages: i18n.supportedLngs,
     fallbackLanguage: i18n.fallbackLng,
+    cookie: localeCookie,
     async findLocale(request) {
       const user = await getLoggedInUser(request);
       return user?.preferences.locale ?? null;

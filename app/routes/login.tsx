@@ -3,7 +3,7 @@ import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-ru
 import { Button, TextInput } from '@tremor/react';
 
 import GitHubLink from '~/components/ui/github-link';
-import { authenticator, EMAIL_PASSWORD_STRATEGY, getLoggedInUser, sessionStorage } from '~/db/auth.server';
+import { authenticator, EMAIL_PASSWORD_STRATEGY, getLoggedInUser, updateSession } from '~/db/auth.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getLoggedInUser(request);
@@ -25,15 +25,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   try {
     const user = await authenticator.authenticate(EMAIL_PASSWORD_STRATEGY, request);
 
-    const session = await sessionStorage.getSession(request.headers.get('cookie'));
-
-    session.set('user', user);
-
-    return redirect('/dashboard', {
-      headers: {
-        'Set-Cookie': await sessionStorage.commitSession(session),
-      },
-    });
+    return await updateSession(request, user, '/dashboard');
   } catch (error) {
     // Return validation errors or authentication errors
     if (error instanceof Error) {

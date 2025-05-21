@@ -35,8 +35,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       theme: colorTheme === 'SYSTEM' ? null : colorTheme,
       locale,
     });
-    await updateSession(request, { ...user, preferences: newUserPreferences });
-    return { preferences: newUserPreferences };
+    return await updateSession(request, { ...user, preferences: newUserPreferences });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return { serverError: (error.meta?.cause as string) || 'An unknown error occurred.' };
@@ -62,12 +61,15 @@ const AccountPreferences = () => {
   useEffect(() => {
     if (data && !data.serverError) {
       if (isOpen) {
-        setTheme(data.preferences?.theme ?? getPreferredTheme());
-        i18n.changeLanguage(data.preferences?.locale);
         handleClose();
       }
     }
-  }, [data, handleClose, i18n, isOpen, setTheme]);
+  }, [data, handleClose, isOpen]);
+
+  useEffect(() => {
+    setTheme(userPreferences?.theme ?? getPreferredTheme());
+    i18n.changeLanguage(userPreferences?.locale);
+  }, [i18n, setTheme, userPreferences?.locale, userPreferences?.theme]);
 
   return (
     <Dialog
