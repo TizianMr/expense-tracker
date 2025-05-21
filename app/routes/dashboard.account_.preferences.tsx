@@ -1,4 +1,4 @@
-import { ColorTheme, Prisma } from '@prisma/client';
+import { ColorTheme, Locale, Prisma } from '@prisma/client';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, redirect, useActionData, useLoaderData, useNavigation } from '@remix-run/react';
 import { RiComputerLine, RiMoonLine, RiSunLine } from '@remixicon/react';
@@ -26,11 +26,13 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   const formData = await request.formData();
   const colorTheme = formData.get('colorTheme') as ColorTheme | 'SYSTEM';
+  const locale = formData.get('locale') as Locale;
 
   try {
     const newUserPreferences = await updateUserPreferences({
       id: user.preferences.id,
       theme: colorTheme === 'SYSTEM' ? null : colorTheme,
+      locale,
     });
     await updateSession(request, { ...user, preferences: newUserPreferences });
     return { preferences: newUserPreferences };

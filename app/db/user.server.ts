@@ -5,7 +5,7 @@ import { deleteAvatar } from './s3.server';
 import { prisma } from '../utils/prisma.server';
 import { getS3ObjectKey } from '~/utils/helpers';
 
-export type UpdatePreference = Pick<UserPreference, 'id' | 'theme'>;
+export type UpdatePreference = Pick<UserPreference, 'id' | 'theme' | 'locale'>;
 
 export const updateMailAddress = async (id: string, newMail: string) => {
   const userWithSameMail = await prisma.user.findUnique({ where: { email: newMail } });
