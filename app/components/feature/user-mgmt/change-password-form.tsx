@@ -1,6 +1,7 @@
 import { useFetcher } from '@remix-run/react';
 import { TextInput, Button } from '@tremor/react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ChangePwdFormErrors } from '~/routes/dashboard.account';
 
@@ -9,6 +10,7 @@ type Props = {
 };
 
 const ChangePasswordForm = ({ onSuccess }: Props) => {
+  const { t } = useTranslation();
   const fetcher = useFetcher<{
     success?: boolean;
     clientErrors?: ChangePwdFormErrors;
@@ -28,7 +30,7 @@ const ChangePasswordForm = ({ onSuccess }: Props) => {
           <label
             className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
             htmlFor='old-password'>
-            Old password <span className='text-red-500'>*</span>
+            {t('ChangePasswordForm.oldPwd')} <span className='text-red-500'>*</span>
           </label>
           <TextInput
             autoComplete='password'
@@ -45,7 +47,7 @@ const ChangePasswordForm = ({ onSuccess }: Props) => {
           <label
             className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
             htmlFor='new-password'>
-            New password <span className='text-red-500'>*</span>
+            {t('ChangePasswordForm.newPwd')} <span className='text-red-500'>*</span>
           </label>
           <TextInput
             autoComplete='password'
@@ -62,7 +64,7 @@ const ChangePasswordForm = ({ onSuccess }: Props) => {
           <label
             className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
             htmlFor='confirm-password'>
-            Confirm new password <span className='text-red-500'>*</span>
+            {t('ChangePasswordForm.confirmPwd')} <span className='text-red-500'>*</span>
           </label>
           <TextInput
             autoComplete='password'
@@ -79,7 +81,7 @@ const ChangePasswordForm = ({ onSuccess }: Props) => {
           className='w-full'
           loading={fetcher.state === 'submitting'}
           type='submit'>
-          Change
+          {t('ChangePasswordForm.submit')}
         </Button>
         {fetcher.data?.serverError && (
           <p className='mt-2 text-tremor-label text-center text-red-500 dark:text-red-300'>

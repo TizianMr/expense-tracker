@@ -1,19 +1,9 @@
 import { Expense } from '@prisma/client';
-import {
-  startOfWeek,
-  endOfWeek,
-  startOfYear,
-  endOfYear,
-  startOfMonth,
-  endOfMonth,
-  getISOWeek,
-  addWeeks,
-} from 'date-fns';
+import { startOfWeek, endOfWeek, startOfYear, endOfYear, startOfMonth, endOfMonth, getISOWeek } from 'date-fns';
 
 import { prisma } from '../utils/prisma.server';
 import { StatisticPeriod } from '~/interfaces';
-import { EXPENSE_CATEGORIES, MONTHS, WEEKDAYS } from '~/utils/constants';
-import { getCalenderWeek, getMonth, getWeekday } from '~/utils/helpers';
+import { EXPENSE_CATEGORIES } from '~/utils/constants';
 
 export type Statistics = {
   period: StatisticPeriod;
@@ -25,10 +15,7 @@ export type Statistics = {
       share: number;
     }[];
   };
-  expensesByPeriod: {
-    name: string;
-    amount: number;
-  }[];
+  expensesByPeriod: number[];
 };
 
 export const fetchStatistics = async (period: StatisticPeriod, userId: string): Promise<Statistics> => {
@@ -81,13 +68,13 @@ const calculateExpensesByCategory = (expenses: Pick<Expense, 'amount' | 'expense
     amount: 0,
     share: 0,
   }));
-  expensesByCategory.push({ category: 'NO CATEGORY', amount: 0, share: 0 });
+  expensesByCategory.push({ category: 'none', amount: 0, share: 0 });
 
   // Calculate amount per category
   expenses.forEach(expense => {
     const categoryEntry =
       expensesByCategory.find(ebc => ebc.category === expense.category) ||
-      expensesByCategory.find(ebc => ebc.category === 'NO CATEGORY');
+      expensesByCategory.find(ebc => ebc.category === 'none');
     if (categoryEntry) {
       categoryEntry.amount += expense.amount;
     }
@@ -112,55 +99,42 @@ const calculateExpensesByPeriod = (
   expenses: Pick<Expense, 'amount' | 'expenseDate' | 'category'>[],
   period: StatisticPeriod,
 ) => {
-  let timePeriod: string[];
-
+  let expensesByPeriod: number[] = Array(getNumberOfWeeksInCurrentMonth()).fill(0);
   switch (period) {
     case StatisticPeriod.WEEK:
-      timePeriod = WEEKDAYS;
+      expensesByPeriod = Array(7).fill(0);
       break;
     case StatisticPeriod.MONTH:
-      timePeriod = getCalendarWeeksOfCurrentMonth();
+      expensesByPeriod = Array(getNumberOfWeeksInCurrentMonth()).fill(0);
       break;
-    default:
-      timePeriod = MONTHS;
+    case StatisticPeriod.YEAR:
+      expensesByPeriod = Array(12).fill(0);
+      break;
   }
 
-  const expensesByPeriod = timePeriod.map(period => ({
-    name: period,
-    amount: 0,
-  }));
-
   expenses.forEach(expense => {
-    const timeUnit =
+    const index =
       period === StatisticPeriod.WEEK
-        ? getWeekday(expense.expenseDate)
+        ? expense.expenseDate.getDay()
         : period === StatisticPeriod.MONTH
-          ? getCalenderWeek(expense.expenseDate)
-          : getMonth(expense.expenseDate);
+          ? getISOWeek(expense.expenseDate) - getISOWeek(startOfMonth(Date.now()))
+          : expense.expenseDate.getMonth();
 
-    const entry = expensesByPeriod.find(exp => exp.name === timeUnit);
-
-    if (entry) {
-      entry.amount += expense.amount;
-    }
+    expensesByPeriod[index] += expense.amount;
   });
 
   return expensesByPeriod;
 };
 
-const getCalendarWeeksOfCurrentMonth = (): string[] => {
+function getNumberOfWeeksInCurrentMonth(): number {
   const now = new Date();
-  const startOfMonthDate = startOfMonth(now);
-  const endOfMonthDate = endOfMonth(now);
-
-  const weeks: string[] = [];
-  let current = startOfMonthDate;
-
-  while (current <= endOfMonthDate) {
-    const weekNumber = getISOWeek(current);
-    weeks.push(`Week ${weekNumber}`);
-    current = addWeeks(current, 1); // Move to the next week
+  const firstWeek = getISOWeek(startOfMonth(now));
+  const lastWeek = getISOWeek(endOfMonth(now));
+  // Handle year wrap-around (e.g., December to January)
+  if (lastWeek < firstWeek) {
+    // ISO weeks reset at the start of the year
+    const weeksInYear = getISOWeek(new Date(now.getFullYear(), 11, 31));
+    return weeksInYear - firstWeek + 1 + lastWeek;
   }
-
-  return weeks;
-};
+  return lastWeek - firstWeek + 1;
+}

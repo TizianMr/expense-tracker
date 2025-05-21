@@ -47,6 +47,7 @@ const AccountPreferences = () => {
   const [, setTheme] = useTheme();
   const { i18n } = useTranslation();
   const { state } = useNavigation();
+  const { t } = useTranslation();
   const { userPreferences, colorThemes } = useLoaderData<typeof loader>();
   const data = useActionData<typeof action>();
 
@@ -78,7 +79,7 @@ const AccountPreferences = () => {
       onClose={handleClose}>
       <DialogPanel className='lg:w-[40vw] big-dialog'>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong pb-4'>
-          Account Preferences
+          {t('AccountPreferences.title')}
         </h3>
 
         <Form method='post'>
@@ -87,7 +88,7 @@ const AccountPreferences = () => {
               <label
                 className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'
                 htmlFor='color-theme'>
-                Color theme
+                {t('AccountPreferences.theme')}
               </label>
               <Select
                 className='mt-2'
@@ -109,7 +110,7 @@ const AccountPreferences = () => {
               <label
                 className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'
                 htmlFor='lang'>
-                Language
+                {t('AccountPreferences.lang')}
               </label>
               <Select
                 className='mt-2'
@@ -131,7 +132,7 @@ const AccountPreferences = () => {
             className='w-full mt-4'
             loading={state === 'submitting'}
             type='submit'>
-            Update
+            {t('AccountPreferences.submit')}
           </Button>
         </Form>
 
@@ -144,7 +145,7 @@ const AccountPreferences = () => {
           <Button
             variant='secondary'
             onClick={handleClose}>
-            Close
+            {t('common.close')}
           </Button>
         </div>
       </DialogPanel>

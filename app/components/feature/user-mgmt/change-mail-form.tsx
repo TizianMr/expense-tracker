@@ -1,6 +1,7 @@
 import { useFetcher } from '@remix-run/react';
 import { TextInput, Button } from '@tremor/react';
 import { useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ChangeMailFormErrors } from '~/routes/dashboard.account';
 
@@ -9,6 +10,7 @@ type Props = {
 };
 
 const ChangeMailForm = ({ onSuccess }: Props) => {
+  const { t } = useTranslation();
   const fetcher = useFetcher<{
     success?: boolean;
     clientErrors?: ChangeMailFormErrors;
@@ -28,7 +30,7 @@ const ChangeMailForm = ({ onSuccess }: Props) => {
           <label
             className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
             htmlFor='new-email'>
-            New Email <span className='text-red-500'>*</span>
+            {t('ChangeMailForm.newMail')} <span className='text-red-500'>*</span>
           </label>
           <TextInput
             autoComplete='email'
@@ -45,7 +47,7 @@ const ChangeMailForm = ({ onSuccess }: Props) => {
           <label
             className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
             htmlFor='confirm-email'>
-            Confirm new Email <span className='text-red-500'>*</span>
+            {t('ChangeMailForm.confirmMail')} <span className='text-red-500'>*</span>
           </label>
           <TextInput
             autoComplete='email'
@@ -62,7 +64,7 @@ const ChangeMailForm = ({ onSuccess }: Props) => {
           className='w-full'
           loading={fetcher.state === 'submitting'}
           type='submit'>
-          Change
+          {t('ChangeMailForm.submit')}
         </Button>
         {fetcher.data?.serverError && (
           <p className='mt-2 text-tremor-label text-center text-red-500 dark:text-red-300'>

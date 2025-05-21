@@ -21,7 +21,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     user.id,
   );
 
-  return budgets;
+  return { budgets, locale: user.preferences.locale };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
@@ -45,7 +45,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 const CreateExpenseDialog = () => {
-  const budgets = useLoaderData<typeof loader>();
+  const { budgets, locale } = useLoaderData<typeof loader>();
   const { errors } = useOutletContext<{
     errors: ExpenseFormErrors;
   }>();
@@ -54,6 +54,7 @@ const CreateExpenseDialog = () => {
     <ExpenseForm
       budgets={budgets}
       errors={errors}
+      locale={locale}
     />
   );
 };

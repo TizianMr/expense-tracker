@@ -1,3 +1,222 @@
 {
-    "hi": "Hello World"
+  "common": {
+    "amount": "Betrag",
+    "budget": "Budget",
+    "cancel": "Abbrechen",
+    "categories": {
+      "food": "Lebensmittel",
+      "transport": "Transport",
+      "shopping": "Einkäufe",
+      "other": "Sonstiges",
+      "none": "Keine Kategorie"
+    },
+    "category": "Kategorie",
+    "close": "Schließen",
+    "create": "Erstellen",
+    "date": "Datum",
+    "delete": "Löschen",
+    "edit": "Bearbeiten",
+    "title": "Titel",
+    "unknownError": "Ein unbekannter Fehler ist aufgetreten"
+  },
+  "AccountPreferences": {
+    "lang": "Spache",
+    "theme": "Farbdesign",
+    "title": "Account Präferenzen",
+    "submit": "Aktualisieren"
+  },
+  "AccountSettings": {
+    "delete": "Account löschen",
+    "errors": {
+      "mailNotIdentical": "Mailadressen sind nicht identisch.",
+      "required": "Diese Eingabe ist erforderlich.",
+      "pwdNotIdentical": "Passwörter sind nicht identisch."
+    },
+    "mailTab": "Mailadresse ändern",
+    "pwdTab": "Passwort ändern",
+    "title": "Account Einstellungen"
+  },
+  "BudgetDetails": {
+    "error": {
+      "title": "Budget nicht gefunden",
+      "text": "Das Budget, auf das du zugreifen möchtest, konnte nicht gefunden werden."
+    },
+    "noCategory": "Keine Kategorie",
+    "noData": "Dem Budget sind keine Ausgaben zugeordnet"
+  },
+  "BudgetDialogRoot": {
+    "errors": {
+      "invalidAmount": "Betrag ist keine valide Nummer.",
+      "required": "Diese Eingabe ist erforderlich."
+    },
+    "subtitle": "Behalte mit Budgets den Überblick über deine Ausgaben. Budgets setzen sich jeden Monat zurück.",
+    "title": {
+      "edit": "Budget bearbeiten",
+      "create": "Budget erstellen"
+    }
+  },
+  "BudgetForm": {
+    "amount": "$t(common.amount)",
+    "amountPlaceholder": "$t(common.amount)...",
+    "title": "$t(common.title)",
+    "titlePlaceholder": "Titelname"
+  },
+  "Budgets": {
+    "create": "$t(common.budget) erstellen",
+    "legend": {
+      "green": "Keine Sorge! Du liegst gut im Rahmen deines Budgets.",
+      "yellow": "Vorsicht! Du näherst dich deinem Budgetlimit.",
+      "red": "Achtung! Du hast dein Budget fast ausgeschöpft."
+    },
+    "noData": "Keine Daten",
+    "noDataSubtext": "Erstelle dein erstes $t(common.budget)",
+    "title": "Budgets"
+  },
+  "ChangeMailForm": {
+    "confirmMail": "Neue Mailadresse bestätigen",
+    "newMail": "Neue Mailadresse",
+    "submit": "Aktualisieren"
+  },
+  "ChangePasswordForm": {
+    "confirmPwd": "Neues Passwort bestätigen",
+    "newPwd": "Neues Passwort",
+    "oldPwd": "Aktuelles Passwort",
+    "submit": "Aktualisieren"
+  },
+  "DeleteBudgetDialog": {
+    "text": "Die Budgetzuordnung aller verbundenen Ausgaben wird zurückgesetzt.",
+    "title": "Budget löschen?"
+  },
+  "DeleteExpenseDialog": {
+    "text": "Gelöschte Ausgaben können nicht wiederhergestellt werden.",
+    "title": "Ausgabe löschen?"
+  },
+  "DeleteUserDialog": {
+    "text": "Einmal gelöscht, kannst du dein Konto nicht wiederherstellen. Alle Ausgaben und Budgets sind dann verloren.",
+    "title": "Nutzer löschen?"
+  },
+  "EditBudgetDialog": {
+    "error": {
+      "title": "Budget nicht gefunden",
+      "text": "Das Budget, auf das du zugreifen möchtest, konnte nicht gefunden werden."
+    }
+  },
+  "EditExpenseDialog": {
+    "error": {
+      "title": "Ausgabe nicht gefunden",
+      "text": "Die Ausgabe, auf die du zugreifen möchtest, konnte nicht gefunden werden."
+    }
+  },
+  "ExpenseDialogRoot": {
+    "errors": {
+      "invalidAmount": "Betrag ist keine valide Nummer.",
+      "required": "Diese Eingabe ist erforderlich."
+    },
+    "subtitle": "Erfasse schnell deine letzte Ausgabe.",
+    "title": {
+      "edit": "Ausgabe bearbeiten",
+      "create": "Ausgabe erstellen"
+    }
+  },
+  "ExpenseForm": {
+    "amount": "$t(common.amount)",
+    "amountPlaceholder": "$t(common.amount)...",
+    "budget": "$t(common.budget)",
+    "budgetHelperText": "In der Budgetübersicht werden nur die Ausgaben für den laufenden Monat berücksichtigt.",
+    "category": "$t(common.category)",
+    "date": "$t(common.date)",
+    "title": "$t(common.title)",
+    "titlePlaceholder": "Titelname"
+  },
+  "Expenses": {
+    "create": "Ausgabe erstellen",
+    "title": "Ausgaben"
+  },
+  "ExpenseTable": {
+    "headers": {
+      "title": "$t(common.title)",
+      "amount": "$t(common.amount)",
+      "date": "$t(common.date)",
+      "category": "$t(common.category)",
+      "budget": "$t(common.budget)",
+      "actions": "Aktionen"
+    },
+    "noData": "Keine Daten"
+  },
+  "LoginPage": {
+    "errors": {
+      "required": "E-Mail und Passwort sind erforderlich."
+    },
+    "mail": "E-Mail",
+    "pwd": "Passwort",
+    "registerAction": "Jetzt registrieren",
+    "registerQuestion": "Kein Account?",
+    "submit": "Login",
+    "title": "Login"
+  },
+  "Pagination": {
+    "first": "Erste Seite",
+    "info": {
+      "0": "Zeige",
+      "1": "von"
+    },
+    "last": "Letzte Seite",
+    "next": "Nächste Seite",
+    "previous": "Vorherige Seite"
+  },
+  "SignUpPage": {
+    "errors": {
+      "required": "Pflichtfelder(*) müssen befüllt werden."
+    },
+    "firstName": "Vorname",
+    "lastName": "Nachname",
+    "mail": "E-Mail",
+    "pwd": "Passwort",
+    "signInAction": "Login",
+    "signInQuestion": "Du hast schon einen Account?",
+    "submit": "Registrieren",
+    "title": "Registrieren"
+  },
+  "Statistics": {
+    "amountAndShare": "$t(common.amount) / Anteil",
+    "barchart": {
+      "week": {
+        "0": "Montag",
+        "1": "Dienstag",
+        "2": "Mittwoch",
+        "3": "Donnerstag",
+        "4": "Freitag",
+        "5": "Samstag",
+        "6": "Sonntag"
+      },
+      "month": "KW {{weeknumber}}",
+      "year": {
+        "0": "Januar",
+        "1": "Februar",
+        "2": "März",
+        "3": "April",
+        "4": "Mai",
+        "5": "Juni",
+        "6": "Juli",
+        "7": "August",
+        "8": "September",
+        "9": "Oktober",
+        "10": "November",
+        "11": "Dezember"
+      }
+    },
+    "category": "$t(common.category)",
+    "noData": "Keine Ausgaben zum anzeigen",
+    "timePeriod": {
+      "week": "Woche",
+      "month": "Monat",
+      "year": "Jahr"
+    },
+    "title": "Statistiken"
+  },
+  "UserDropdown": {
+    "logout": "Ausloggen",
+    "preferences": "Account Präferenzen",
+    "settings": "Account Einstellungen"
+  }
 }

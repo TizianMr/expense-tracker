@@ -1,16 +1,16 @@
 import { Category } from '@prisma/client';
 
 export const EXPENSE_CATEGORIES = [
-  { label: 'Food', value: Category.FOOD, color: 'orange' },
-  { label: 'Transport', value: Category.TRANSPORT, color: 'blue' },
-  { label: 'Shopping', value: Category.SHOPPING, color: 'red' },
-  { label: 'Other', value: Category.OTHER, color: 'cyan' },
+  { labelKey: 'common.categories.food', value: Category.FOOD, color: 'orange' },
+  { labelKey: 'common.categories.transport', value: Category.TRANSPORT, color: 'blue' },
+  { labelKey: 'common.categories.shopping', value: Category.SHOPPING, color: 'red' },
+  { labelKey: 'common.categories.other', value: Category.OTHER, color: 'cyan' },
 ];
 
 export const LOCALES = [
   { label: 'English', value: 'en' },
   { label: 'Deutsch', value: 'de' },
-];
+] as const;
 
 export const EXPENSE_PAGE_SIZE = 5;
 export const BUDGET_PAGE_SIZE = 6;

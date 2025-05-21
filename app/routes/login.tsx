@@ -1,9 +1,11 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-run/react';
 import { Button, TextInput } from '@tremor/react';
+import { useTranslation } from 'react-i18next';
 
 import GitHubLink from '~/components/ui/github-link';
 import { authenticator, EMAIL_PASSWORD_STRATEGY, getLoggedInUser, updateSession } from '~/db/auth.server';
+import i18next from '~/utils/i18n/i18next.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getLoggedInUser(request);
@@ -18,8 +20,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
+  const t = await i18next.getFixedT(request);
+
   if (!email || !password) {
-    return { error: 'E-Mail and password are required' };
+    return { error: t('LoginPage.errors.required') };
   }
 
   try {
@@ -39,6 +43,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 const LoginPage = () => {
   const data = useActionData<typeof action>();
+  const { t } = useTranslation();
   const { state } = useNavigation();
 
   return (
@@ -52,7 +57,7 @@ const LoginPage = () => {
             width='200rem'
           />
           <h3 className='text-center text-tremor-title font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-            Login
+            {t('LoginPage.title')}
           </h3>
           <Form
             className='mt-6 space-y-4'
@@ -61,7 +66,7 @@ const LoginPage = () => {
               <label
                 className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
                 htmlFor='email'>
-                Email <span className='text-red-500'>*</span>
+                {t('LoginPage.mail')} <span className='text-red-500'>*</span>
               </label>
               <TextInput
                 autoComplete='email'
@@ -76,7 +81,7 @@ const LoginPage = () => {
               <label
                 className='text-tremor-default font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'
                 htmlFor='password'>
-                Password <span className='text-red-500'>*</span>
+                {t('LoginPage.pwd')} <span className='text-red-500'>*</span>
               </label>
               <TextInput
                 autoComplete='password'
@@ -91,16 +96,16 @@ const LoginPage = () => {
               className='mt-4 w-full whitespace-nowrap rounded-tremor-default bg-tremor-brand py-2 text-center text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-tremor-brand-emphasis dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis'
               loading={state === 'submitting'}
               type='submit'>
-              Login
+              {t('LoginPage.submit')}
             </Button>
           </Form>
           {data?.error && (
             <p className='mt-2 text-tremor-label text-center text-red-500 dark:text-red-300'>{data.error}</p>
           )}
           <p className='mt-4 text-tremor-label text-tremor-content dark:text-dark-tremor-content text-center'>
-            Don&apos;t have an account?{' '}
+            {t('LoginPage.registerQuestion')}{' '}
             <span className='underline underline-offset-4'>
-              <NavLink to={'/signup'}>Sign up</NavLink>
+              <NavLink to={'/signup'}>{t('LoginPage.registerAction')}</NavLink>
             </span>
           </p>
         </div>
