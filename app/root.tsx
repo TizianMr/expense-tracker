@@ -1,5 +1,5 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
-import { Links, Meta, MetaFunction, Outlet, Scripts, ScrollRestoration } from '@remix-run/react';
+import { Links, Meta, MetaFunction, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
 import './tailwind.css';
 
 import { cx } from './utils/helpers';
@@ -30,12 +30,13 @@ export const meta: MetaFunction = () => {
 };
 
 function Layout({ children }: { children: React.ReactNode }) {
+  const { locale } = useLoaderData<typeof loader>();
   const [theme] = useTheme();
 
   return (
     <html
       className={cx('antialiased', theme?.toLowerCase())}
-      lang='en'>
+      lang={locale}>
       <head>
         <meta charSet='utf-8' />
         <meta

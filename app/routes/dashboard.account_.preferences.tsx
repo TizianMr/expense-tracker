@@ -4,6 +4,7 @@ import { Form, redirect, useActionData, useLoaderData, useNavigation } from '@re
 import { RiComputerLine, RiMoonLine, RiSunLine } from '@remixicon/react';
 import { Button, Dialog, DialogPanel, Divider, Select, SelectItem } from '@tremor/react';
 import { useCallback, useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser, updateSession } from '~/db/auth.server';
@@ -45,6 +46,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
 const AccountPreferences = () => {
   const [, setTheme] = useTheme();
+  const { i18n } = useTranslation();
   const { state } = useNavigation();
   const { userPreferences, colorThemes } = useLoaderData<typeof loader>();
   const data = useActionData<typeof action>();
@@ -61,10 +63,11 @@ const AccountPreferences = () => {
     if (data && !data.serverError) {
       if (isOpen) {
         setTheme(data.preferences?.theme ?? getPreferredTheme());
+        i18n.changeLanguage(data.preferences?.locale);
         handleClose();
       }
     }
-  }, [data, handleClose, isOpen, setTheme]);
+  }, [data, handleClose, i18n, isOpen, setTheme]);
 
   return (
     <Dialog
