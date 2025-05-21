@@ -20,6 +20,11 @@ enum Category {
   OTHER
 }
 
+enum ColorTheme {
+  LIGHT
+  DARK
+}
+
 model Expense {
   id              String    @id @default(cuid())
   amount          Float
@@ -46,14 +51,24 @@ model Budget {
 }
 
 model User {
-  id             String    @id @default(cuid())
-  email          String    @unique
-  password       String
-  firstName      String
-  lastName       String
-  createdAt      DateTime  @default(now())
-  updatedAt      DateTime  @updatedAt
-  profilePicture String?
-  Expense        Expense[]
-  Budget         Budget[]
+  id               String         @id @default(cuid())
+  email            String         @unique
+  password         String
+  firstName        String
+  lastName         String
+  createdAt        DateTime       @default(now())
+  updatedAt        DateTime       @updatedAt
+  profilePicture   String?
+  Expense          Expense[]
+  Budget           Budget[]
+  UserPreference   UserPreference @relation(fields: [userPreferenceId], references: [id])
+  userPreferenceId String         @unique
+}
+
+model UserPreference {
+  id        String     @id @default(cuid())
+  theme     ColorTheme?
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  User      User?
 }

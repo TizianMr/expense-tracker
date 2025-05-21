@@ -17,7 +17,7 @@ function getRandomPastDate(range: 'week' | 'month' | 'year' | 'any'): Date {
   switch (range) {
     case 'week':
       start = new Date(now);
-      start.setDate(now.getDate() - now.getDay()); // Start of the week (Sunday)
+      start.setDate(now.getDate() - (now.getDay() - 1)); // Start of the week
       break;
     case 'month':
       start = new Date(now.getFullYear(), now.getMonth(), 1); // Start of the month
@@ -44,9 +44,14 @@ async function main() {
     update: {},
     create: {
       email: 'demo@example.com',
-      password: hashedPassword, // Replace with hashed version in prod
+      password: hashedPassword,
       firstName: 'Demo',
       lastName: 'User',
+       UserPreference: {
+        create: {
+          theme: null,
+        },
+      },
     },
   });
 
@@ -88,7 +93,7 @@ const expenses: (CreateExpense & { createdByUserId: string })[] = [];
     for (let i = 0; i < rangeDistribution[range]; i++) {
       expenses.push({
         title: `Expense ${expenses.length + 1}`,
-        amount: parseFloat((Math.random() * 100 + 5).toFixed(2)), // $5 to $105
+        amount: parseFloat((Math.random() * 100 + 5).toFixed(2)), // 5 to 105
         expenseDate: getRandomPastDate(range),
         category: randomCategory(),
         budgetId: randomBudgetId(),

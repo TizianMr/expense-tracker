@@ -1,4 +1,4 @@
-import { User } from '@prisma/client';
+import { User, UserPreference } from '@prisma/client';
 import { createCookieSessionStorage } from '@remix-run/node';
 import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
@@ -8,7 +8,9 @@ import { getSignedAvatarUrl } from './s3.server';
 import { prisma } from '../utils/prisma.server';
 import { getS3ObjectKey } from '~/utils/helpers';
 
-export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'>;
+export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'> & {
+  preferences: Pick<UserPreference, 'id' | 'theme'>;
+};
 type LoginInfo = Pick<User, 'password' | 'email'>;
 type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'>;
 
@@ -76,14 +78,29 @@ export const createUser = async ({ password, email, firstName, lastName }: Creat
     password: hashedPassword,
   };
 
-  return await prisma.user.create({ data: newUser });
+  const createdUser = await prisma.user.create({
+    data: {
+      ...newUser,
+      UserPreference: {
+        create: {
+          theme: null,
+        },
+      },
+    },
+  });
+
+  return createdUser;
 };
 
 export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> => {
-  const user = await prisma.user.findUnique({ where: { email } });
+  const user = await prisma.user.findUnique({ where: { email }, include: { UserPreference: true } });
 
   if (!user || !(await verify(user.password, password))) {
     throw new Error('Mail or password are not correct');
+  }
+
+  if (!user.UserPreference) {
+    throw new Error('User preference not found');
   }
 
   let signedAvatarUrl: string | null = null;
@@ -97,5 +114,9 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
     lastName: user.lastName,
     firstName: user.firstName,
     profilePicture: signedAvatarUrl,
+    preferences: {
+      id: user.UserPreference.id,
+      theme: user.UserPreference.theme,
+    },
   };
 };
