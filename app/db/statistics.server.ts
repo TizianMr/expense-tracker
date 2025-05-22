@@ -115,7 +115,7 @@ const calculateExpensesByPeriod = (
   expenses.forEach(expense => {
     const index =
       period === StatisticPeriod.WEEK
-        ? expense.expenseDate.getDay()
+        ? (expense.expenseDate.getDay() + 6) % 7 // week starts on monday
         : period === StatisticPeriod.MONTH
           ? getISOWeek(expense.expenseDate) - getISOWeek(startOfMonth(Date.now()))
           : expense.expenseDate.getMonth();
