@@ -1,6 +1,8 @@
 import { useSearchParams } from '@remix-run/react';
 import { BarChart, DonutChart, List, ListItem, Tab, TabGroup, TabList } from '@tremor/react';
+import { getISOWeek, startOfMonth } from 'date-fns';
 import qs from 'qs';
+import { useTranslation } from 'react-i18next';
 
 import LoadingSpinner from '~/components/ui/loading-spinner';
 import { useDelayedQueryParamLoading } from '~/customHooks/useDelayedQueryParamLoading';
@@ -16,6 +18,7 @@ type Props = {
 };
 
 const Statistics = ({ statistics }: Props) => {
+  const { t } = useTranslation();
   const dataIsLoading = useDelayedQueryParamLoading('statistics');
   const [searchParams, setSearchParams] = useSearchParams();
 
@@ -23,6 +26,14 @@ const Statistics = ({ statistics }: Props) => {
     const category = EXPENSE_CATEGORIES.find(cat => cat.value === expense.category);
     return category ? category.color : 'gray';
   });
+
+  const expensesWithTranslatedPeriod = statistics.expensesByPeriod.map((amount, idx) => ({
+    name:
+      statistics.period === StatisticPeriod.MONTH
+        ? t(`Statistics.barchart.month`, { weeknumber: idx + getISOWeek(startOfMonth(Date.now())) })
+        : t(`Statistics.barchart.${statistics.period}.${idx}`),
+    amount,
+  }));
 
   const handleTabChange = (idx: number) => {
     const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
@@ -40,14 +51,14 @@ const Statistics = ({ statistics }: Props) => {
     <>
       <div className='flex items-center justify-between'>
         <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
-          Statistics
+          {t('Statistics.title')}
         </h1>
         <TabGroup
           className='flex justify-end'
           onIndexChange={handleTabChange}>
           <TabList variant='solid'>
             {Object.values(StatisticPeriod).map(period => (
-              <Tab key={period}>{period.charAt(0).toUpperCase() + period.slice(1)}</Tab>
+              <Tab key={period}>{t(`Statistics.timePeriod.${period}`)}</Tab>
             ))}
           </TabList>
         </TabGroup>
@@ -64,9 +75,9 @@ const Statistics = ({ statistics }: Props) => {
             categories={['amount']}
             className='lg:h-[90%]'
             colors={['emerald']}
-            data={statistics.expensesByPeriod}
+            data={expensesWithTranslatedPeriod}
             index='name'
-            noDataText='No expenses to show'
+            noDataText={t('Statistics.noData')}
             showLegend={false}
             valueFormatter={valueFormatter}
             yAxisWidth={75}
@@ -80,7 +91,7 @@ const Statistics = ({ statistics }: Props) => {
               valueFormatter={valueFormatter}
             />
             <p className='mt-8 flex items-center justify-between text-tremor-label text-tremor-content dark:text-dark-tremor-content'>
-              <span>Category</span> <span>Amount / Share</span>
+              <span>{t('Statistics.category')}</span> <span>{t('Statistics.amountAndShare')}</span>
             </p>
             <List className='mt-2'>
               {statistics.expensesByCategory.categories.map((item, idx) => (
@@ -92,7 +103,9 @@ const Statistics = ({ statistics }: Props) => {
                       aria-hidden={true}
                       className={cx(`bg-${categoryColors[idx]}-500`, 'size-2.5 shrink-0 rounded-sm')}
                     />
-                    <span className='truncate dark:text-dark-tremor-content-emphasis'> {item.category} </span>
+                    <span className='truncate dark:text-dark-tremor-content-emphasis'>
+                      {t(`common.categories.${item.category.toLowerCase()}`)}
+                    </span>
                   </div>
                   <div className='flex items-center space-x-2'>
                     <span className='font-medium tabular-nums text-tremor-content-strong dark:text-dark-tremor-content-strong'>

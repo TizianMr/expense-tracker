@@ -1,5 +1,6 @@
 import { Badge, Table, TableBody, TableCell, TableHead, TableRow } from '@tremor/react';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ExpenseDropdown } from './expense-dropdown';
 import LoadingSpinner from '../../ui/loading-spinner';
@@ -20,6 +21,7 @@ type Props = {
 };
 
 export function ExpenseTable({ expenses, paginationState, excludeColumns, searchParamKey }: Props) {
+  const { t } = useTranslation();
   const dataIsLoading = useDelayedQueryParamLoading('expense');
   const isLoadingFromExpenseMutation = useDelayedNavigationLoading('expenses');
   const [tableState, setTableState] = useState<Omit<TableState, 'paginationState'>>({
@@ -30,32 +32,32 @@ export function ExpenseTable({ expenses, paginationState, excludeColumns, search
   const columnHeader: ThDef[] = [
     {
       id: 'title',
-      title: 'Title',
+      title: t('ExpenseTable.headers.title'),
       isSortable: true,
     },
     {
       id: 'amount',
-      title: 'Amount',
+      title: t('ExpenseTable.headers.amount'),
       isSortable: true,
     },
     {
       id: 'expenseDate',
-      title: 'Date',
+      title: t('ExpenseTable.headers.date'),
       isSortable: true,
     },
     {
       id: 'category',
-      title: 'Category',
+      title: t('ExpenseTable.headers.category'),
       isSortable: true,
     },
     {
       id: 'budget',
-      title: 'Budget',
+      title: t('ExpenseTable.headers.budget'),
       isSortable: false,
     },
     {
       id: 'actions',
-      title: 'Actions',
+      title: t('ExpenseTable.headers.actions'),
       isSortable: false,
       options: { align: 'right' },
     },
@@ -134,7 +136,7 @@ export function ExpenseTable({ expenses, paginationState, excludeColumns, search
                   <TableCell
                     className={cellStyle}
                     key='category'>
-                    {expense.category ? <Badge color={category?.color}>{expense.category}</Badge> : '-'}
+                    {category ? <Badge color={category.color}>{t(category.labelKey)}</Badge> : '-'}
                   </TableCell>
                 ),
                 budget: (
@@ -162,7 +164,7 @@ export function ExpenseTable({ expenses, paginationState, excludeColumns, search
               <TableCell
                 className='text-center'
                 colSpan={columnHeader.length}>
-                No data to show.
+                {t('ExpenseTable.noData')}
               </TableCell>
             </TableRow>
           )}

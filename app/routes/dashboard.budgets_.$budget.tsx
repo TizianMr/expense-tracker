@@ -4,6 +4,7 @@ import { RiErrorWarningLine } from '@remixicon/react';
 import { Dialog, DialogPanel, Divider, Button, Callout, DonutChart, EventProps } from '@tremor/react';
 import qs from 'qs';
 import { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { ExpenseTable } from '../components/feature/expense/expense-table';
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
@@ -13,11 +14,13 @@ import { fetchExpenses } from '~/db/expense.server';
 import { QueryParams, SortDirection } from '~/interfaces';
 import { EXPENSE_CATEGORIES, EXPENSE_PAGE_SIZE } from '~/utils/constants';
 import { formatCurrency } from '~/utils/helpers';
+import i18next from '~/utils/i18n/i18next.server';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
+  const t = await i18next.getFixedT(request);
   const budgetId = params.budget as string;
   const url = new URL(request.url);
   const query = url.searchParams;
@@ -37,7 +40,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
                 {
                   filterBy: parsedQueryParams.budgetDetails.filter.filterBy,
                   filterValue:
-                    parsedQueryParams.budgetDetails.filter.filterValue === 'No category'
+                    parsedQueryParams.budgetDetails.filter.filterValue === t('BudgetDetails.noCategory')
                       ? null
                       : parsedQueryParams.budgetDetails.filter.filterValue,
                 },
@@ -57,6 +60,7 @@ const valueFormatter = (number: number) => formatCurrency(number);
 
 const BudgetDetails = () => {
   const [open, setIsOpen] = useState(true);
+  const { t } = useTranslation();
   const { triggerDelayedNavigation } = useDelayedNavigation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { budget, expenses } = useLoaderData<typeof loader>();
@@ -65,6 +69,11 @@ const BudgetDetails = () => {
     const category = EXPENSE_CATEGORIES.find(cat => cat.value === expense.category);
     return category ? category.color : 'gray';
   });
+
+  const budgetsWithTranslatedCategories = budget?.expensesByCategory.map(expense => ({
+    ...expense,
+    category: t(`common.categories.${expense.category.toLowerCase()}`),
+  }));
 
   const handleClose = () => {
     setIsOpen(false);
@@ -98,7 +107,7 @@ const BudgetDetails = () => {
       onClose={handleClose}>
       <DialogPanel className='lg:w-[60vw] big-dialog'>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong truncate'>
-          {budget?.title ?? 'Not found'}
+          {budget?.title ?? t('BudgetDetails.error.title')}
         </h3>
         {budget ? (
           <div className='flex flex-col lg:flex-row lg:h-[50vh] items-center'>
@@ -107,10 +116,10 @@ const BudgetDetails = () => {
               category='amount'
               className='xl:h-[60%] min-h-[15rem]'
               colors={categoryColors}
-              data={budget.expensesByCategory}
+              data={budgetsWithTranslatedCategories!}
               index='category'
               label={`${formatCurrency(budget.totalUsedBudget)} of ${formatCurrency(budget.amount)}`}
-              noDataText='No expenses assigned to budget'
+              noDataText={t('BudgetDetails.noData')}
               valueFormatter={valueFormatter}
               onValueChange={v => handleValueChange(v)}
             />
@@ -128,8 +137,8 @@ const BudgetDetails = () => {
             className='mt-4'
             color='rose'
             icon={RiErrorWarningLine}
-            title='Budget not found'>
-            The budget you are trying to access could not be found.
+            title={t('BudgetDetails.error.title')}>
+            {t('BudgetDetails.error.text')}
           </Callout>
         )}
         <Divider />
@@ -137,7 +146,7 @@ const BudgetDetails = () => {
           <Button
             variant='secondary'
             onClick={handleClose}>
-            Close
+            {t('common.close')}
           </Button>
         </div>
       </DialogPanel>

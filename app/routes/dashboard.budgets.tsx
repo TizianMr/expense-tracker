@@ -2,6 +2,7 @@ import { Budget } from '@prisma/client';
 import { Outlet, useFetcher, useLocation, useNavigate, useOutlet } from '@remix-run/react';
 import { Button, Dialog, DialogPanel, Divider } from '@tremor/react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 
@@ -14,6 +15,7 @@ const BudgetDialogRoot = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const inOutlet = !!useOutlet();
+  const { t } = useTranslation();
   const { triggerDelayedNavigation } = useDelayedNavigation();
 
   const pathnames = location.pathname.split('/budgets/');
@@ -47,16 +49,16 @@ const BudgetDialogRoot = () => {
     const errors: BudgetFormErrors = {};
 
     if (!formData.get('title')) {
-      errors['title'] = 'Title is required.';
+      errors['title'] = t('BudgetDialogRoot.errors.required');
     }
 
     if (!formData.get('amount')) {
-      errors['amount'] = 'Amount is required.';
+      errors['amount'] = t('BudgetDialogRoot.errors.required');
     }
 
     const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
     if (isNaN(Number(convertedAmount))) {
-      errors['amount'] = 'Amount is not a valid number.';
+      errors['amount'] = t('BudgetDialogRoot.errors.invalidAmount');
     }
 
     if (Object.keys(errors).length > 0) {
@@ -78,10 +80,10 @@ const BudgetDialogRoot = () => {
       onClose={handleClose}>
       <DialogPanel>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-          {`${isEdit ? 'Edit' : 'Create'} budget`}
+          {t(`BudgetDialogRoot.title.${isEdit ? 'edit' : 'create'}`)}
         </h3>
         <p className='mt-1 pb-4 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content'>
-          Keep track of your expenses by using budgets. Budgets reset every month.
+          {t('BudgetDialogRoot.subtitle')}
         </p>
         <fetcher.Form
           id='expenseForm'
@@ -93,13 +95,13 @@ const BudgetDialogRoot = () => {
           <Button
             variant='secondary'
             onClick={handleClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Button
             loading={isSubmitting}
             variant='primary'
             onClick={handleSubmit}>
-            {`${isEdit ? 'Edit' : 'Create'}`}
+            {t(`common.${isEdit ? 'edit' : 'create'}`)}
           </Button>
         </div>
       </DialogPanel>

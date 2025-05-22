@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from '@remix-run/react';
 import { RiMoreFill } from '@remixicon/react';
 import { Button } from '@tremor/react';
+import { useTranslation } from 'react-i18next';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/dropdown';
 
@@ -10,6 +11,8 @@ type Props = {
 
 export const ExpenseDropdown = ({ expenseId }: Props) => {
   const location = useLocation();
+  const { t } = useTranslation();
+
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
@@ -28,13 +31,13 @@ export const ExpenseDropdown = ({ expenseId }: Props) => {
         <NavLink
           preventScrollReset
           to={{ pathname: `expenses/${expenseId}/edit`, search: location.search }}>
-          <DropdownMenuItem>Edit</DropdownMenuItem>
+          <DropdownMenuItem>{t('common.edit')}</DropdownMenuItem>
         </NavLink>
 
         <NavLink
           preventScrollReset
           to={{ pathname: `expenses/${expenseId}/delete`, search: location.search }}>
-          <DropdownMenuItem className='text-red-600 dark:text-red-500'>Delete</DropdownMenuItem>
+          <DropdownMenuItem className='text-red-600 dark:text-red-500'>{t('common.delete')}</DropdownMenuItem>
         </NavLink>
       </DropdownMenuContent>
     </DropdownMenu>

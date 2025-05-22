@@ -1,6 +1,7 @@
 import { NavLink, useLocation } from '@remix-run/react';
 import { RiQuestionLine, RiAddLine, RiBarChartFill } from '@remixicon/react';
 import { Legend, Icon, Button } from '@tremor/react';
+import { useTranslation } from 'react-i18next';
 
 import BudgetInfo from './budget-info';
 import LoadingSpinner from '~/components/ui/loading-spinner';
@@ -17,6 +18,7 @@ type Props = {
 
 const Budgets = ({ budgets }: Props) => {
   const location = useLocation();
+  const { t } = useTranslation();
   const isDataLoading = useDelayedQueryParamLoading('budget');
   const loading = useDelayedNavigationLoading('budgets');
   const budgetDialogIsLoading = useDelayedNavigationLoading('dashboard', 'budgets/create');
@@ -26,17 +28,13 @@ const Budgets = ({ budgets }: Props) => {
       <div className='flex items-center justify-between'>
         <div className='flex items-center'>
           <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
-            Budgets
+            {t('Budgets.title')}
           </h1>
           <Tooltip
-            className='w-[20rem] dark:bg-gray-900'
+            className='w-[24rem] dark:bg-gray-900'
             content={
               <Legend
-                categories={[
-                  'No worries! You are well within your budget.',
-                  "Heads up! You're nearing your budget limit.",
-                  "Alert! You've nearly maxed out your budget.",
-                ]}
+                categories={[t('Budgets.legend.green'), t('Budgets.legend.yellow'), t('Budgets.legend.red')]}
                 className='light:tooltip-legend-white'
                 colors={['emerald', 'yellow', 'red']}
               />
@@ -55,7 +53,7 @@ const Budgets = ({ budgets }: Props) => {
           <Button
             icon={RiAddLine}
             loading={budgetDialogIsLoading}>
-            Create budget
+            {t('Budgets.create')}
           </Button>
         </NavLink>
       </div>
@@ -82,10 +80,10 @@ const Budgets = ({ budgets }: Props) => {
                 className='mx-auto h-7 w-7 text-tremor-content-subtle dark:text-dark-tremor-content-subtle'
               />
               <p className='mt-2 text-tremor-default font-medium text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-                No data to show
+                {t('Budgets.noData')}
               </p>
               <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content'>
-                Get started by creating your first budget
+                {t('Budgets.noDataSubtext')}
               </p>
             </div>
           )}

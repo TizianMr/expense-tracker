@@ -4,6 +4,7 @@ import { RiPencilLine, RiUserLine } from '@remixicon/react';
 import { Button, Dialog, DialogPanel, Divider, Tab, TabGroup, TabList, TabPanel, TabPanels } from '@tremor/react';
 import qs from 'qs';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import ChangeMailForm from '~/components/feature/user-mgmt/change-mail-form';
 import ChangePasswordForm from '~/components/feature/user-mgmt/change-password-form';
@@ -11,6 +12,7 @@ import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser, updateSession } from '~/db/auth.server';
 import { updateMailAddress, updatePassword } from '~/db/user.server';
 import { QueryParams } from '~/interfaces';
+import i18next from '~/utils/i18n/i18next.server';
 
 export type ChangeMailFormErrors = {
   newMail?: string;
@@ -23,14 +25,16 @@ export type ChangePwdFormErrors = {
   confirmedPwd?: string;
 };
 
-const TAB_VALUES = [
-  { label: 'Change Email', value: 'email' },
-  { label: 'Change Password', value: 'password' },
-];
-
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
+
+  const t = await i18next.getFixedT(request);
+
+  const TAB_VALUES = [
+    { label: t('AccountSettings.mailTab'), value: 'email' },
+    { label: t('AccountSettings.pwdTab'), value: 'password' },
+  ];
 
   const url = new URL(request.url);
 
@@ -39,13 +43,14 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
     return redirect(url.toString());
   }
 
-  return { user };
+  return { user, TAB_VALUES };
 };
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
+  const t = await i18next.getFixedT(request);
   const formData = await request.formData();
   const url = new URL(request.url);
   const query = url.searchParams;
@@ -57,16 +62,16 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const confirmedMail = formData.get('confirm-email') as string;
 
     if (newMail !== confirmedMail) {
-      clientErrors.newMail = 'Mail addresses are not identical.';
-      clientErrors.confirmedMail = 'Mail addresses are not identical.';
+      clientErrors.newMail = t('AccountSettings.errors.mailNotIdentical');
+      clientErrors.confirmedMail = t('AccountSettings.errors.mailNotIdentical');
     }
 
     if (!newMail) {
-      clientErrors.newMail = 'This input is required.';
+      clientErrors.newMail = t('AccountSettings.errors.required');
     }
 
     if (!confirmedMail) {
-      clientErrors.confirmedMail = 'This input is required.';
+      clientErrors.confirmedMail = t('AccountSettings.errors.required');
     }
 
     if (Object.keys(clientErrors).length > 0) {
@@ -89,20 +94,20 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     const confirmedPwd = formData.get('confirm-password') as string;
 
     if (!oldPwd) {
-      clientErrors.oldPwd = 'This input is required.';
+      clientErrors.oldPwd = t('AccountSettings.errors.required');
     }
 
     if (!newPwd) {
-      clientErrors.newPwd = 'This input is required.';
+      clientErrors.newPwd = t('AccountSettings.errors.required');
     }
 
     if (!confirmedPwd) {
-      clientErrors.confirmedPwd = 'This input is required.';
+      clientErrors.confirmedPwd = t('AccountSettings.errors.required');
     }
 
     if (confirmedPwd !== newPwd) {
-      clientErrors.newPwd = 'Passwords are not identical.';
-      clientErrors.confirmedPwd = 'Passwords are not identical.';
+      clientErrors.newPwd = t('AccountSettings.errors.pwdNotIdentical');
+      clientErrors.confirmedPwd = t('AccountSettings.errors.pwdNotIdentical');
     }
 
     if (Object.keys(clientErrors).length > 0) {
@@ -122,9 +127,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 const AccountSettings = () => {
-  const { user } = useLoaderData<typeof loader>();
+  const { user, TAB_VALUES } = useLoaderData<typeof loader>();
   const [open, setIsOpen] = useState(true);
   const submit = useSubmit();
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { triggerDelayedNavigation } = useDelayedNavigation();
   const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
@@ -149,7 +155,7 @@ const AccountSettings = () => {
       onClose={handleClose}>
       <DialogPanel className='lg:w-[40vw] big-dialog'>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-          Account Settings
+          {t('AccountSettings.title')}
         </h3>
         <div className='flex lg:flex-row flex-col'>
           <div className='lg:w-[60%] flex flex-col space-y-2 justify-center items-center pt-4'>
@@ -203,7 +209,7 @@ const AccountSettings = () => {
                 setIsOpen(false);
                 triggerDelayedNavigation('delete');
               }}>
-              Delete account
+              {t('AccountSettings.delete')}
             </Button>
           </div>
 
@@ -235,7 +241,7 @@ const AccountSettings = () => {
           <Button
             variant='secondary'
             onClick={handleClose}>
-            Close
+            {t('common.close')}
           </Button>
         </div>
       </DialogPanel>

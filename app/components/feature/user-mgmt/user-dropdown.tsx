@@ -1,6 +1,7 @@
 import { NavLink, useLocation, useSubmit } from '@remix-run/react';
 import { RiArrowDownSLine, RiLogoutCircleLine, RiSettings2Line, RiUserLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
+import { useTranslation } from 'react-i18next';
 
 import {
   DropdownMenu,
@@ -18,6 +19,7 @@ type Props = {
 const UserDropdown = ({ userInfo }: Props) => {
   const submit = useSubmit();
   const location = useLocation();
+  const { t } = useTranslation();
 
   return (
     <div className='flex justify-end'>
@@ -52,7 +54,7 @@ const UserDropdown = ({ userInfo }: Props) => {
           <NavLink to='account'>
             <DropdownMenuItem>
               <span className='flex items-center gap-x-2'>
-                <RiUserLine className='size-4 text-inherit' /> <span>Account Settings</span>
+                <RiUserLine className='size-4 text-inherit' /> <span>{t('UserDropdown.settings')}</span>
               </span>
             </DropdownMenuItem>
           </NavLink>
@@ -60,7 +62,7 @@ const UserDropdown = ({ userInfo }: Props) => {
           <NavLink to={{ pathname: 'account/preferences', search: location.search }}>
             <DropdownMenuItem>
               <span className='flex items-center gap-x-2'>
-                <RiSettings2Line className='size-4 text-inherit' /> <span>Account Preferences</span>
+                <RiSettings2Line className='size-4 text-inherit' /> <span>{t('UserDropdown.preferences')}</span>
               </span>
             </DropdownMenuItem>
           </NavLink>
@@ -69,7 +71,8 @@ const UserDropdown = ({ userInfo }: Props) => {
 
           <DropdownMenuItem onClick={() => submit(null, { action: '/logout', method: 'post', replace: true })}>
             <span className='flex items-center gap-x-2'>
-              <RiLogoutCircleLine className='size-4 text-red-500' /> <span className='text-red-500'>Logout</span>
+              <RiLogoutCircleLine className='size-4 text-red-500' />{' '}
+              <span className='text-red-500'>{t('UserDropdown.logout')}</span>
             </span>
           </DropdownMenuItem>
         </DropdownMenuContent>

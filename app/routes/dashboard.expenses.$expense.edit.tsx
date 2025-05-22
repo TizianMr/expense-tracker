@@ -3,6 +3,7 @@ import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { redirect, useLoaderData, useOutletContext } from '@remix-run/react';
 import { RiErrorWarningLine } from '@remixicon/react';
 import { Callout } from '@tremor/react';
+import { useTranslation } from 'react-i18next';
 
 import { ExpenseFormErrors } from './dashboard.expenses';
 import { fetchExpenseById, updateExpense, UpdateExpense } from '../db/expense.server';
@@ -28,7 +29,7 @@ export const loader = async ({ params, request }: LoaderFunctionArgs) => {
     ),
   ]);
 
-  return { expense, budgets };
+  return { expense, budgets, locale: user.preferences.locale };
 };
 
 export const action = async ({ request, params }: ActionFunctionArgs) => {
@@ -53,7 +54,8 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 };
 
 const EditExpenseDialog = () => {
-  const { expense, budgets } = useLoaderData<typeof loader>();
+  const { expense, budgets, locale } = useLoaderData<typeof loader>();
+  const { t } = useTranslation();
   const { errors } = useOutletContext<{
     errors: ExpenseFormErrors;
   }>();
@@ -64,8 +66,8 @@ const EditExpenseDialog = () => {
         className='mt-4'
         color='rose'
         icon={RiErrorWarningLine}
-        title='Expense not found'>
-        The expense you are trying to edit could not be found.
+        title={t('EditExpenseDialog.error.title')}>
+        {t('EditExpenseDialog.error.text')}
       </Callout>
     );
   }
@@ -75,6 +77,7 @@ const EditExpenseDialog = () => {
       budgets={budgets}
       errors={errors}
       expense={expense}
+      locale={locale}
     />
   );
 };

@@ -2,6 +2,7 @@ import { ActionFunctionArgs } from '@remix-run/node';
 import { Form, redirect, useNavigation } from '@remix-run/react';
 import { Button, Dialog, DialogPanel } from '@tremor/react';
 import { useCallback, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser, sessionStorage } from '~/db/auth.server';
@@ -20,6 +21,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 const DeleteUserDialog = () => {
+  const { t } = useTranslation();
   const { state } = useNavigation();
   const { triggerDelayedNavigation } = useDelayedNavigation();
   const [isOpen, setIsOpen] = useState(true);
@@ -36,16 +38,16 @@ const DeleteUserDialog = () => {
       onClose={handleClose}>
       <DialogPanel>
         <h1 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-          Delete User?
+          {t('DeleteUserDialog.title')}
         </h1>
         <p className='mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>
-          Once deleted, you cannot restore your account. All expenses and budgets will be lost.
+          {t('DeleteUserDialog.text')}
         </p>
         <div className='mt-8 flex items-center justify-end space-x-2'>
           <Button
             variant='secondary'
             onClick={handleClose}>
-            Cancel
+            {t('common.cancel')}
           </Button>
           <Form method='delete'>
             <Button
@@ -53,7 +55,7 @@ const DeleteUserDialog = () => {
               loading={state === 'submitting'}
               type='submit'
               variant='primary'>
-              Delete
+              {t('common.delete')}
             </Button>
           </Form>
         </div>

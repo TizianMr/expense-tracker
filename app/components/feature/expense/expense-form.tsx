@@ -1,19 +1,24 @@
 import { Expense } from '@prisma/client';
 import { DatePicker, SearchSelect, SearchSelectItem, TextInput } from '@tremor/react';
+import { de, enUS } from 'date-fns/locale';
+import { useTranslation } from 'react-i18next';
 
 import { ExpenseFormErrors } from '../../../routes/dashboard.expenses';
 import { EXPENSE_CATEGORIES } from '../../../utils/constants';
 import CurrencyInput from '../../ui/currency-input';
 import { useControlledInput } from '~/customHooks/useControlledInput';
 import { BudgetWithUsage } from '~/db/budget.server';
+import { Language } from '~/utils/i18n/resource';
 
 type Props = {
   errors: ExpenseFormErrors;
+  locale: Language;
   expense?: Expense;
   budgets: BudgetWithUsage[];
 };
 
-const ExpenseForm = ({ errors, expense, budgets }: Props) => {
+const ExpenseForm = ({ errors, expense, budgets, locale }: Props) => {
+  const { t } = useTranslation();
   const { handleChange: handleDateChange, value: selectedDate } = useControlledInput(
     expense?.expenseDate ?? new Date(),
   );
@@ -32,7 +37,7 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
         <label
           className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
           htmlFor='expense-title'>
-          Title <span className='text-red-500'>*</span>
+          {t('ExpenseForm.title')} <span className='text-red-500'>*</span>
         </label>
         <TextInput
           required
@@ -42,7 +47,7 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
           errorMessage={errors.title}
           id='expense-title'
           name='title'
-          placeholder='Title name'
+          placeholder={t('ExpenseForm.titlePlaceholder')}
           type='text'
         />
       </div>
@@ -52,22 +57,22 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
         defaultValue={expense?.amount.toString() ?? ''}
         error={!!errors.amount}
         errorMessage={errors.amount}
-        label='Amount'
+        label={t('ExpenseForm.amount')}
         name='amount'
-        placeholder='Amount...'
+        placeholder={t('ExpenseForm.amountPlaceholder')}
       />
 
       <div>
         <label
           className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
           htmlFor='expense-date'>
-          Date <span className='text-red-500'>*</span>
+          {t('ExpenseForm.date')} <span className='text-red-500'>*</span>
         </label>
         <DatePicker
-          className='mt-2'
           defaultValue={selectedDate}
           enableClear={false}
           id='expense-date'
+          locale={locale === 'de' ? de : enUS}
           onValueChange={date => handleDateChange(date as Date)}
         />
         <input
@@ -81,7 +86,7 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
         <label
           className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
           htmlFor='expense-category'>
-          Category
+          {t('ExpenseForm.category')}
         </label>
         <SearchSelect
           className='mt-2'
@@ -92,7 +97,7 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
             <SearchSelectItem
               key={item.value}
               value={item.value}>
-              {item.label}
+              {t(item.labelKey)}
             </SearchSelectItem>
           ))}
         </SearchSelect>
@@ -102,7 +107,7 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
         <label
           className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
           htmlFor='expense-budget'>
-          Budget
+          {t('ExpenseForm.budget')}
         </label>
         <SearchSelect
           className='mt-2'
@@ -119,7 +124,7 @@ const ExpenseForm = ({ errors, expense, budgets }: Props) => {
         </SearchSelect>
         {!isExpenseDateWithCurrentMonth && (
           <p className='mt-2 text-tremor-label text-orange-500 dark:text-orange-300'>
-            Only expenses for the current month are considered in the budget overview.
+            {t('ExpenseForm.budgetHelperText')}
           </p>
         )}
       </div>

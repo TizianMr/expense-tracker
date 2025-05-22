@@ -21,6 +21,15 @@ export default defineConfig({
     }),
     tsconfigPaths(),
   ],
+  // https://stackoverflow.com/questions/72618944/get-error-to-build-my-project-in-vite-top-level-await-is-not-available-in-the
+  optimizeDeps: {
+    esbuildOptions: {
+      target: 'esnext',
+    },
+  },
+  build: {
+    target: 'esnext',
+  },
   // https://github.com/prisma/prisma/issues/12504#issuecomment-1285883083
   resolve: {
     alias: {

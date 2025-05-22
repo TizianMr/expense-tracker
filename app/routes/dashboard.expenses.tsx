@@ -2,6 +2,7 @@ import { Expense } from '@prisma/client';
 import { Outlet, useFetcher, useLocation, useNavigate, useOutlet } from '@remix-run/react';
 import { Button, Dialog, DialogPanel, Divider } from '@tremor/react';
 import { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 
@@ -15,6 +16,7 @@ const ExpenseDialogRoot = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const inOutlet = !!useOutlet();
+  const { t } = useTranslation();
   const { triggerDelayedNavigation } = useDelayedNavigation();
 
   const pathnames = location.pathname.split('/expenses/');
@@ -48,20 +50,20 @@ const ExpenseDialogRoot = () => {
     const errors: ExpenseFormErrors = {};
 
     if (!formData.get('title')) {
-      errors['title'] = 'Title is required.';
+      errors['title'] = t('ExpenseDialogRoot.errors.required');
     }
 
     if (!formData.get('amount')) {
-      errors['amount'] = 'Amount is required.';
+      errors['amount'] = t('ExpenseDialogRoot.errors.required');
     }
 
     const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
     if (isNaN(Number(convertedAmount))) {
-      errors['amount'] = 'Amount is not a valid number.';
+      errors['amount'] = t('ExpenseDialogRoot.errors.invalidAmount');
     }
 
     if (!formData.get('date')) {
-      errors['date'] = 'Date is required.';
+      errors['date'] = t('ExpenseDialogRoot.errors.required');
     }
 
     if (Object.keys(errors).length > 0) {
@@ -83,10 +85,10 @@ const ExpenseDialogRoot = () => {
       onClose={handleClose}>
       <DialogPanel>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
-          {`${isEdit ? 'Edit' : 'Create'} expense`}
+          {t(`ExpenseDialogRoot.title.${isEdit ? 'edit' : 'create'}`)}
         </h3>
         <p className='mt-1 pb-4 text-tremor-default leading-6 text-tremor-content dark:text-dark-tremor-content'>
-          Quickly record your latest purchase.
+          {t('ExpenseDialogRoot.subtitle')}
         </p>
         <fetcher.Form
           id='expenseForm'
@@ -104,7 +106,7 @@ const ExpenseDialogRoot = () => {
             loading={isSubmitting}
             variant='primary'
             onClick={handleSubmit}>
-            {`${isEdit ? 'Edit' : 'Create'}`}
+            {t(`common.${isEdit ? 'edit' : 'create'}`)}
           </Button>
         </div>
       </DialogPanel>

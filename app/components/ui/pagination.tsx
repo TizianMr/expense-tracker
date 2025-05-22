@@ -2,6 +2,7 @@ import { useSearchParams } from '@remix-run/react';
 import { RiArrowLeftDoubleLine, RiArrowLeftSLine, RiArrowRightDoubleLine, RiArrowRightSLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
 import qs from 'qs';
+import { useTranslation } from 'react-i18next';
 
 import { QueryParams, TablePaginationState } from '~/interfaces';
 
@@ -11,6 +12,7 @@ type Props = {
 };
 
 const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems }, searchParamKey }: Props) => {
+  const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
 
@@ -29,7 +31,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
         setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
       disabled: currentPage == 1,
-      srText: 'First page',
+      srText: t('Pagination.first'),
       mobileView: 'hidden sm:block',
     },
     {
@@ -46,7 +48,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
         setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
       disabled: currentPage == 1,
-      srText: 'Previous page',
+      srText: t('Pagination.previous'),
       mobileView: '',
     },
     {
@@ -63,7 +65,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
         setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
       disabled: Number(currentPage) >= Math.ceil(totalItems / pageSize),
-      srText: 'Next page',
+      srText: t('Pagination.next'),
       mobileView: '',
     },
     {
@@ -80,7 +82,7 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
         setSearchParams(qs.stringify(updated), { preventScrollReset: true });
       },
       disabled: currentPage >= Math.ceil(totalItems / pageSize),
-      srText: 'Last page',
+      srText: t('Pagination.last'),
       mobileView: 'hidden sm:block',
     },
   ];
@@ -88,11 +90,11 @@ const Pagination = ({ paginationState: { page: currentPage, pageSize, totalItems
   return (
     <div className='flex items-center justify-between gap-2'>
       <p className='hidden text-sm tabular-nums text-gray-500 sm:block'>
-        Showing{' '}
+        {t('Pagination.info.0')}{' '}
         <span className='font-semibold text-gray-900 dark:text-gray-50'>
           {totalItems === 0 ? 0 : currentPage * pageSize - pageSize + 1}-{Math.min(currentPage * pageSize, totalItems)}
         </span>{' '}
-        of <span className='font-semibold text-gray-900 dark:text-gray-50'>{totalItems}</span>
+        {t('Pagination.info.1')} <span className='font-semibold text-gray-900 dark:text-gray-50'>{totalItems}</span>
       </p>{' '}
       <div className='flex items-center sm:w-auto w-full justify-center gap-x-6 lg:gap-x-8'>
         <div className='flex items-center gap-x-1.5'>

@@ -1,4 +1,5 @@
 import { TextInput } from '@tremor/react';
+import { useTranslation } from 'react-i18next';
 
 import CurrencyInput from '../../ui/currency-input';
 import { BudgetDetails } from '~/db/budget.server';
@@ -10,13 +11,15 @@ type Props = {
 };
 
 const BudgetForm = ({ errors, budget }: Props) => {
+  const { t } = useTranslation();
+
   return (
     <div className='space-y-6'>
       <div>
         <label
           className='text-tremor-default text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'
           htmlFor='budget-title'>
-          Title <span className='text-red-500'>*</span>
+          {t('BudgetForm.title')} <span className='text-red-500'>*</span>
         </label>
         <TextInput
           required
@@ -26,7 +29,7 @@ const BudgetForm = ({ errors, budget }: Props) => {
           errorMessage={errors.title}
           id='budget-title'
           name='title'
-          placeholder='Title name'
+          placeholder={t('BudgetForm.titlePlaceholder')}
           type='text'
         />
       </div>
@@ -36,9 +39,9 @@ const BudgetForm = ({ errors, budget }: Props) => {
         defaultValue={budget?.amount.toString() ?? ''}
         error={!!errors.amount}
         errorMessage={errors.amount}
-        label='Amount'
+        label={t('BudgetForm.amount')}
         name='amount'
-        placeholder='Amount...'
+        placeholder={t('BudgetForm.amountPlaceholder')}
       />
     </div>
   );

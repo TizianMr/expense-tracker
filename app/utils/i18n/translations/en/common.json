@@ -1,0 +1,222 @@
+{
+  "common": {
+    "amount": "Amount",
+    "budget": "Budget",
+    "cancel": "Cancel",
+    "categories": {
+      "food": "Food",
+      "transport": "Transport",
+      "shopping": "Shopping",
+      "other": "Other",
+      "none": "No Category"
+    },
+    "category": "Category",
+    "close": "Close",
+    "create": "Create",
+    "date": "Date",
+    "delete": "Delete",
+    "edit": "Edit",
+    "title": "Title",
+    "unknownError": "An unknown error occurred."
+  },
+  "AccountPreferences": {
+    "lang": "Language",
+    "theme": "Color theme",
+    "title": "Account preferences",
+    "submit": "Update"
+  },
+  "AccountSettings": {
+    "delete": "$t(common.delete) account",
+    "errors": {
+      "mailNotIdentical": "Mail addresses are not identical.",
+      "required": "This input is required",
+      "pwdNotIdentical": "Passwords are not identical."
+    },
+    "mailTab": "Change mail address",
+    "pwdTab": "Change password",
+    "title": "Account settings"
+  },
+  "BudgetDetails": {
+    "error": {
+      "title": "Budget not found",
+      "text": "The budget you are trying to access could not be found."
+    },
+    "noCategory": "$t(common.categories.none)",
+    "noData": "No expenses assigned to budget"
+  },
+  "BudgetDialogRoot": {
+    "errors": {
+      "invalidAmount": "Amount is not a valid number.",
+      "required": "The input is required."
+    },
+    "subtitle": "Keep track of your expenses by using budgets. Budgets reset every month.",
+    "title": {
+      "edit": "Edit budget",
+      "create": "Create budget"
+    }
+  },
+  "BudgetForm": {
+    "amount": "$t(common.amount)",
+    "amountPlaceholder": "$t(common.amount)...",
+    "title": "$t(common.title)",
+    "titlePlaceholder": "Title name"
+  },
+  "Budgets": {
+    "create": "Create $t(common.budget)",
+    "legend": {
+      "green": "No worries! You are well within your budget.",
+      "yellow": "Heads up! You're nearing your budget limit.",
+      "red": "Alert! You've nearly maxed out your budget."
+    },
+    "noData": "No data to show",
+    "noDataSubtext": "Get started by creating your first $t(common.budget)",
+    "title": "Budgets"
+  },
+  "ChangeMailForm": {
+    "confirmMail": "Confirm new mail",
+    "newMail": "New mail",
+    "submit": "Change"
+  },
+  "ChangePasswordForm": {
+    "confirmPwd": "Confirm new password",
+    "newPwd": "New password",
+    "oldPwd": "Current password",
+    "submit": "Change"
+  },
+  "DeleteBudgetDialog": {
+    "text": "The budget allocation of all linked expenses will be reset.",
+    "title": "Delete budget?"
+  },
+  "DeleteExpenseDialog": {
+    "text": "Deleted expenses cannot be restored.",
+    "title": "Delete expense?"
+  },
+  "DeleteUserDialog": {
+    "text": "Once deleted, you cannot restore your account. All expenses and budgets will be lost.",
+    "title": "Delete user?"
+  },
+  "EditBudgetDialog": {
+    "error": {
+      "title": "Budget not found",
+      "text": "The budget you are trying to access could not be found."
+    }
+  },
+  "EditExpenseDialog": {
+    "error": {
+      "title": "Expense not found",
+      "text": "The expense you are trying to edit could not be found."
+    }
+  },
+  "ExpenseDialogRoot": {
+    "errors": {
+      "invalidAmount": "Amount is not a valid number.",
+      "required": "This input is required"
+    },
+    "subtitle": "Quickly record your latest purchase.",
+    "title": {
+      "edit": "Edit expense",
+      "create": "Create expense"
+    }
+  },
+  "ExpenseForm": {
+    "amount": "$t(common.amount)",
+    "amountPlaceholder": "$t(common.amount)...",
+    "budget": "$t(common.budget)",
+    "budgetHelperText": "Only expenses for the current month are considered in the budget overview.",
+    "category": "$t(common.category)",
+    "date": "$t(common.date)",
+    "title": "$t(common.title)",
+    "titlePlaceholder": "Title name"
+  },
+  "Expenses": {
+    "create": "Create expense",
+    "title": "Expenses"
+  },
+  "ExpenseTable": {
+    "headers": {
+      "title": "$t(common.title)",
+      "amount": "$t(common.amount)",
+      "date": "$t(common.date)",
+      "category": "$t(common.category)",
+      "budget": "$t(common.budget)",
+      "actions": "Actions"
+    },
+    "noData": "No data to show"
+  },
+  "LoginPage": {
+    "errors": {
+      "required": "Email and password are required."
+    },
+    "mail": "Email",
+    "pwd": "Password",
+    "registerAction": "Sign up",
+    "registerQuestion": "Don't have an account?",
+    "submit": "Login",
+    "title": "Login"
+  },
+  "Pagination": {
+    "first": "First page",
+    "info": {
+      "0": "Showing",
+      "1": "of"
+    },
+    "last": "Last page",
+    "next": "Next page",
+    "previous": "Previous page"
+  },
+  "SignUpPage": {
+    "errors": {
+      "required": "Required fields need to be filled."
+    },
+    "firstName": "First name",
+    "lastName": "Last name",
+    "mail": "Email",
+    "pwd": "Password",
+    "signInAction": "Login",
+    "signInQuestion": "Already having an account?",
+    "submit": "Sign up",
+    "title": "Sign up"
+  },
+  "Statistics": {
+    "amountAndShare": "$t(common.amount) / share",
+    "barchart": {
+      "week": {
+        "0": "Monday",
+        "1": "Tuesday",
+        "2": "Wednesday",
+        "3": "Thursday",
+        "4": "Friday",
+        "5": "Saturday",
+        "6": "Sunday"
+      },
+      "month": "CW {{weeknumber}}",
+      "year": {
+        "0": "January",
+        "1": "February",
+        "2": "March",
+        "3": "April",
+        "4": "May",
+        "5": "June",
+        "6": "July",
+        "7": "August",
+        "8": "September",
+        "9": "October",
+        "10": "November",
+        "11": "December"
+      }
+    },
+    "category": "$t(common.category)",
+    "noData": "No expenses to show",
+    "timePeriod": {
+      "week": "Week",
+      "month": "Month",
+      "year": "Year"
+    },
+    "title": "Statistics"
+  },
+  "UserDropdown": {
+    "logout": "Logout",
+    "preferences": "Account preferences",
+    "settings": "Account settings"
+  }
+}
