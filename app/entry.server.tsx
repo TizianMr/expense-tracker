@@ -11,6 +11,7 @@ import { I18nextProvider, initReactI18next } from 'react-i18next';
 
 import i18n from './utils/i18n/i18n';
 import i18next from './utils/i18n/i18next.server';
+import { resources } from './utils/i18n/resource';
 
 const ABORT_DELAY = 5000;
 
@@ -33,7 +34,8 @@ export default async function handleRequest(
       ...i18n, // spread the configuration
       lng, // The locale we detected above
       ns, // The namespaces the routes about to render wants to use
-      backend: { loadPath: resolve('./public/locales/{{lng}}/{{ns}}.json') },
+      backend: { loadPath: resolve('utils/i18n/translations/{{lng}}/{{ns}}.json') },
+      resources, // prevent translations to flash on load
     });
 
   return new Promise((resolve, reject) => {

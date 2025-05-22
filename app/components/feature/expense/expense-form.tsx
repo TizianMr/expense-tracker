@@ -4,14 +4,15 @@ import { de, enUS } from 'date-fns/locale';
 import { useTranslation } from 'react-i18next';
 
 import { ExpenseFormErrors } from '../../../routes/dashboard.expenses';
-import { EXPENSE_CATEGORIES, LOCALES } from '../../../utils/constants';
+import { EXPENSE_CATEGORIES } from '../../../utils/constants';
 import CurrencyInput from '../../ui/currency-input';
 import { useControlledInput } from '~/customHooks/useControlledInput';
 import { BudgetWithUsage } from '~/db/budget.server';
+import { Language } from '~/utils/i18n/resource';
 
 type Props = {
   errors: ExpenseFormErrors;
-  locale: (typeof LOCALES)[number]['value'];
+  locale: Language;
   expense?: Expense;
   budgets: BudgetWithUsage[];
 };

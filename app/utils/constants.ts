@@ -1,5 +1,7 @@
 import { Category } from '@prisma/client';
 
+import { supportedLanguages } from './i18n/resource';
+
 export const EXPENSE_CATEGORIES = [
   { labelKey: 'common.categories.food', value: Category.FOOD, color: 'orange' },
   { labelKey: 'common.categories.transport', value: Category.TRANSPORT, color: 'blue' },
@@ -8,8 +10,8 @@ export const EXPENSE_CATEGORIES = [
 ];
 
 export const LOCALES = [
-  { label: 'English', value: 'en' },
-  { label: 'Deutsch', value: 'de' },
+  { label: 'English', value: supportedLanguages[0] },
+  { label: 'Deutsch', value: supportedLanguages[1] },
 ] as const;
 
 export const EXPENSE_PAGE_SIZE = 5;
@@ -21,20 +23,3 @@ export const DATE_OPTIONS: Intl.DateTimeFormatOptions = {
   month: 'long',
   day: 'numeric',
 };
-
-export const WEEKDAYS = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
-
-export const MONTHS = [
-  'January',
-  'February',
-  'March',
-  'April',
-  'May',
-  'June',
-  'July',
-  'August',
-  'September',
-  'October',
-  'November',
-  'December',
-];

@@ -8,6 +8,7 @@ import { I18nextProvider, initReactI18next } from 'react-i18next';
 import { getInitialNamespaces } from 'remix-i18next/client';
 
 import i18n from './utils/i18n/i18n';
+import { resources } from './utils/i18n/resource';
 
 async function hydrate() {
   await i18next
@@ -18,7 +19,8 @@ async function hydrate() {
       ...i18n, // spread the configuration
       // This function detects the namespaces your routes rendered while SSR use
       ns: getInitialNamespaces(),
-      backend: { loadPath: '/locales/{{lng}}/{{ns}}.json' },
+      backend: { loadPath: 'utils/i18n/translations/{{lng}}/{{ns}}.json' },
+      resources, // prevent translations to flash on load
       detection: {
         // Here only enable htmlTag detection, we'll detect the language only
         // server-side with remix-i18next, by using the `<html lang>` attribute
