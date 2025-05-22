@@ -41,7 +41,7 @@
       "title": "Budget nicht gefunden",
       "text": "Das Budget, auf das du zugreifen möchtest, konnte nicht gefunden werden."
     },
-    "noCategory": "Keine Kategorie",
+    "noCategory": "$t(common.categories.none)",
     "noData": "Dem Budget sind keine Ausgaben zugeordnet"
   },
   "BudgetDialogRoot": {
