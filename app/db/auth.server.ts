@@ -1,4 +1,4 @@
-import { User, UserPreference } from '@prisma/client';
+import { Locale, User, UserPreference } from '@prisma/client';
 import { createCookieSessionStorage, redirect } from '@remix-run/node';
 import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
@@ -13,7 +13,7 @@ export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'p
   preferences: Pick<UserPreference, 'id' | 'theme' | 'locale'>;
 };
 type LoginInfo = Pick<User, 'password' | 'email'>;
-type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'>;
+type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'> & { acceptLang: Locale };
 
 export const EMAIL_PASSWORD_STRATEGY = 'email-password-strategy';
 
@@ -73,7 +73,7 @@ export const getLoggedInUser = async (request: Request): Promise<AuthUser | null
   return user;
 };
 
-export const createUser = async ({ password, email, firstName, lastName }: CreateUser) => {
+export const createUser = async ({ password, email, firstName, lastName, acceptLang }: CreateUser) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (user) {
@@ -95,6 +95,7 @@ export const createUser = async ({ password, email, firstName, lastName }: Creat
       UserPreference: {
         create: {
           theme: null,
+          locale: acceptLang,
         },
       },
     },

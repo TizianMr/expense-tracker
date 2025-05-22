@@ -1,10 +1,12 @@
+import { Locale } from '@prisma/client';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-run/react';
 import { Button, TextInput } from '@tremor/react';
 import { useTranslation } from 'react-i18next';
 
 import GitHubLink from '~/components/ui/github-link';
-import { authenticator, createUser, EMAIL_PASSWORD_STRATEGY, getLoggedInUser, sessionStorage } from '~/db/auth.server';
+import { authenticator, createUser, EMAIL_PASSWORD_STRATEGY, getLoggedInUser, updateSession } from '~/db/auth.server';
+import i18next from '~/utils/i18n/i18next.server';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getLoggedInUser(request);
@@ -26,19 +28,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   }
 
   try {
-    await createUser({ password, email, firstName, lastName });
+    await createUser({
+      password,
+      email,
+      firstName,
+      lastName,
+      acceptLang: (await i18next.getLocale(request)) as Locale,
+    });
 
     const user = await authenticator.authenticate(EMAIL_PASSWORD_STRATEGY, request);
 
-    const session = await sessionStorage.getSession(request.headers.get('cookie'));
-
-    session.set('user', user);
-
-    return redirect('/dashboard', {
-      headers: {
-        'Set-Cookie': await sessionStorage.commitSession(session),
-      },
-    });
+    return await updateSession(request, user, '/dashboard');
   } catch (error) {
     // Return validation errors or authentication errors
     if (error instanceof Error) {
