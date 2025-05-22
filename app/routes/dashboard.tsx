@@ -23,6 +23,13 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const query = url.searchParams;
   const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
 
+  const TAB_VALUES = ['week', 'month', 'year'];
+
+  if (!url.searchParams.has('statistics')) {
+    url.searchParams.set('statistics', TAB_VALUES[0]);
+    return redirect(url.toString());
+  }
+
   const [expenses, budgets, statistics] = await Promise.all([
     // expenses
     fetchExpenses(
