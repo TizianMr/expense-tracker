@@ -156,6 +156,10 @@
     "noData": "No data to show"
   },
   "LoginPage": {
+    "disclaimer": {
+      "text": "This app was developed as a personal project to expand my technical skills and showcase my work. While it is fully functional, please note that there are currently no plans to actively maintain it, and it may not receive updates or long-term support. Use it at your own discretion.",
+      "title": "Not meant for productive use"
+    },
     "errors": {
       "required": "Email and password are required."
     },
