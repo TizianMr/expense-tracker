@@ -21,6 +21,7 @@ const Statistics = ({ statistics }: Props) => {
   const { t } = useTranslation();
   const dataIsLoading = useDelayedQueryParamLoading('statistics');
   const [searchParams, setSearchParams] = useSearchParams();
+  const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
 
   const categoryColors = statistics.expensesByCategory.categories.map(expense => {
     const category = EXPENSE_CATEGORIES.find(cat => cat.value === expense.category);
@@ -55,10 +56,15 @@ const Statistics = ({ statistics }: Props) => {
         </h1>
         <TabGroup
           className='flex justify-end'
+          defaultIndex={Object.values(StatisticPeriod).findIndex(period => period === nestedParams.statistics)}
           onIndexChange={handleTabChange}>
           <TabList variant='solid'>
             {Object.values(StatisticPeriod).map(period => (
-              <Tab key={period}>{t(`Statistics.timePeriod.${period}`)}</Tab>
+              <Tab
+                key={period}
+                value={period}>
+                {t(`Statistics.timePeriod.${period}`)}
+              </Tab>
             ))}
           </TabList>
         </TabGroup>

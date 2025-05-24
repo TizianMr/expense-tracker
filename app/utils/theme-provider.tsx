@@ -38,18 +38,18 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setTheme] = useState<ColorTheme | null>(() => {
-    if (typeof window !== 'undefined') {
-      const stored = window.localStorage.getItem('theme') as ColorTheme | null;
-      return stored;
-    }
-
-    // there's no way for us to know what the theme should be in this context
-    // the client will have to figure it out before hydration.
-    if (typeof document === 'undefined') {
+    if (typeof window === 'undefined') {
+      // there's no way for us to know what the theme should be in this context
+      // the client will have to figure it out before hydration.
       return null;
     }
 
-    return getPreferredTheme();
+    const stored = window.localStorage.getItem('theme') as ColorTheme | null;
+    if (!stored) {
+      return getPreferredTheme();
+    }
+
+    return stored;
   });
 
   useEffect(() => {

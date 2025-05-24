@@ -20,6 +20,11 @@
     "unknownError": "Ein unbekannter Fehler ist aufgetreten"
   },
   "AccountPreferences": {
+    "color": {
+      "DARK": "Dunkel",
+      "LIGHT": "Hell",
+      "SYSTEM": "System"
+    },
     "lang": "Spache",
     "theme": "Farbdesign",
     "title": "Account Präferenzen",
@@ -151,8 +156,8 @@
     "pwd": "Passwort",
     "registerAction": "Jetzt registrieren",
     "registerQuestion": "Kein Account?",
-    "submit": "Login",
-    "title": "Login"
+    "submit": "Einloggen",
+    "title": "Einloggen"
   },
   "Pagination": {
     "first": "Erste Seite",
