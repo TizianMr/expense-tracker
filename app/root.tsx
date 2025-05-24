@@ -7,7 +7,7 @@ import './tailwind.css';
 import { getLoggedInUser } from './db/auth.server';
 import { cx } from './utils/helpers';
 import i18next from './utils/i18n/i18next.server';
-import { NonFlashOfWrongThemeEls, ThemeProvider, useTheme } from './utils/theme-provider';
+import { getPreferredTheme, NonFlashOfWrongThemeEls, ThemeProvider, useTheme } from './utils/theme-provider';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const locale = await i18next.getLocale(request);
@@ -44,9 +44,7 @@ function Layout({ children }: { children: React.ReactNode }) {
   useChangeLanguage(locale);
 
   useEffect(() => {
-    if (userTheme) {
-      setTheme(userTheme);
-    }
+    setTheme(userTheme ?? getPreferredTheme());
   }, [setTheme, userTheme]);
 
   return (
