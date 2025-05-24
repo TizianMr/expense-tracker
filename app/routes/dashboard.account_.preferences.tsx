@@ -10,7 +10,6 @@ import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser, updateSession } from '~/db/auth.server';
 import { fetchUserPreferences, updateUserPreferences } from '~/db/user.server';
 import { LOCALES } from '~/utils/constants';
-import { getPreferredTheme, useTheme } from '~/utils/theme-provider';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
@@ -44,7 +43,6 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 };
 
 const AccountPreferences = () => {
-  const [, setTheme] = useTheme();
   const { i18n } = useTranslation();
   const { state } = useNavigation();
   const { t } = useTranslation();
@@ -68,9 +66,8 @@ const AccountPreferences = () => {
   }, [data, handleClose, isOpen]);
 
   useEffect(() => {
-    setTheme(userPreferences?.theme ?? getPreferredTheme());
     i18n.changeLanguage(userPreferences?.locale);
-  }, [i18n, setTheme, userPreferences?.locale, userPreferences?.theme]);
+  }, [i18n, userPreferences?.locale, userPreferences?.theme]);
 
   return (
     <Dialog

@@ -1,15 +1,18 @@
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { Links, Meta, MetaFunction, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
+import { useEffect } from 'react';
 import { useChangeLanguage } from 'remix-i18next/react';
 import './tailwind.css';
 
+import { getLoggedInUser } from './db/auth.server';
 import { cx } from './utils/helpers';
 import i18next from './utils/i18n/i18next.server';
 import { NonFlashOfWrongThemeEls, ThemeProvider, useTheme } from './utils/theme-provider';
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const locale = await i18next.getLocale(request);
-  return { locale };
+  const user = await getLoggedInUser(request);
+  return { locale, userTheme: user?.preferences.theme };
 }
 
 export const handle = {
@@ -31,14 +34,20 @@ export const meta: MetaFunction = () => {
 };
 
 function Layout({ children }: { children: React.ReactNode }) {
-  const { locale } = useLoaderData<typeof loader>();
-  const [theme] = useTheme();
+  const { locale, userTheme } = useLoaderData<typeof loader>();
+  const [theme, setTheme] = useTheme();
 
   // This hook will change the i18n instance language to the current locale
   // detected by the loader, this way, when we do something to change the
   // language, this locale will change and i18next will load the correct
   // translation files
   useChangeLanguage(locale);
+
+  useEffect(() => {
+    if (userTheme) {
+      setTheme(userTheme);
+    }
+  }, [setTheme, userTheme]);
 
   return (
     <html
