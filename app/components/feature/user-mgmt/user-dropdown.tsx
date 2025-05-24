@@ -58,7 +58,7 @@ const UserDropdown = ({ userInfo }: Props) => {
               showArrow={false}>
               <DropdownMenuItem disabled>
                 <span className='flex items-center gap-x-2'>
-                  <RiUserLine className='size-4 text-inherit' /> <span>Account Settings</span>
+                  <RiUserLine className='size-4 text-inherit' /> <span>{t('UserDropdown.settings')}</span>
                 </span>
               </DropdownMenuItem>
             </Tooltip>
@@ -67,18 +67,18 @@ const UserDropdown = ({ userInfo }: Props) => {
               <DropdownMenuItem>
                 <span className='flex items-center gap-x-2'>
                   <RiUserLine className='size-4 text-inherit' /> <span>{t('UserDropdown.settings')}</span>
-              </span>
-            </DropdownMenuItem>
-          </CustomNavLink>
+                </span>
+              </DropdownMenuItem>
+            </CustomNavLink>
+          )}
 
           <CustomNavLink to='account/preferences'>
             <DropdownMenuItem>
               <span className='flex items-center gap-x-2'>
                 <RiSettings2Line className='size-4 text-inherit' /> <span>{t('UserDropdown.preferences')}</span>
-                </span>
-              </DropdownMenuItem>
-            </NavLink>
-          )}
+              </span>
+            </DropdownMenuItem>
+          </NavLink>
 
           <DropdownMenuSeparator />
 
