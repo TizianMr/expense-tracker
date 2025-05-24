@@ -1,6 +1,6 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-run/react';
-import { Button, Divider, List, ListItem, TextInput } from '@tremor/react';
+import { Button, Callout, Divider, List, ListItem, TextInput } from '@tremor/react';
 import { useTranslation } from 'react-i18next';
 
 import GitHubLink from '~/components/ui/github-link';
@@ -49,6 +49,12 @@ const LoginPage = () => {
   return (
     <>
       <div className='flex min-h-screen flex-col px-4 py-10 lg:px-6'>
+        <Callout
+          className='mb-2 lg:w-[80%] mx-auto'
+          color='orange'
+          title={t('LoginPage.disclaimer.title')}>
+          <span className='flex flex-col'>{t('LoginPage.disclaimer.text')}</span>
+        </Callout>
         <div className='sm:mx-auto sm:w-full sm:max-w-sm flex flex-col justify-center flex-1'>
           <img
             alt='Expense tracker logo'
