@@ -3,6 +3,7 @@ import { Outlet, redirect, useLoaderData } from '@remix-run/react';
 import { Button, Callout, Card } from '@tremor/react';
 import qs from 'qs';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 import Budgets from '~/components/feature/budget/budgets';
 import Expenses from '~/components/feature/expense/expenses';
@@ -64,6 +65,7 @@ const Dashboard = () => {
   const { expenses, budgets, statistics, user } = useLoaderData<typeof loader>();
   const [isDisplayingDisclaimer, setIsDisplayingDisclaimer] = useState(true);
   const [isHydrated, setIsHydrated] = useState(false);
+  const { t } = useTranslation();
 
   useEffect(() => {
     const storedValue = sessionStorage.getItem('showDisclaimer');
@@ -96,18 +98,15 @@ const Dashboard = () => {
         <Callout
           className=' m-auto'
           color='orange'
-          title="You're using a demo account">
+          title={t('Dashboard.disclaimer.title')}>
           <span className='flex flex-col'>
-            Any changes you make—such as adding or editing expenses or budgets—are temporary and will be automatically
-            reset at midnight (UTC) each day. Please note that access to account settings (including changing your
-            password, email or profile picture) is disabled while using the demo. <br />
-            <br /> Feel free to explore all other features of the app to see how it works!
+            {t('Dashboard.disclaimer.text')}
             <Button
-              className='mt-2 w-20'
+              className='mt-2 min-w-20 max-w-[6rem]'
               color='orange'
               variant='secondary'
               onClick={() => setIsDisplayingDisclaimer(false)}>
-              Got it!
+              {t('Dashboard.disclaimer.action')}
             </Button>
           </span>
         </Callout>

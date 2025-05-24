@@ -88,6 +88,13 @@
     "oldPwd": "Aktuelles Passwort",
     "submit": "Aktualisieren"
   },
+  "Dashboard": {
+    "disclaimer": {
+      "action": "Verstanden!",
+      "text": "Alle vorgenommenen Änderungen - wie das Hinzufügen oder Bearbeiten von Ausgaben oder Budgets - sind vorübergehend und werden jeden Tag um Mitternacht (UTC) automatisch zurückgesetzt. Bitte beachte, dass der Zugriff auf die Account Einstellungen (einschließlich der Änderung des Passworts, der E-Mail oder des Profilbildes) während der Nutzung des Demo Accounts deaktiviert ist. Du kannst aber gerne alle anderen Funktionen der App ausprobieren, um zu sehen, wie sie funktioniert!",
+      "title": "Du benutzt einen Demo Account"
+    }
+  },
   "DeleteBudgetDialog": {
     "text": "Die Budgetzuordnung aller verbundenen Ausgaben wird zurückgesetzt.",
     "title": "Budget löschen?"
