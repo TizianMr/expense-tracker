@@ -97,7 +97,7 @@ const AccountPreferences = () => {
                     icon={theme === 'SYSTEM' ? RiComputerLine : theme === 'LIGHT' ? RiSunLine : RiMoonLine}
                     key={theme}
                     value={theme}>
-                    {theme.charAt(0) + theme.slice(1).toLowerCase()}
+                    {t(`AccountPreferences.color.${theme}`)}
                   </SelectItem>
                 ))}
               </Select>

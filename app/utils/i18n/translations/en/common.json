@@ -20,6 +20,11 @@
     "unknownError": "An unknown error occurred."
   },
   "AccountPreferences": {
+    "color": {
+      "DARK": "Dark",
+      "LIGHT": "Light",
+      "SYSTEM": "System"
+    },
     "lang": "Language",
     "theme": "Color theme",
     "title": "Account preferences",
