@@ -148,7 +148,7 @@ const AccountSettings = () => {
       static
       open={open}
       onClose={handleClose}>
-      <DialogPanel className='lg:w-[40vw] big-dialog'>
+      <DialogPanel className='lg:w-[45vw] big-dialog'>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
           {t('AccountSettings.title')}
         </h3>
