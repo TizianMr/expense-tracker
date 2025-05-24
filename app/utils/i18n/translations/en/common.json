@@ -88,6 +88,13 @@
     "oldPwd": "Current password",
     "submit": "Change"
   },
+    "Dashboard": {
+    "disclaimer": {
+      "action": "Got it!",
+      "text": "Any changes you make—such as adding or editing expenses or budgets—are temporary and will be automatically reset at midnight (UTC) each day. Please note that access to account settings (including changing your password, email or profile picture) is disabled while using the demo. Feel free to explore all other features of the app to see how it works!",
+      "title": "You're using a demo account"
+    }
+  },
   "DeleteBudgetDialog": {
     "text": "The budget allocation of all linked expenses will be reset.",
     "title": "Delete budget?"
