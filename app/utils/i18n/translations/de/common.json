@@ -37,8 +37,8 @@
       "required": "Diese Eingabe ist erforderlich.",
       "pwdNotIdentical": "Passwörter sind nicht identisch."
     },
-    "mailTab": "Mailadresse ändern",
-    "pwdTab": "Passwort ändern",
+    "email": "Mailadresse ändern",
+    "password": "Passwort ändern",
     "title": "Account Einstellungen"
   },
   "BudgetDetails": {

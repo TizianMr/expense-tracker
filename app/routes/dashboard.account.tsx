@@ -29,17 +29,12 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
-  const t = await i18next.getFixedT(request);
-
-  const TAB_VALUES = [
-    { label: t('AccountSettings.mailTab'), value: 'email' },
-    { label: t('AccountSettings.pwdTab'), value: 'password' },
-  ];
+  const TAB_VALUES = ['email', 'password'];
 
   const url = new URL(request.url);
 
   if (!url.searchParams.has('tab')) {
-    url.searchParams.set('tab', TAB_VALUES[0].value);
+    url.searchParams.set('tab', TAB_VALUES[0]);
     return redirect(url.toString());
   }
 
@@ -137,7 +132,7 @@ const AccountSettings = () => {
 
   const handleTabChange = (idx: number) => {
     const updatedSearchParams = {
-      tab: TAB_VALUES[idx].value,
+      tab: TAB_VALUES[idx],
     };
 
     setSearchParams(qs.stringify(updatedSearchParams), { preventScrollReset: true });
@@ -153,7 +148,7 @@ const AccountSettings = () => {
       static
       open={open}
       onClose={handleClose}>
-      <DialogPanel className='lg:w-[40vw] big-dialog'>
+      <DialogPanel className='lg:w-[45vw] big-dialog'>
         <h3 className='text-lg font-semibold text-tremor-content-strong dark:text-dark-tremor-content-strong'>
           {t('AccountSettings.title')}
         </h3>
@@ -214,14 +209,14 @@ const AccountSettings = () => {
           </div>
 
           <TabGroup
-            defaultIndex={TAB_VALUES.findIndex(tab => tab.value === nestedParams.tab)}
+            defaultIndex={TAB_VALUES.findIndex(tab => tab === nestedParams.tab)}
             onIndexChange={handleTabChange}>
             <TabList variant='line'>
               {TAB_VALUES.map(tab => (
                 <Tab
-                  key={tab.value}
-                  value={tab.value}>
-                  {tab.label}
+                  key={tab}
+                  value={tab}>
+                  {t(`AccountSettings.${tab}`)}
                 </Tab>
               ))}
             </TabList>
