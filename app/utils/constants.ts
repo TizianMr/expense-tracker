@@ -9,6 +9,8 @@ export const EXPENSE_CATEGORIES = [
   { labelKey: 'common.categories.other', value: Category.OTHER, color: 'cyan' },
 ];
 
+export const NO_CATEGORY = 'none';
+
 export const LOCALES = [
   { label: 'English', value: supportedLanguages[0] },
   { label: 'Deutsch', value: supportedLanguages[1] },

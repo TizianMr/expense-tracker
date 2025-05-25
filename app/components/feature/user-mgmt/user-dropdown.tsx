@@ -1,4 +1,4 @@
-import { NavLink, useLocation, useSubmit } from '@remix-run/react';
+import { useSubmit } from '@remix-run/react';
 import { RiArrowDownSLine, RiLogoutCircleLine, RiSettings2Line, RiUserLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
 import { useTranslation } from 'react-i18next';
@@ -10,6 +10,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from '../../ui/dropdown';
+import CustomNavLink from '~/components/ui/custom-navlink';
 import { AuthUser } from '~/db/auth.server';
 
 type Props = {
@@ -18,7 +19,6 @@ type Props = {
 
 const UserDropdown = ({ userInfo }: Props) => {
   const submit = useSubmit();
-  const location = useLocation();
   const { t } = useTranslation();
 
   return (
@@ -51,21 +51,21 @@ const UserDropdown = ({ userInfo }: Props) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <NavLink to='account'>
+          <CustomNavLink to='account'>
             <DropdownMenuItem>
               <span className='flex items-center gap-x-2'>
                 <RiUserLine className='size-4 text-inherit' /> <span>{t('UserDropdown.settings')}</span>
               </span>
             </DropdownMenuItem>
-          </NavLink>
+          </CustomNavLink>
 
-          <NavLink to={{ pathname: 'account/preferences', search: location.search }}>
+          <CustomNavLink to='account/preferences'>
             <DropdownMenuItem>
               <span className='flex items-center gap-x-2'>
                 <RiSettings2Line className='size-4 text-inherit' /> <span>{t('UserDropdown.preferences')}</span>
               </span>
             </DropdownMenuItem>
-          </NavLink>
+          </CustomNavLink>
 
           <DropdownMenuSeparator />
 

@@ -1,9 +1,9 @@
-import { NavLink, useLocation } from '@remix-run/react';
 import { RiQuestionLine, RiAddLine, RiBarChartFill } from '@remixicon/react';
 import { Legend, Icon, Button } from '@tremor/react';
 import { useTranslation } from 'react-i18next';
 
 import BudgetInfo from './budget-info';
+import CustomNavLink from '~/components/ui/custom-navlink';
 import LoadingSpinner from '~/components/ui/loading-spinner';
 import Pagination from '~/components/ui/pagination';
 import { Tooltip } from '~/components/ui/tooltip';
@@ -17,7 +17,6 @@ type Props = {
 };
 
 const Budgets = ({ budgets }: Props) => {
-  const location = useLocation();
   const { t } = useTranslation();
   const isDataLoading = useDelayedQueryParamLoading('budget');
   const loading = useDelayedNavigationLoading('budgets');
@@ -47,15 +46,13 @@ const Budgets = ({ budgets }: Props) => {
           </Tooltip>
         </div>
 
-        <NavLink
-          preventScrollReset
-          to={{ pathname: 'budgets/create', search: location.search }}>
+        <CustomNavLink to='budgets/create'>
           <Button
             icon={RiAddLine}
             loading={budgetDialogIsLoading}>
             {t('Budgets.create')}
           </Button>
-        </NavLink>
+        </CustomNavLink>
       </div>
       <div className='flex flex-col mx-auto h-full w-full mt-6'>
         <div className='flex flex-col flex-grow justify-center lg:justify-start lg:space-y-6'>

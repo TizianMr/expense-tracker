@@ -2,6 +2,7 @@ import { Budget } from '@prisma/client';
 
 import { prisma } from '../utils/prisma.server';
 import { Filter, FilterWithPagination, ListResult } from '~/interfaces';
+import { NO_CATEGORY } from '~/utils/constants';
 
 export type CreateBudget = Pick<Budget, 'title' | 'amount'>;
 export type UpdateBudget = Pick<Budget, 'id'> & CreateBudget;
@@ -104,13 +105,13 @@ export const fetchBudgetById = async (id: string, userId: string): Promise<Budge
 
   const expensesPerCategory = budgetDetails[1].reduce((acc: { category: string; amount: number }[], expense) => {
     const category = acc.find(
-      item => item.category === expense.category || (!expense.category && item.category === 'No category'),
+      item => item.category === expense.category || (!expense.category && item.category === NO_CATEGORY),
     );
 
     if (category) {
       category.amount += expense.amount;
     } else {
-      acc.push({ category: expense.category ?? 'No category', amount: expense.amount });
+      acc.push({ category: expense.category ?? NO_CATEGORY, amount: expense.amount });
     }
     return acc;
   }, []);

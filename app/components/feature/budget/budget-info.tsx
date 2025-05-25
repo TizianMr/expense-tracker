@@ -19,7 +19,7 @@ const BudgetInfo = ({ totalAmount, usedAmount, title, id }: Props) => {
   const color = usedBudgetInPercentage >= 90 ? 'red' : usedBudgetInPercentage <= 60 ? 'emerald' : 'yellow';
 
   const handleRowClick = () => {
-    navigate(`budgets/${id}`, { preventScrollReset: true });
+    navigate({ pathname: `budgets/${id}`, search: location.search }, { preventScrollReset: true });
   };
 
   return (

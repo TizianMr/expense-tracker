@@ -12,15 +12,13 @@ import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgetById } from '~/db/budget.server';
 import { fetchExpenses } from '~/db/expense.server';
 import { QueryParams, SortDirection } from '~/interfaces';
-import { EXPENSE_CATEGORIES, EXPENSE_PAGE_SIZE } from '~/utils/constants';
+import { EXPENSE_CATEGORIES, EXPENSE_PAGE_SIZE, NO_CATEGORY } from '~/utils/constants';
 import { formatCurrency } from '~/utils/helpers';
-import i18next from '~/utils/i18n/i18next.server';
 
 export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
-  const t = await i18next.getFixedT(request);
   const budgetId = params.budget as string;
   const url = new URL(request.url);
   const query = url.searchParams;
@@ -40,7 +38,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
                 {
                   filterBy: parsedQueryParams.budgetDetails.filter.filterBy,
                   filterValue:
-                    parsedQueryParams.budgetDetails.filter.filterValue === t('BudgetDetails.noCategory')
+                    parsedQueryParams.budgetDetails.filter.filterValue === NO_CATEGORY
                       ? null
                       : parsedQueryParams.budgetDetails.filter.filterValue,
                 },
@@ -61,7 +59,7 @@ const valueFormatter = (number: number) => formatCurrency(number);
 const BudgetDetails = () => {
   const [open, setIsOpen] = useState(true);
   const { t } = useTranslation();
-  const { triggerDelayedNavigation } = useDelayedNavigation();
+  const { triggerDelayedNavigation } = useDelayedNavigation({ searchParams: { clear: true, keys: ['budgetDetails'] } });
   const [searchParams, setSearchParams] = useSearchParams();
   const { budget, expenses } = useLoaderData<typeof loader>();
 
@@ -73,6 +71,7 @@ const BudgetDetails = () => {
   const budgetsWithTranslatedCategories = budget?.expensesByCategory.map(expense => ({
     ...expense,
     category: t(`common.categories.${expense.category.toLowerCase()}`),
+    key: expense.category,
   }));
 
   const handleClose = () => {
@@ -88,7 +87,7 @@ const BudgetDetails = () => {
       updated = {
         ...nestedParams,
         budgetDetails: {
-          filter: { filterBy: 'category', filterValue: v.category },
+          filter: { filterBy: 'category', filterValue: v.key },
         },
       };
     } else {

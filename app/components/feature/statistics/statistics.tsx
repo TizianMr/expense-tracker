@@ -36,6 +36,11 @@ const Statistics = ({ statistics }: Props) => {
     amount,
   }));
 
+  const budgetsWithTranslatedCategories = statistics.expensesByCategory.categories.map(expense => ({
+    ...expense,
+    category: t(`common.categories.${expense.category.toLowerCase()}`),
+  }));
+
   const handleTabChange = (idx: number) => {
     const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
     const tabValues = Object.values(StatisticPeriod);
@@ -92,7 +97,7 @@ const Statistics = ({ statistics }: Props) => {
             <DonutChart
               category='amount'
               colors={categoryColors}
-              data={statistics.expensesByCategory.categories}
+              data={budgetsWithTranslatedCategories}
               index='category'
               valueFormatter={valueFormatter}
             />

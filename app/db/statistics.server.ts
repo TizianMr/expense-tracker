@@ -3,7 +3,7 @@ import { startOfWeek, endOfWeek, startOfYear, endOfYear, startOfMonth, endOfMont
 
 import { prisma } from '../utils/prisma.server';
 import { StatisticPeriod } from '~/interfaces';
-import { EXPENSE_CATEGORIES } from '~/utils/constants';
+import { EXPENSE_CATEGORIES, NO_CATEGORY } from '~/utils/constants';
 
 export type Statistics = {
   period: StatisticPeriod;
@@ -68,13 +68,13 @@ const calculateExpensesByCategory = (expenses: Pick<Expense, 'amount' | 'expense
     amount: 0,
     share: 0,
   }));
-  expensesByCategory.push({ category: 'none', amount: 0, share: 0 });
+  expensesByCategory.push({ category: NO_CATEGORY, amount: 0, share: 0 });
 
   // Calculate amount per category
   expenses.forEach(expense => {
     const categoryEntry =
       expensesByCategory.find(ebc => ebc.category === expense.category) ||
-      expensesByCategory.find(ebc => ebc.category === 'none');
+      expensesByCategory.find(ebc => ebc.category === NO_CATEGORY);
     if (categoryEntry) {
       categoryEntry.amount += expense.amount;
     }
