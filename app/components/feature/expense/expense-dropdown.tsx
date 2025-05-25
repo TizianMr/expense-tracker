@@ -1,16 +1,15 @@
-import { NavLink, useLocation } from '@remix-run/react';
 import { RiMoreFill } from '@remixicon/react';
 import { Button } from '@tremor/react';
 import { useTranslation } from 'react-i18next';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/dropdown';
+import CustomNavLink from '~/components/ui/custom-navlink';
 
 type Props = {
   expenseId: string;
 };
 
 export const ExpenseDropdown = ({ expenseId }: Props) => {
-  const location = useLocation();
   const { t } = useTranslation();
 
   return (
@@ -28,17 +27,13 @@ export const ExpenseDropdown = ({ expenseId }: Props) => {
       <DropdownMenuContent
         align='end'
         className='min-w-40'>
-        <NavLink
-          preventScrollReset
-          to={{ pathname: `expenses/${expenseId}/edit`, search: location.search }}>
+        <CustomNavLink to={`expenses/${expenseId}/edit`}>
           <DropdownMenuItem>{t('common.edit')}</DropdownMenuItem>
-        </NavLink>
+        </CustomNavLink>
 
-        <NavLink
-          preventScrollReset
-          to={{ pathname: `expenses/${expenseId}/delete`, search: location.search }}>
+        <CustomNavLink to={`expenses/${expenseId}/delete`}>
           <DropdownMenuItem className='text-red-600 dark:text-red-500'>{t('common.delete')}</DropdownMenuItem>
-        </NavLink>
+        </CustomNavLink>
       </DropdownMenuContent>
     </DropdownMenu>
   );
