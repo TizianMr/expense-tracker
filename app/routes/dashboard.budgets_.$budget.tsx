@@ -73,6 +73,7 @@ const BudgetDetails = () => {
   const budgetsWithTranslatedCategories = budget?.expensesByCategory.map(expense => ({
     ...expense,
     category: t(`common.categories.${expense.category.toLowerCase()}`),
+    key: expense.category,
   }));
 
   const handleClose = () => {
@@ -88,7 +89,7 @@ const BudgetDetails = () => {
       updated = {
         ...nestedParams,
         budgetDetails: {
-          filter: { filterBy: 'category', filterValue: v.category },
+          filter: { filterBy: 'category', filterValue: v.key },
         },
       };
     } else {
