@@ -63,7 +63,7 @@ const UserDropdown = ({ userInfo }: Props) => {
               </DropdownMenuItem>
             </Tooltip>
           ) : (
-            <NavLink to='account'>
+            <CustomNavLink to='account'>
               <DropdownMenuItem>
                 <span className='flex items-center gap-x-2'>
                   <RiUserLine className='size-4 text-inherit' /> <span>{t('UserDropdown.settings')}</span>
@@ -78,7 +78,7 @@ const UserDropdown = ({ userInfo }: Props) => {
                 <RiSettings2Line className='size-4 text-inherit' /> <span>{t('UserDropdown.preferences')}</span>
               </span>
             </DropdownMenuItem>
-          </NavLink>
+          </CustomNavLink>
 
           <DropdownMenuSeparator />
 
