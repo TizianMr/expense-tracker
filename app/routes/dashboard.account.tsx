@@ -127,7 +127,7 @@ const AccountSettings = () => {
   const submit = useSubmit();
   const { t } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { triggerDelayedNavigation } = useDelayedNavigation();
+  const { triggerDelayedNavigation } = useDelayedNavigation({ searchParams: { clear: true, keys: ['tab'] } });
   const nestedParams = qs.parse(searchParams.toString()) as QueryParams;
 
   const handleTabChange = (idx: number) => {

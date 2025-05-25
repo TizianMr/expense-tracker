@@ -61,7 +61,7 @@ const valueFormatter = (number: number) => formatCurrency(number);
 const BudgetDetails = () => {
   const [open, setIsOpen] = useState(true);
   const { t } = useTranslation();
-  const { triggerDelayedNavigation } = useDelayedNavigation();
+  const { triggerDelayedNavigation } = useDelayedNavigation({ searchParams: { clear: true, keys: ['budgetDetails'] } });
   const [searchParams, setSearchParams] = useSearchParams();
   const { budget, expenses } = useLoaderData<typeof loader>();
 

@@ -51,7 +51,7 @@ const UserDropdown = ({ userInfo }: Props) => {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align='end'>
-          <NavLink to='account'>
+          <NavLink to={{ pathname: 'account', search: location.search }}>
             <DropdownMenuItem>
               <span className='flex items-center gap-x-2'>
                 <RiUserLine className='size-4 text-inherit' /> <span>{t('UserDropdown.settings')}</span>
