@@ -12,6 +12,7 @@ import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser, updateSession } from '~/db/auth.server';
 import { updateMailAddress, updatePassword } from '~/db/user.server';
 import { QueryParams } from '~/interfaces';
+import { cx } from '~/utils/helpers';
 import i18next from '~/utils/i18n/i18next.server';
 
 export type ChangeMailFormErrors = {
@@ -43,7 +44,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const user = await getLoggedInUser(request);
-  if (!user) throw redirect('/login');
+  if (!user || user.isGithubUser) throw redirect('/login');
 
   const t = await i18next.getFixedT(request);
   const formData = await request.formData();
@@ -153,7 +154,11 @@ const AccountSettings = () => {
           {t('AccountSettings.title')}
         </h3>
         <div className='flex lg:flex-row flex-col'>
-          <div className='lg:w-[60%] flex flex-col space-y-2 justify-center items-center pt-4'>
+          <div
+            className={cx(
+              'flex flex-col space-y-2 justify-center items-center pt-4',
+              user.isGithubUser ? 'lg:w-[100%]' : 'lg:w-[60%]',
+            )}>
             <Form
               method='post'
               onChange={e => {
@@ -164,15 +169,20 @@ const AccountSettings = () => {
                 });
               }}>
               <label
-                className='group relative h-20 w-20 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden flex dark:border-gray-800 dark:bg-gray-950 hover:bg-gray-600 cursor-pointer duration-300 ease-in-out'
+                className={cx(
+                  'group relative h-20 w-20 shrink-0 items-center justify-center rounded-full border border-gray-300 bg-white overflow-hidden flex dark:border-gray-800 dark:bg-gray-950',
+                  !user.isGithubUser && 'cursor-pointer duration-300 ease-in-out hover:bg-gray-600',
+                )}
                 htmlFor='profile-pic'>
-                <RiPencilLine
-                  className='absolute inset-0 m-auto opacity-0 group-hover:opacity-100 duration-300 ease-in-out z-10'
-                  color='white'
-                />
+                {!user.isGithubUser && (
+                  <RiPencilLine
+                    className='absolute inset-0 m-auto opacity-0 group-hover:opacity-100 duration-300 ease-in-out z-10'
+                    color='white'
+                  />
+                )}
 
                 {user.profilePicture ? (
-                  <span className='group-hover:opacity-50 duration-300 ease-in-out'>
+                  <span className={cx(!user.isGithubUser && 'group-hover:opacity-50 duration-300 ease-in-out')}>
                     <img
                       alt='avatar'
                       src={user.profilePicture}
@@ -185,6 +195,7 @@ const AccountSettings = () => {
                 <input
                   accept='image/*'
                   className='hidden'
+                  disabled={user.isGithubUser}
                   id='profile-pic'
                   name='profile-pic'
                   type='file'
@@ -208,27 +219,29 @@ const AccountSettings = () => {
             </Button>
           </div>
 
-          <TabGroup
-            defaultIndex={TAB_VALUES.findIndex(tab => tab === nestedParams.tab)}
-            onIndexChange={handleTabChange}>
-            <TabList variant='line'>
-              {TAB_VALUES.map(tab => (
-                <Tab
-                  key={tab}
-                  value={tab}>
-                  {t(`AccountSettings.${tab}`)}
-                </Tab>
-              ))}
-            </TabList>
-            <TabPanels>
-              <TabPanel>
-                <ChangeMailForm onSuccess={handleClose} />
-              </TabPanel>
-              <TabPanel>
-                <ChangePasswordForm onSuccess={handleClose} />
-              </TabPanel>
-            </TabPanels>
-          </TabGroup>
+          {!user.isGithubUser && (
+            <TabGroup
+              defaultIndex={TAB_VALUES.findIndex(tab => tab === nestedParams.tab)}
+              onIndexChange={handleTabChange}>
+              <TabList variant='line'>
+                {TAB_VALUES.map(tab => (
+                  <Tab
+                    key={tab}
+                    value={tab}>
+                    {t(`AccountSettings.${tab}`)}
+                  </Tab>
+                ))}
+              </TabList>
+              <TabPanels>
+                <TabPanel>
+                  <ChangeMailForm onSuccess={handleClose} />
+                </TabPanel>
+                <TabPanel>
+                  <ChangePasswordForm onSuccess={handleClose} />
+                </TabPanel>
+              </TabPanels>
+            </TabGroup>
+          )}
         </div>
 
         <Divider />

@@ -13,6 +13,7 @@ import { getS3ObjectKey } from '~/utils/helpers';
 
 export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'> & {
   preferences: Pick<UserPreference, 'id' | 'theme' | 'locale'>;
+  isGithubUser: boolean;
 };
 
 // only the values we neeed
@@ -158,6 +159,7 @@ const emailLogin = async ({ password, email }: LoginInfo): Promise<AuthUser> => 
       theme: user.UserPreference.theme,
       locale: user.UserPreference.locale,
     },
+    isGithubUser: false,
   };
 };
 
@@ -209,5 +211,6 @@ const githubLogin = async (tokens: OAuth2Tokens): Promise<AuthUser> => {
       theme: user.UserPreference.theme,
       locale: user.UserPreference.locale,
     },
+    isGithubUser: true,
   };
 };
