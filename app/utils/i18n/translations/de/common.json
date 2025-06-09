@@ -149,6 +149,7 @@
     "noData": "Keine Daten"
   },
   "LoginPage": {
+    "dividerText": "oder",
     "errors": {
       "required": "E-Mail und Passwort sind erforderlich."
     },
@@ -157,6 +158,7 @@
     "registerAction": "Jetzt registrieren",
     "registerQuestion": "Kein Account?",
     "submit": "Einloggen",
+    "submitGithub": "Mit GitHub einloggen",
     "title": "Einloggen"
   },
   "Pagination": {
