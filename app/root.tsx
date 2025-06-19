@@ -1,3 +1,4 @@
+import { ColorTheme } from '@prisma/client';
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { Links, Meta, MetaFunction, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
 import { useEffect } from 'react';
@@ -44,7 +45,9 @@ function Layout({ children }: { children: React.ReactNode }) {
   useChangeLanguage(locale);
 
   useEffect(() => {
-    setTheme(userTheme ?? getPreferredTheme());
+    // when userTheme = null, check if there is a stored theme in localStorage, otherwise use the preferred theme
+    const storedTheme = window.localStorage.getItem('theme') as ColorTheme | null;
+    setTheme(userTheme ? userTheme : (storedTheme ?? getPreferredTheme()));
   }, [setTheme, userTheme]);
 
   return (
