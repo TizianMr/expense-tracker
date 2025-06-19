@@ -41,9 +41,9 @@ const UserDropdown = ({ userInfo }: Props) => {
               </span>
 
               <div className='truncate'>
-                <p className='text-tremor-default text-left truncate'>{`${userInfo.firstName} ${userInfo.lastName}`}</p>
+                <p className='text-tremor-default text-left truncate'>{`${userInfo.firstName} ${userInfo.lastName ?? ''}`}</p>
                 <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content truncate'>
-                  {userInfo.email}
+                  {userInfo.email ?? ''}
                 </p>
               </div>
               <RiArrowDownSLine className='shrink-0' />

@@ -1,11 +1,23 @@
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { Form, NavLink, redirect, useActionData, useNavigation } from '@remix-run/react';
-import { Button, TextInput } from '@tremor/react';
+import { RiGithubFill } from '@remixicon/react';
+import { Button, Divider, TextInput } from '@tremor/react';
 import { useTranslation } from 'react-i18next';
 
 import GitHubLink from '~/components/ui/github-link';
-import { authenticator, EMAIL_PASSWORD_STRATEGY, getLoggedInUser, updateSession } from '~/db/auth.server';
+import {
+  authenticator,
+  EMAIL_PASSWORD_STRATEGY,
+  getLoggedInUser,
+  GITHUB_STRATEGY,
+  updateSession,
+} from '~/db/auth.server';
 import i18next from '~/utils/i18n/i18next.server';
+
+enum FORM_INTENTS {
+  EMAIL = 'email',
+  GITHUB = 'github',
+}
 
 export async function loader({ request }: LoaderFunctionArgs) {
   const user = await getLoggedInUser(request);
@@ -17,6 +29,11 @@ export async function loader({ request }: LoaderFunctionArgs) {
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const formData = await request.clone().formData();
+
+  if (formData.get('intent') === FORM_INTENTS.GITHUB) {
+    return await authenticator.authenticate(GITHUB_STRATEGY, request);
+  }
+
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
@@ -44,7 +61,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 const LoginPage = () => {
   const data = useActionData<typeof action>();
   const { t } = useTranslation();
-  const { state } = useNavigation();
+  const { state, formData } = useNavigation();
+
+  const isSubmittingEmail = state === 'submitting' && formData?.get('intent') === FORM_INTENTS.EMAIL;
+  const isSubmittingGithub = state === 'submitting' && formData?.get('intent') === FORM_INTENTS.GITHUB;
 
   return (
     <>
@@ -94,14 +114,28 @@ const LoginPage = () => {
             </div>
             <Button
               className='mt-4 w-full whitespace-nowrap rounded-tremor-default bg-tremor-brand py-2 text-center text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-tremor-brand-emphasis dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis'
-              loading={state === 'submitting'}
-              type='submit'>
+              loading={isSubmittingEmail}
+              name='intent'
+              type='submit'
+              value={FORM_INTENTS.EMAIL}>
               {t('LoginPage.submit')}
             </Button>
           </Form>
           {data?.error && (
             <p className='mt-2 text-tremor-label text-center text-red-500 dark:text-red-300'>{data.error}</p>
           )}
+          <Divider>{t('LoginPage.dividerText')}</Divider>
+          <Form method='post'>
+            <Button
+              className='w-full whitespace-nowrap rounded-tremor-default bg-tremor-brand text-center text-tremor-default font-medium text-tremor-brand-inverted shadow-tremor-input hover:bg-tremor-brand-emphasis dark:bg-dark-tremor-brand dark:text-dark-tremor-brand-inverted dark:shadow-dark-tremor-input dark:hover:bg-dark-tremor-brand-emphasis'
+              icon={RiGithubFill}
+              loading={isSubmittingGithub}
+              name='intent'
+              type='submit'
+              value={FORM_INTENTS.GITHUB}>
+              {t('LoginPage.submitGithub')}
+            </Button>
+          </Form>
           <p className='mt-4 text-tremor-label text-tremor-content dark:text-dark-tremor-content text-center'>
             {t('LoginPage.registerQuestion')}{' '}
             <span className='underline underline-offset-4'>

@@ -1,8 +1,10 @@
 import { Locale, User, UserPreference } from '@prisma/client';
 import { createCookieSessionStorage, redirect } from '@remix-run/node';
+import { OAuth2Tokens } from 'arctic';
 import { hash, verify } from 'argon2';
 import { Authenticator } from 'remix-auth';
 import { FormStrategy } from 'remix-auth-form';
+import { GitHubStrategy } from 'remix-auth-github';
 
 import { getSignedAvatarUrl } from './s3.server';
 import { prisma } from '../utils/prisma.server';
@@ -11,11 +13,22 @@ import { getS3ObjectKey } from '~/utils/helpers';
 
 export type AuthUser = Pick<User, 'id' | 'email' | 'firstName' | 'lastName' | 'profilePicture'> & {
   preferences: Pick<UserPreference, 'id' | 'theme' | 'locale'>;
+  isGithubUser: boolean;
 };
-type LoginInfo = Pick<User, 'password' | 'email'>;
-type CreateUser = LoginInfo & Pick<User, 'firstName' | 'lastName'> & { acceptLang: Locale };
+
+// only the values we neeed
+type GithubUser = {
+  id: number;
+  login: string;
+  avatar_url: string;
+  email: string | null;
+  name: string | null;
+};
+type LoginInfo = { email: NonNullable<User['email']>; password: NonNullable<User['password']> };
+type CreateUser = LoginInfo & Required<Pick<User, 'firstName' | 'lastName'>> & { acceptLang: Locale };
 
 export const EMAIL_PASSWORD_STRATEGY = 'email-password-strategy';
+export const GITHUB_STRATEGY = 'github-strategy';
 
 export const sessionStorage = createCookieSessionStorage({
   cookie: {
@@ -39,9 +52,24 @@ authenticator.use(
       throw new Error('Email and password are required');
     }
 
-    return await login({ password, email });
+    return await emailLogin({ password, email });
   }),
   EMAIL_PASSWORD_STRATEGY,
+);
+
+authenticator.use(
+  new GitHubStrategy(
+    {
+      clientId: process.env.CLIENT_ID ?? '',
+      clientSecret: process.env.CLIENT_SECRET ?? 'super-secret',
+      redirectURI: process.env.CALLBACK_URL ?? 'https://example.app/auth/callback',
+      scopes: ['user:email'],
+    },
+    async ({ tokens }) => {
+      return await githubLogin(tokens);
+    },
+  ),
+  GITHUB_STRATEGY,
 );
 
 export const updateSession = async (
@@ -104,10 +132,10 @@ export const createUser = async ({ password, email, firstName, lastName, acceptL
   return createdUser;
 };
 
-export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> => {
+const emailLogin = async ({ password, email }: LoginInfo): Promise<AuthUser> => {
   const user = await prisma.user.findUnique({ where: { email }, include: { UserPreference: true } });
 
-  if (!user || !(await verify(user.password, password))) {
+  if (!user?.password || !(await verify(user.password, password))) {
     throw new Error('Mail or password are not correct');
   }
 
@@ -131,5 +159,58 @@ export const login = async ({ password, email }: LoginInfo): Promise<AuthUser> =
       theme: user.UserPreference.theme,
       locale: user.UserPreference.locale,
     },
+    isGithubUser: false,
+  };
+};
+
+const githubLogin = async (tokens: OAuth2Tokens): Promise<AuthUser> => {
+  const response = await fetch('https://api.github.com/user', {
+    headers: {
+      'Accept': 'application/vnd.github+json',
+      'Authorization': `Bearer ${tokens.accessToken()}`,
+      'X-GitHub-Api-Version': '2022-11-28',
+    },
+  });
+
+  const githubUser: GithubUser = await response.json();
+  const firstName = githubUser.name !== null ? githubUser.name.split(' ')[0] : githubUser.login;
+  const lastName = githubUser.name !== null ? githubUser.name.split(' ').slice(1).join(' ') : null;
+
+  const user = await prisma.user.upsert({
+    where: { githubId: githubUser.id },
+    include: { UserPreference: true },
+    update: {
+      email: githubUser.email,
+      firstName,
+      lastName,
+      profilePicture: githubUser.avatar_url,
+    },
+    create: {
+      email: githubUser.email,
+      githubId: githubUser.id,
+      firstName,
+      lastName,
+      profilePicture: githubUser.avatar_url,
+      UserPreference: {
+        create: {
+          theme: null,
+          locale: Locale.en,
+        },
+      },
+    },
+  });
+
+  return {
+    id: user.id,
+    email: user.email,
+    lastName: user.lastName,
+    firstName: user.firstName,
+    profilePicture: user.profilePicture,
+    preferences: {
+      id: user.UserPreference.id,
+      theme: user.UserPreference.theme,
+      locale: user.UserPreference.locale,
+    },
+    isGithubUser: true,
   };
 };

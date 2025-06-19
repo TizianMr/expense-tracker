@@ -123,6 +123,18 @@ BUCKET_NAME="<s3 bucket name>"
 BUCKET_REGION="<s3 bucket region>"
 ```
 
+### Configure GitHub SSO
+
+To configure GitHub SSO you need to create a new OAuth application and get a client ID and secret. To do so, follow these steps on [the GitHub documentation](https://docs.github.com/en/apps/oauth-apps/building-oauth-apps/creating-an-oauth-app).
+
+After generating your client ID and secret, update your `env` file accordingly.
+
+```
+# Auth
+CLIENT_ID=your-client-id
+CLIENT_SECRET=your-client-secret
+CALLBACK_URL="http://localhost:5173/auth/callback"
+```
 
 ## Limitations
 
