@@ -203,7 +203,7 @@ const AccountSettings = () => {
               </label>
             </Form>
             <div className='truncate text-center'>
-              <p className='text-tremor-default text-tremor-content-strong truncate'>{`${user.firstName} ${user.lastName}`}</p>
+              <p className='text-tremor-default text-tremor-content-strong truncate dark:dark:text-dark-tremor-content-strong'>{`${user.firstName} ${user.lastName ?? ''}`}</p>
               <p className='text-tremor-default text-tremor-content dark:text-dark-tremor-content truncate'>
                 {user.email}
               </p>
