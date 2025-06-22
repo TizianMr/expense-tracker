@@ -39,9 +39,9 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
 
   try {
     const updatedExpense = await updateBudget(budget, user.id);
-    return jsonWithSuccess(updatedExpense, t('toasts.budget.success.edit'));
+    return jsonWithSuccess({ ...updatedExpense, success: true }, t('toasts.budget.success.edit'));
   } catch {
-    return jsonWithError(null, t('toasts.budget.error.edit'));
+    return jsonWithError({ success: false }, t('toasts.budget.error.edit'));
   }
 };
 

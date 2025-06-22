@@ -24,9 +24,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   try {
     const createdBudget = await createBudget(budgetData, user.id);
-    return jsonWithSuccess(createdBudget, t('toasts.budget.success.create'));
+    return jsonWithSuccess({ ...createdBudget, success: true }, t('toasts.budget.success.create'));
   } catch {
-    return jsonWithError(null, t('toasts.budget.error.create'));
+    return jsonWithError({ success: false }, t('toasts.budget.error.create'));
   }
 };
 

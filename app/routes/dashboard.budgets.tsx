@@ -1,7 +1,7 @@
 import { Budget } from '@prisma/client';
 import { Outlet, useFetcher, useLocation, useNavigate, useOutlet } from '@remix-run/react';
 import { Button, Dialog, DialogPanel, Divider } from '@tremor/react';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
@@ -24,23 +24,23 @@ const BudgetDialogRoot = () => {
 
   const formRef = useRef<HTMLFormElement>(null);
 
-  const fetcher = useFetcher<Budget>();
+  const fetcher = useFetcher<Budget & { success: boolean }>();
   const isSubmitting = fetcher.state === 'submitting';
 
   const [isOpen, setIsOpen] = useState(inOutlet);
   const [errors, setErrors] = useState<BudgetFormErrors>({});
 
-  useEffect(() => {
-    if (fetcher.state === 'idle' && fetcher.data) {
-      setIsOpen(false);
-    }
-  }, [fetcher.data, fetcher.state, navigate]);
-
-  const handleClose = () => {
+  const handleClose = useCallback(() => {
     setIsOpen(false);
     triggerDelayedNavigation('/dashboard'); // delay navigation to allow dialog to close with animation
     setErrors({});
-  };
+  }, [triggerDelayedNavigation]);
+
+  useEffect(() => {
+    if (isOpen && fetcher.state === 'idle' && fetcher.data && fetcher.data.success) {
+      handleClose();
+    }
+  }, [fetcher.data, fetcher.state, handleClose, isOpen, navigate]);
 
   const handleSubmit = (event: React.MouseEvent<HTMLButtonElement>) => {
     event.preventDefault();
@@ -65,7 +65,6 @@ const BudgetDialogRoot = () => {
       setErrors(errors);
     } else {
       fetcher.submit(formData, { method: isEdit ? 'put' : 'post', action });
-      handleClose();
     }
   };
 
