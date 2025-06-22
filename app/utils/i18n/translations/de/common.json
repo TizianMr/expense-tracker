@@ -221,6 +221,20 @@
     },
     "title": "Statistiken"
   },
+  "Toasts": {
+    "expense": {
+      "success": {
+        "create": "Ausgabe erfolgreich erstellt.",
+        "edit": "Ausgabe erfolgreich aktualisiert.",
+        "delete": "Ausgabe erfolgreich gelöscht."
+      },
+      "error": {
+        "create": "Fehler beim Erstellen der Ausgabe.",
+        "edit": "Fehler beim Aktualisieren der Ausgabe.",
+        "delete": "Fehler beim Löschen der Ausgabe."
+      }
+    }
+  },
   "UserDropdown": {
     "logout": "Ausloggen",
     "preferences": "Account Präferenzen",

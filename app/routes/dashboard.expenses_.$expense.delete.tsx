@@ -4,6 +4,7 @@ import { Form, redirect, useActionData, useNavigation } from '@remix-run/react';
 import { Button, Dialog, DialogPanel } from '@tremor/react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 
 import { deleteExpense } from '../db/expense.server';
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
@@ -20,13 +21,15 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   try {
     await deleteExpense(expenseId, user.id);
+    return jsonWithSuccess({ expenseId }, t('Toasts.expense.success.delete'));
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { serverError: (error.meta?.cause as string) || t('common.unknownError') };
+      return jsonWithError(
+        { serverError: (error.meta?.cause as string) || t('common.unknownError') },
+        t('Toasts.expense.error.delete'),
+      );
     }
   }
-
-  return { expenseId };
 };
 
 const DeleteExpenseDialog = () => {
@@ -42,7 +45,7 @@ const DeleteExpenseDialog = () => {
   }, [triggerDelayedNavigation]);
 
   useEffect(() => {
-    if (data && !data.serverError && state !== 'submitting') {
+    if (data && !('serverError' in data) && state !== 'submitting') {
       if (isOpen) {
         handleClose();
       }
@@ -61,7 +64,7 @@ const DeleteExpenseDialog = () => {
         <p className='mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>
           {t('DeleteExpenseDialog.text')}
         </p>
-        {data?.serverError && (
+        {data && 'serverError' in data && (
           <p className='mt-2 text-tremor-label text-red-500 dark:text-red-300'>{data.serverError}</p>
         )}
         <div className='mt-8 flex items-center justify-end space-x-2'>
@@ -73,7 +76,7 @@ const DeleteExpenseDialog = () => {
           <Form method='delete'>
             <Button
               color='red'
-              disabled={data?.serverError !== undefined}
+              disabled={data && 'serverError' in data}
               loading={state === 'submitting'}
               type='submit'
               variant='primary'>

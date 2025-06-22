@@ -1,10 +1,13 @@
-import { resolve } from 'node:path';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 import Backend from 'i18next-fs-backend';
 import { RemixI18Next } from 'remix-i18next/server';
 
 import i18n from './i18n'; // your i18n configuration file
 import { localeCookie } from '../cookies.server';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const i18next = new RemixI18Next({
   detection: {
@@ -17,7 +20,7 @@ const i18next = new RemixI18Next({
   i18next: {
     ...i18n,
     backend: {
-      loadPath: resolve('./public/locales/{{lng}}/{{ns}}.json'),
+      loadPath: resolve(__dirname, './translations/{{lng}}/{{ns}}.json'),
     },
   },
   // The i18next plugins you want RemixI18next to use for `i18n.getFixedT` inside loaders and actions.

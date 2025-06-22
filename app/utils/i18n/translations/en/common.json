@@ -221,6 +221,20 @@
     },
     "title": "Statistics"
   },
+  "Toasts": {
+    "expense": {
+      "success": {
+        "create": "Expense successfully created.",
+        "edit": "Expense successfully updated.",
+        "delete": "Expense successfully deleted."
+      },
+      "error": {
+        "create": "Error creating expense.",
+        "edit": "Error updating expense.",
+        "delete": "Error deleting expense."
+      }
+    }
+  },
   "UserDropdown": {
     "logout": "Logout",
     "preferences": "Account preferences",
