@@ -43,6 +43,14 @@
         "edit": "Fehler beim Aktualisieren des Budgets.",
         "delete": "Fehler beim Löschen des Budgets."
       }
+    },
+    "preferences": {
+      "success": {
+        "update": "Account Präferenzen erfolgreich aktualisiert."
+      },
+      "error": {
+        "update": "Fehler beim Aktualisieren der Account Präferenzen."
+      }
     }
   },
   "AccountPreferences": {

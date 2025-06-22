@@ -43,6 +43,14 @@
         "edit": "Error updating budget.",
         "delete": "Error deleting budget."
       }
+    },
+    "preferences": {
+      "success": {
+        "update": "Account preferences successfully updated."
+      },
+      "error": {
+        "update": "Error updating account preferences."
+      }
     }
   },
   "AccountPreferences": {

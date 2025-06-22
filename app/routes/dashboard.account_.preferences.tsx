@@ -5,11 +5,13 @@ import { RiComputerLine, RiMoonLine, RiSunLine } from '@remixicon/react';
 import { Button, Dialog, DialogPanel, Divider, Select, SelectItem } from '@tremor/react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser, updateSession } from '~/db/auth.server';
 import { fetchUserPreferences, updateUserPreferences } from '~/db/user.server';
 import { LOCALES } from '~/utils/constants';
+import i18next from '~/utils/i18n/i18next.server';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
@@ -25,6 +27,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (!user) throw redirect('/login');
 
   const formData = await request.formData();
+  const t = await i18next.getFixedT(request);
   const colorTheme = formData.get('colorTheme') as ColorTheme | 'SYSTEM';
   const locale = formData.get('locale') as Locale;
 
@@ -34,10 +37,17 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       theme: colorTheme === 'SYSTEM' ? null : colorTheme,
       locale,
     });
-    return await updateSession(request, { ...user, preferences: newUserPreferences });
+
+    return jsonWithSuccess(
+      await updateSession(request, { ...user, preferences: newUserPreferences }),
+      t('toasts.preferences.success.update'),
+    );
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { serverError: (error.meta?.cause as string) || 'An unknown error occurred.' };
+      return jsonWithError(
+        { serverError: (error.meta?.cause as string) || t('common.unknownError') },
+        t('toasts.preferences.error.update'),
+      );
     }
   }
 };
@@ -58,7 +68,7 @@ const AccountPreferences = () => {
   }, [triggerDelayedNavigation]);
 
   useEffect(() => {
-    if (data && !data.serverError) {
+    if (data && !('serverError' in data)) {
       if (isOpen) {
         handleClose();
       }
@@ -133,7 +143,7 @@ const AccountPreferences = () => {
           </Button>
         </Form>
 
-        {data?.serverError && (
+        {data && 'serverError' in data && (
           <p className='mt-2 text-center text-tremor-label text-red-500 dark:text-red-300'>{data.serverError}</p>
         )}
 
