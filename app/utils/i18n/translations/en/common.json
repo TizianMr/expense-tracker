@@ -51,6 +51,16 @@
       "error": {
         "update": "Error updating account preferences."
       }
+    },
+    "settings": {
+      "success": {
+        "delete": "Account successfully deleted.",
+        "update": "Account settings successfully updated."
+      },
+      "error": {
+        "delete": "Error deleting account.",
+        "update": "Error updating account settings."
+      }
     }
   },
   "AccountPreferences": {

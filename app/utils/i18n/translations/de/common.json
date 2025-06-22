@@ -51,6 +51,16 @@
       "error": {
         "update": "Fehler beim Aktualisieren der Account Präferenzen."
       }
+    },
+    "settings": {
+      "success": {
+        "delete": "Account erfolgreich gelöscht.", 
+        "update": "Account Einstellungen erfolgreich aktualisiert."
+      },
+      "error": {
+        "delete": "Fehler beim Löschen des Accounts.",
+        "update": "Fehler beim Aktualisieren der Account Einstellungen."
+      }
     }
   },
   "AccountPreferences": {
