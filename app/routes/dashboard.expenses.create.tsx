@@ -45,9 +45,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
   try {
     const createdExpense = await createExpense(expenseData, user.id);
-    return jsonWithSuccess(createdExpense, t('Toasts.expense.success.create'));
+    return jsonWithSuccess(createdExpense, t('toasts.expense.success.create'));
   } catch {
-    return jsonWithError(null, t('Toasts.expense.error.create'));
+    return jsonWithError(null, t('toasts.expense.error.create'));
   }
 };
 

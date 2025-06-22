@@ -19,6 +19,32 @@
     "title": "Title",
     "unknownError": "An unknown error occurred."
   },
+  "toasts": {
+    "expense": {
+      "success": {
+        "create": "Expense successfully created.",
+        "edit": "Expense successfully updated.",
+        "delete": "Expense successfully deleted."
+      },
+      "error": {
+        "create": "Error creating expense.",
+        "edit": "Error updating expense.",
+        "delete": "Error deleting expense."
+      }
+    },
+    "budget": {
+      "success": {
+        "create": "Budget successfully created.",
+        "edit": "Budget successfully updated.",
+        "delete": "Budget successfully deleted."
+      },
+      "error": {
+        "create": "Error creating budget.",
+        "edit": "Error updating budget.",
+        "delete": "Error deleting budget."
+      }
+    }
+  },
   "AccountPreferences": {
     "color": {
       "DARK": "Dark",
@@ -220,20 +246,6 @@
       "year": "Year"
     },
     "title": "Statistics"
-  },
-  "Toasts": {
-    "expense": {
-      "success": {
-        "create": "Expense successfully created.",
-        "edit": "Expense successfully updated.",
-        "delete": "Expense successfully deleted."
-      },
-      "error": {
-        "create": "Error creating expense.",
-        "edit": "Error updating expense.",
-        "delete": "Error deleting expense."
-      }
-    }
   },
   "UserDropdown": {
     "logout": "Logout",

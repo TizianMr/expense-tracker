@@ -21,12 +21,12 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   try {
     await deleteExpense(expenseId, user.id);
-    return jsonWithSuccess({ expenseId }, t('Toasts.expense.success.delete'));
+    return jsonWithSuccess({ expenseId }, t('toasts.expense.success.delete'));
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return jsonWithError(
         { serverError: (error.meta?.cause as string) || t('common.unknownError') },
-        t('Toasts.expense.error.delete'),
+        t('toasts.expense.error.delete'),
       );
     }
   }

@@ -19,6 +19,32 @@
     "title": "Titel",
     "unknownError": "Ein unbekannter Fehler ist aufgetreten"
   },
+  "toasts": {
+    "expense": {
+      "success": {
+        "create": "Ausgabe erfolgreich erstellt.",
+        "edit": "Ausgabe erfolgreich aktualisiert.",
+        "delete": "Ausgabe erfolgreich gelöscht."
+      },
+      "error": {
+        "create": "Fehler beim Erstellen der Ausgabe.",
+        "edit": "Fehler beim Aktualisieren der Ausgabe.",
+        "delete": "Fehler beim Löschen der Ausgabe."
+      }
+    },
+    "budget": {
+      "success": {
+        "create": "Budget erfolgreich erstellt.",
+        "edit": "Budget erfolgreich aktualisiert.",
+        "delete": "Budget erfolgreich gelöscht."
+      },
+      "error": {
+        "create": "Fehler beim Erstellen des Budgets.",
+        "edit": "Fehler beim Aktualisieren des Budgets.",
+        "delete": "Fehler beim Löschen des Budgets."
+      }
+    }
+  },
   "AccountPreferences": {
     "color": {
       "DARK": "Dunkel",
@@ -220,20 +246,6 @@
       "year": "Jahr"
     },
     "title": "Statistiken"
-  },
-  "Toasts": {
-    "expense": {
-      "success": {
-        "create": "Ausgabe erfolgreich erstellt.",
-        "edit": "Ausgabe erfolgreich aktualisiert.",
-        "delete": "Ausgabe erfolgreich gelöscht."
-      },
-      "error": {
-        "create": "Fehler beim Erstellen der Ausgabe.",
-        "edit": "Fehler beim Aktualisieren der Ausgabe.",
-        "delete": "Fehler beim Löschen der Ausgabe."
-      }
-    }
   },
   "UserDropdown": {
     "logout": "Ausloggen",
