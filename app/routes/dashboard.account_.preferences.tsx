@@ -38,10 +38,9 @@ export const action = async ({ request }: ActionFunctionArgs) => {
       locale,
     });
 
-    return jsonWithSuccess(
-      await updateSession(request, { ...user, preferences: newUserPreferences }),
-      t('toasts.preferences.success.update'),
-    );
+    const res = await updateSession(request, { ...user, preferences: newUserPreferences });
+
+    return jsonWithSuccess({ success: true }, t('toasts.preferences.success.update'), { headers: res.headers });
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
       return jsonWithError(

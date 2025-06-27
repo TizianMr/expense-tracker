@@ -77,14 +77,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     try {
       const updatedUser = await updateMailAddress(user.id, newMail);
+      const res = await updateSession(request, { ...user, ...updatedUser });
 
-      return jsonWithSuccess(
-        await updateSession(request, { ...user, ...updatedUser }),
-        t('AccountSettings.success.update'),
-      );
+      return jsonWithSuccess({ success: true }, t('toasts.settings.success.update'), { headers: res.headers });
     } catch (error) {
       if (error instanceof Error) {
-        return jsonWithError({ serverError: error.message }, t('AccountSettings.error.update'));
+        return jsonWithError({ serverError: error.message }, t('toasts.settings.error.update'));
       }
     }
   } else if (parsedQueryParams.tab === 'password') {
@@ -116,10 +114,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     try {
       await updatePassword(user.id, oldPwd, newPwd);
-      return jsonWithSuccess(null, t('AccountSettings.success.update'));
+      return jsonWithSuccess({ success: true }, t('toasts.settings.success.update'));
     } catch (error) {
       if (error instanceof Error) {
-        return jsonWithError({ serverError: error.message }, t('AccountSettings.error.update'));
+        return jsonWithError({ serverError: error.message }, t('toasts.settings.error.update'));
       }
     }
   }
