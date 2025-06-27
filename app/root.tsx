@@ -88,6 +88,14 @@ function Layout({ children }: { children: React.ReactNode }) {
         <Toaster
           position='bottom-center'
           reverseOrder={false}
+          toastOptions={{
+            ...(theme === ColorTheme.DARK && {
+              style: {
+                background: '#333',
+                color: '#fff',
+              },
+            }),
+          }}
         />
       </body>
     </html>
