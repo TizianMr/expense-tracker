@@ -5,6 +5,7 @@ import { Button, Dialog, DialogPanel, Divider, Tab, TabGroup, TabList, TabPanel,
 import qs from 'qs';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 
 import ChangeMailForm from '~/components/feature/user-mgmt/change-mail-form';
 import ChangePasswordForm from '~/components/feature/user-mgmt/change-password-form';
@@ -76,11 +77,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     try {
       const updatedUser = await updateMailAddress(user.id, newMail);
+      const res = await updateSession(request, { ...user, ...updatedUser });
 
-      return await updateSession(request, { ...user, ...updatedUser });
+      return jsonWithSuccess({ success: true }, t('toasts.settings.success.update'), { headers: res.headers });
     } catch (error) {
       if (error instanceof Error) {
-        return { serverError: error.message };
+        return jsonWithError({ serverError: error.message }, t('toasts.settings.error.update'));
       }
     }
   } else if (parsedQueryParams.tab === 'password') {
@@ -112,9 +114,10 @@ export const action = async ({ request }: ActionFunctionArgs) => {
 
     try {
       await updatePassword(user.id, oldPwd, newPwd);
+      return jsonWithSuccess({ success: true }, t('toasts.settings.success.update'));
     } catch (error) {
       if (error instanceof Error) {
-        return { serverError: error.message };
+        return jsonWithError({ serverError: error.message }, t('toasts.settings.error.update'));
       }
     }
   }

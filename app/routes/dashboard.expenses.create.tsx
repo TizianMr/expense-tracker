@@ -1,6 +1,7 @@
 import { Category } from '@prisma/client';
 import { ActionFunctionArgs, LoaderFunctionArgs } from '@remix-run/node';
 import { redirect, useLoaderData, useOutletContext } from '@remix-run/react';
+import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 
 import { ExpenseFormErrors } from './dashboard.expenses';
 import ExpenseForm from '~/components/feature/expense/expense-form';
@@ -8,6 +9,7 @@ import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { createExpense, CreateExpense } from '~/db/expense.server';
 import { SortDirection } from '~/interfaces';
+import i18next from '~/utils/i18n/i18next.server';
 
 export const loader = async ({ request }: LoaderFunctionArgs) => {
   const user = await getLoggedInUser(request);
@@ -29,6 +31,7 @@ export const action = async ({ request }: ActionFunctionArgs) => {
   if (!user) throw redirect('/login');
 
   const formData = await request.formData();
+  const t = await i18next.getFixedT(request);
 
   const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
 
@@ -40,8 +43,12 @@ export const action = async ({ request }: ActionFunctionArgs) => {
     budgetId: formData.get('budget') as string,
   };
 
-  const createdExpense = await createExpense(expenseData, user.id);
-  return createdExpense;
+  try {
+    const createdExpense = await createExpense(expenseData, user.id);
+    return jsonWithSuccess({ ...createdExpense, success: true }, t('toasts.expense.success.create'));
+  } catch {
+    return jsonWithError({ success: false }, t('toasts.expense.error.create'));
+  }
 };
 
 const CreateExpenseDialog = () => {

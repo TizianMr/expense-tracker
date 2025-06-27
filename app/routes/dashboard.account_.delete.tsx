@@ -3,21 +3,28 @@ import { Form, redirect, useNavigation } from '@remix-run/react';
 import { Button, Dialog, DialogPanel } from '@tremor/react';
 import { useCallback, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { jsonWithError, redirectWithSuccess } from 'remix-toast';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser, sessionStorage } from '~/db/auth.server';
 import { deleteUser } from '~/db/user.server';
+import i18next from '~/utils/i18n/i18next.server';
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const user = await getLoggedInUser(request);
   if (!user) throw redirect('/login');
 
-  await deleteUser(user.id);
+  const t = await i18next.getFixedT(request);
 
-  const session = await sessionStorage.getSession(request.headers.get('cookie'));
-  return redirect('/login', {
-    headers: { 'Set-Cookie': await sessionStorage.destroySession(session) },
-  });
+  try {
+    await deleteUser(user.id);
+    const session = await sessionStorage.getSession(request.headers.get('cookie'));
+    return redirectWithSuccess('/login', t('toasts.settings.success.delete'), {
+      headers: { 'Set-Cookie': await sessionStorage.destroySession(session) },
+    });
+  } catch {
+    return jsonWithError(null, t('toasts.settings.error.delete'));
+  }
 };
 
 const DeleteUserDialog = () => {

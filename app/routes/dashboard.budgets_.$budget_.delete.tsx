@@ -4,6 +4,7 @@ import { Form, redirect, useActionData, useNavigation } from '@remix-run/react';
 import { Button, Dialog, DialogPanel } from '@tremor/react';
 import { useCallback, useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
+import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser } from '~/db/auth.server';
@@ -19,13 +20,15 @@ export const action = async ({ params, request }: ActionFunctionArgs) => {
 
   try {
     await deleteBudget(budgetId, user.id);
+    return jsonWithSuccess({ budgetId }, t('toasts.budget.success.delete'));
   } catch (error) {
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return { serverError: (error.meta?.cause as string) || t('common.unknownError') };
+      return jsonWithError(
+        { serverError: (error.meta?.cause as string) || t('common.unknownError') },
+        t('toasts.budget.error.delete'),
+      );
     }
   }
-
-  return { budgetId };
 };
 
 const DeleteBudgetDialog = () => {
@@ -41,12 +44,12 @@ const DeleteBudgetDialog = () => {
   }, [triggerDelayedNavigation]);
 
   useEffect(() => {
-    if (data && !data.serverError) {
+    if (data && !('serverError' in data) && state !== 'submitting') {
       if (isOpen) {
         handleClose();
       }
     }
-  }, [data, handleClose, isOpen]);
+  }, [data, handleClose, isOpen, state]);
 
   return (
     <Dialog
@@ -60,7 +63,7 @@ const DeleteBudgetDialog = () => {
         <p className='mt-2 leading-6 text-tremor-default text-tremor-content dark:text-dark-tremor-content'>
           {t('DeleteBudgetDialog.text')}
         </p>
-        {data?.serverError && (
+        {data && 'serverError' in data && (
           <p className='mt-2 text-tremor-label text-red-500 dark:text-red-300'>{data.serverError}</p>
         )}
         <div className='mt-8 flex items-center justify-end space-x-2'>
@@ -72,7 +75,7 @@ const DeleteBudgetDialog = () => {
           <Form method='delete'>
             <Button
               color='red'
-              disabled={data?.serverError !== undefined}
+              disabled={data && 'serverError' in data}
               loading={state === 'submitting'}
               type='submit'
               variant='primary'>

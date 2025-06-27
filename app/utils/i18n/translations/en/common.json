@@ -19,6 +19,50 @@
     "title": "Title",
     "unknownError": "An unknown error occurred."
   },
+  "toasts": {
+    "expense": {
+      "success": {
+        "create": "Expense successfully created.",
+        "edit": "Expense successfully updated.",
+        "delete": "Expense successfully deleted."
+      },
+      "error": {
+        "create": "Error creating expense.",
+        "edit": "Error updating expense.",
+        "delete": "Error deleting expense."
+      }
+    },
+    "budget": {
+      "success": {
+        "create": "Budget successfully created.",
+        "edit": "Budget successfully updated.",
+        "delete": "Budget successfully deleted."
+      },
+      "error": {
+        "create": "Error creating budget.",
+        "edit": "Error updating budget.",
+        "delete": "Error deleting budget."
+      }
+    },
+    "preferences": {
+      "success": {
+        "update": "Account preferences successfully updated."
+      },
+      "error": {
+        "update": "Error updating account preferences."
+      }
+    },
+    "settings": {
+      "success": {
+        "delete": "Account successfully deleted.",
+        "update": "Account settings successfully updated."
+      },
+      "error": {
+        "delete": "Error deleting account.",
+        "update": "Error updating account settings."
+      }
+    }
+  },
   "AccountPreferences": {
     "color": {
       "DARK": "Dark",

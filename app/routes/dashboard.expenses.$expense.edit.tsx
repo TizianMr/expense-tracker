@@ -4,6 +4,7 @@ import { redirect, useLoaderData, useOutletContext } from '@remix-run/react';
 import { RiErrorWarningLine } from '@remixicon/react';
 import { Callout } from '@tremor/react';
 import { useTranslation } from 'react-i18next';
+import { jsonWithError, jsonWithSuccess } from 'remix-toast';
 
 import { ExpenseFormErrors } from './dashboard.expenses';
 import { fetchExpenseById, updateExpense, UpdateExpense } from '../db/expense.server';
@@ -11,6 +12,7 @@ import ExpenseForm from '~/components/feature/expense/expense-form';
 import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
 import { SortDirection } from '~/interfaces';
+import i18next from '~/utils/i18n/i18next.server';
 
 export const loader = async ({ params, request }: LoaderFunctionArgs) => {
   const expenseId = params.expense as string;
@@ -37,6 +39,7 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
   if (!user) throw redirect('/login');
 
   const formData = await request.formData();
+  const t = await i18next.getFixedT(request);
 
   const convertedAmount = (formData.get('amount') as string).replace(/\./g, '').replace(/,/g, '.');
 
@@ -49,8 +52,12 @@ export const action = async ({ request, params }: ActionFunctionArgs) => {
     budgetId: formData.get('budget') as string,
   };
 
-  const updatedExpense = await updateExpense(expense, user.id);
-  return updatedExpense;
+  try {
+    const updatedExpense = await updateExpense(expense, user.id);
+    return jsonWithSuccess({ ...updatedExpense, success: true }, t('toasts.expense.success.edit'));
+  } catch {
+    return jsonWithError({ success: false }, t('toasts.expense.error.edit'));
+  }
 };
 
 const EditExpenseDialog = () => {

@@ -2,7 +2,9 @@ import { ColorTheme } from '@prisma/client';
 import { LoaderFunctionArgs } from '@remix-run/node';
 import { Links, Meta, MetaFunction, Outlet, Scripts, ScrollRestoration, useLoaderData } from '@remix-run/react';
 import { useEffect } from 'react';
+import notify, { Toaster } from 'react-hot-toast';
 import { useChangeLanguage } from 'remix-i18next/react';
+import { getToast } from 'remix-toast';
 import './tailwind.css';
 
 import { getLoggedInUser } from './db/auth.server';
@@ -13,7 +15,9 @@ import { getPreferredTheme, NonFlashOfWrongThemeEls, ThemeProvider, useTheme } f
 export async function loader({ request }: LoaderFunctionArgs) {
   const locale = await i18next.getLocale(request);
   const user = await getLoggedInUser(request);
-  return { locale, userTheme: user?.preferences.theme };
+
+  const { toast, headers } = await getToast(request);
+  return Response.json({ locale, userTheme: user?.preferences.theme, toast }, { headers });
 }
 
 export const handle = {
@@ -35,7 +39,7 @@ export const meta: MetaFunction = () => {
 };
 
 function Layout({ children }: { children: React.ReactNode }) {
-  const { locale, userTheme } = useLoaderData<typeof loader>();
+  const { locale, userTheme, toast } = useLoaderData<typeof loader>();
   const [theme, setTheme] = useTheme();
 
   // This hook will change the i18n instance language to the current locale
@@ -49,6 +53,19 @@ function Layout({ children }: { children: React.ReactNode }) {
     const storedTheme = window.localStorage.getItem('theme') as ColorTheme | null;
     setTheme(userTheme ? userTheme : (storedTheme ?? getPreferredTheme()));
   }, [setTheme, userTheme]);
+
+  useEffect(() => {
+    switch (toast?.type) {
+      case 'success':
+        notify.success(toast.message);
+        return;
+      case 'error':
+        notify.error(toast.message);
+        return;
+      default:
+        return;
+    }
+  }, [toast]);
 
   return (
     <html
@@ -68,6 +85,18 @@ function Layout({ children }: { children: React.ReactNode }) {
         {children}
         <ScrollRestoration />
         <Scripts />
+        <Toaster
+          position='bottom-center'
+          reverseOrder={false}
+          toastOptions={{
+            ...(theme === ColorTheme.DARK && {
+              style: {
+                background: '#333',
+                color: '#fff',
+              },
+            }),
+          }}
+        />
       </body>
     </html>
   );
