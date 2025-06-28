@@ -20,7 +20,8 @@ const i18next = new RemixI18Next({
   i18next: {
     ...i18n,
     backend: {
-      loadPath: resolve(__dirname, './translations/{{lng}}/{{ns}}.json'),
+      // localePath: resolve(__dirname, './translations'),
+      loadPath: resolve(__dirname, './public/locales/{{lng}}/{{ns}}.json'),
     },
   },
   // The i18next plugins you want RemixI18next to use for `i18n.getFixedT` inside loaders and actions.

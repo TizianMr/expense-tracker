@@ -1,7 +1,7 @@
 // https://www.youtube.com/watch?v=kMuY6I0Z--g&t=646s
 
-import german from '../i18n/translations/de/common.json';
-import english from '../i18n/translations/en/common.json';
+import german from '../../../public/locales/de/common.json';
+import english from '../../../public/locales/en/common.json';
 
 const languages = ['en', 'de'] as const;
 export const supportedLanguages = [...languages];
