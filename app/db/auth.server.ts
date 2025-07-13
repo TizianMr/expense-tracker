@@ -211,6 +211,7 @@ const githubLogin = async (tokens: OAuth2Tokens): Promise<AuthUser> => {
       theme: user.UserPreference.theme,
       locale: user.UserPreference.locale,
     },
+    isDemo: user.isDemo,
     isGithubUser: true,
   };
 };
