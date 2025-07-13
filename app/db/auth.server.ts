@@ -63,7 +63,6 @@ authenticator.use(
       clientId: process.env.CLIENT_ID ?? '',
       clientSecret: process.env.CLIENT_SECRET ?? 'super-secret',
       redirectURI: process.env.CALLBACK_URL ?? 'https://example.app/auth/callback',
-      scopes: ['user:email'],
     },
     async ({ tokens }) => {
       return await githubLogin(tokens);
