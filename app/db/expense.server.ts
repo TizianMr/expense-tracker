@@ -22,7 +22,7 @@ export const updateExpense = async (expense: UpdateExpense, userId: string) => {
   return await prisma.expense.update({ where: { id, createdByUserId: userId }, data: updatedExpense });
 };
 
-export const fetchExpenses = async (
+export const fetchPaginatedExpenses = async (
   filterOptions: FilterWithPagination<Expense>,
   userId: string,
 ): Promise<ListResult<ExpenseWithBudget>> => {
@@ -83,6 +83,10 @@ export const fetchExpenses = async (
     pageSize,
     totalItems: expenses[0],
   };
+};
+
+export const fetchAllExpenses = async (userId: string): Promise<Expense[]> => {
+  return await prisma.expense.findMany({ where: { createdByUserId: userId } });
 };
 
 export const fetchExpenseById = async (id: string, userId: string): Promise<Expense | null> => {

@@ -10,7 +10,7 @@ import UserDropdown from '~/components/feature/user-mgmt/user-dropdown';
 import GitHubLink from '~/components/ui/github-link';
 import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgets } from '~/db/budget.server';
-import { fetchExpenses } from '~/db/expense.server';
+import { fetchPaginatedExpenses } from '~/db/expense.server';
 import { fetchStatistics } from '~/db/statistics.server';
 import { QueryParams, SortDirection, StatisticPeriod } from '~/interfaces';
 import { BUDGET_PAGE_SIZE, EXPENSE_PAGE_SIZE } from '~/utils/constants';
@@ -32,7 +32,7 @@ export const loader = async ({ request }: LoaderFunctionArgs) => {
 
   const [expenses, budgets, statistics] = await Promise.all([
     // expenses
-    fetchExpenses(
+    fetchPaginatedExpenses(
       {
         page: Number(parsedQueryParams.expense?.page) || 1,
         pageSize: EXPENSE_PAGE_SIZE,
