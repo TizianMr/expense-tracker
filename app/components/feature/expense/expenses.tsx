@@ -3,6 +3,7 @@ import { Button } from '@tremor/react';
 import { useTranslation } from 'react-i18next';
 
 import { ExpenseTable } from './expense-table';
+import { ExportDropdown } from './export-dropdown';
 import CustomNavLink from '~/components/ui/custom-navlink';
 import { useDelayedNavigationLoading } from '~/customHooks/useDelayedNavigationLoading';
 import { ExpenseWithBudget } from '~/db/expense.server';
@@ -22,13 +23,17 @@ const Expenses = ({ expenses }: Props) => {
         <h1 className='text-2xl text-tremor-content-strong dark:text-dark-tremor-content-strong font-semibold'>
           {t('Expenses.title')}
         </h1>
-        <CustomNavLink to={'expenses/create'}>
-          <Button
-            icon={RiAddLine}
-            loading={expenseDialogIsLoading}>
-            {t('Expenses.create')}
-          </Button>
-        </CustomNavLink>
+        <div className='gap-2 flex'>
+          <CustomNavLink to={'expenses/create'}>
+            <Button
+              icon={RiAddLine}
+              loading={expenseDialogIsLoading}>
+              {t('Expenses.create')}
+            </Button>
+          </CustomNavLink>
+
+          <ExportDropdown />
+        </div>
       </div>
       <ExpenseTable
         expenses={expenses.items}
