@@ -32,7 +32,7 @@ const Expenses = ({ expenses }: Props) => {
             </Button>
           </CustomNavLink>
 
-          <ExportDropdown />
+          <ExportDropdown isDisabled={!expenses.totalItems} />
         </div>
       </div>
       <ExpenseTable

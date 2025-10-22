@@ -195,7 +195,8 @@
   "ExportDropdown": {
     "exportAsJson": "Export as JSON",
     "exportAsXlsx": "Export as XLSX",
-    "exportAsCsv": "Export as CSV"
+    "exportAsCsv": "Export as CSV",
+    "noData": "No data to export"
   },
   "LoginPage": {
     "dividerText": "or",

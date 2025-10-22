@@ -5,16 +5,22 @@ import { useTranslation } from 'react-i18next';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/dropdown';
 import { useExportData } from '~/customHooks/useExportData';
 
-// TODO: Toast message when nothing to export
-export const ExportDropdown = () => {
+type Props = {
+  isDisabled: boolean;
+};
+
+export const ExportDropdown = ({ isDisabled }: Props) => {
   const { t } = useTranslation();
   const { handleExportAsCsv, handleExportAsJson, handleExportAsXlsx } = useExportData();
 
   return (
     <DropdownMenu>
-      <DropdownMenuTrigger asChild>
+      <DropdownMenuTrigger
+        asChild
+        disabled={isDisabled}>
         <Button
           icon={RiFileDownloadLine}
+          {...(isDisabled && { tooltip: t('ExportDropdown.noData') })}
           variant='secondary'
         />
       </DropdownMenuTrigger>
