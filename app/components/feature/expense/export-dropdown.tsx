@@ -1,10 +1,12 @@
-import { Expense } from '@prisma/client';
 import { RiFileDownloadLine } from '@remixicon/react';
 import { Button } from '@tremor/react';
 import { useTranslation } from 'react-i18next';
+import { utils, write } from 'xlsx';
 
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '../../ui/dropdown';
-import { convertJSONToCSV } from '~/utils/helpers';
+import { ExpenseWithBudget } from '~/db/expense.server';
+import { DATE_OPTIONS, EXPENSE_CATEGORIES } from '~/utils/constants';
+import { convertJSONToCSV, formatCurrency } from '~/utils/helpers';
 
 // TODO: Toast message when nothing to export
 export const ExportDropdown = () => {
@@ -12,7 +14,7 @@ export const ExportDropdown = () => {
 
   const handleExportAsJson = async () => {
     const res = await fetch('/api/export');
-    const expenses: Expense[] = await res.json();
+    const expenses: ExpenseWithBudget[] = await res.json();
 
     const blob = new Blob(
       [
@@ -44,7 +46,7 @@ export const ExportDropdown = () => {
 
   const handleExportAsCsv = async () => {
     const res = await fetch('/api/export');
-    const expenses: Expense[] = await res.json();
+    const expenses: ExpenseWithBudget[] = await res.json();
 
     const headers = ['title', 'amount', 'date', 'category'];
 
@@ -65,6 +67,45 @@ export const ExportDropdown = () => {
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+  };
+
+  const handleExportAsXlsx = async () => {
+    const res = await fetch('/api/export');
+    const expenses: ExpenseWithBudget[] = await res.json();
+
+    const data = [
+      [
+        t('ExpenseTable.headers.title'),
+        t('ExpenseTable.headers.amount'),
+        t('ExpenseTable.headers.date'),
+        t('ExpenseTable.headers.category'),
+        t('ExpenseTable.headers.budget'),
+      ],
+      ...expenses.map(exp => [
+        exp.title,
+        formatCurrency(exp.amount),
+        new Date(exp.expenseDate).toLocaleDateString('en-US', DATE_OPTIONS),
+        t(`${EXPENSE_CATEGORIES.find(cat => cat.value === exp.category)?.labelKey}`, { defaultValue: '-' }),
+        exp.budget?.title ?? '-',
+      ]),
+    ];
+
+    const worksheet = utils.aoa_to_sheet(data);
+
+    const workbook = utils.book_new();
+    utils.book_append_sheet(workbook, worksheet, 'Expenses');
+    const excelBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
+    const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet' });
+
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = 'expenses.xlsx';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
   };
 
   return (
@@ -91,6 +132,13 @@ export const ExportDropdown = () => {
             handleExportAsCsv();
           }}>
           {t('ExportDropdown.exportAsCsv')}
+        </DropdownMenuItem>
+        <DropdownMenuItem
+          onSelect={e => {
+            e.preventDefault();
+            handleExportAsXlsx();
+          }}>
+          {t('ExportDropdown.exportAsXlsx')}
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>

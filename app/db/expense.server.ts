@@ -85,8 +85,25 @@ export const fetchPaginatedExpenses = async (
   };
 };
 
-export const fetchAllExpenses = async (userId: string): Promise<Expense[]> => {
-  return await prisma.expense.findMany({ where: { createdByUserId: userId } });
+export const fetchAllExpenses = async (userId: string): Promise<ExpenseWithBudget[]> => {
+  return await prisma.expense.findMany({
+    where: { createdByUserId: userId },
+    select: {
+      id: true,
+      title: true,
+      amount: true,
+      expenseDate: true,
+      category: true,
+      createdAt: true,
+      updatedAt: true,
+      budget: {
+        select: {
+          id: true,
+          title: true,
+        },
+      },
+    },
+  });
 };
 
 export const fetchExpenseById = async (id: string, userId: string): Promise<Expense | null> => {
