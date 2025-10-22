@@ -23,6 +23,7 @@ export const useExportData = () => {
             amount: expense.amount,
             date: expense.createdAt,
             category: expense.category,
+            budget: expense.budget?.title || null,
           })),
           null,
           2,
@@ -33,7 +34,7 @@ export const useExportData = () => {
       },
     );
 
-    downloadFile(blob, 'expenses.json');
+    downloadFile(blob, `expenses-${Date.now()}.json`);
   };
 
   const handleExportAsCsv = async () => {
@@ -47,12 +48,13 @@ export const useExportData = () => {
         amount: expense.amount,
         date: expense.createdAt,
         category: expense.category,
+        budget: expense.budget?.title || '-',
       })),
       headers,
     );
 
     const blob = new Blob([csvData], { type: 'text/csv;charset=utf-8;' });
-    downloadFile(blob, 'expenses.csv');
+    downloadFile(blob, `expenses-${Date.now()}.csv`);
   };
 
   const handleExportAsXlsx = async () => {
@@ -82,7 +84,7 @@ export const useExportData = () => {
     const excelBuffer = write(workbook, { bookType: 'xlsx', type: 'array' });
     const blob = new Blob([excelBuffer], { type: 'application/vnd.openxmlformatsofficedocument.spreadsheetml.sheet' });
 
-    downloadFile(blob, 'expenses.xlsx');
+    downloadFile(blob, `expenses-${Date.now()}.xlsx`);
   };
 
   return { handleExportAsJson, handleExportAsCsv, handleExportAsXlsx };
