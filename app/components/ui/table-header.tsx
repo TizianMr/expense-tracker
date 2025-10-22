@@ -1,5 +1,5 @@
 import { useSearchParams } from '@remix-run/react';
-import { RiArrowDownSLine, RiArrowUpSLine } from '@remixicon/react';
+import { RiArrowDownSLine, RiArrowUpSLine, RiFilterLine } from '@remixicon/react';
 import { TableHeaderCell } from '@tremor/react';
 import qs from 'qs';
 
@@ -8,6 +8,7 @@ import { cx } from '~/utils/helpers';
 
 interface CommonProps extends Omit<ThDef, 'title' | 'isSortable'> {
   id: string;
+  isFilterable?: boolean;
   children: React.ReactNode;
 }
 
@@ -27,17 +28,18 @@ type ConditionalProps =
 
 type Props = CommonProps & ConditionalProps;
 
-const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, options, searchParamKey }: Props) => {
+const TableHeader = ({
+  isSortable,
+  isFilterable,
+  children,
+  id,
+  onSortingChange,
+  tableState,
+  options,
+  searchParamKey,
+}: Props) => {
   const [searchParams, setSearchParams] = useSearchParams();
   const sortDirection: SortDirection | null = tableState?.sortBy === id ? tableState.sortDirection : null;
-
-  if (!isSortable) {
-    return (
-      <TableHeaderCell className={cx('w-52', options?.align ? `text-${options.align}` : '')}>
-        {children}
-      </TableHeaderCell>
-    );
-  }
 
   const handleSorting = () => {
     const newDirection = determineNewSortDirection();
@@ -71,15 +73,15 @@ const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, op
     if (newSortDirection) {
       updated = {
         ...nestedParams,
-        [searchParamKey]: {
-          ...(nestedParams[searchParamKey] ?? {}),
+        [searchParamKey!]: {
+          ...(nestedParams[searchParamKey!] ?? {}),
           sortBy: id,
           sortDirection: newSortDirection,
         },
       };
     } else {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      const { [searchParamKey]: _, ...rest } = nestedParams; // Destructure to exclude the property
+      const { [searchParamKey!]: _, ...rest } = nestedParams; // Destructure to exclude the property
       updated = rest;
     }
 
@@ -88,39 +90,39 @@ const TableHeader = ({ isSortable, children, id, onSortingChange, tableState, op
 
   return (
     <TableHeaderCell className={cx('w-52', options?.align ? `text-${options.align}` : '')}>
-      <div
-        className={
-          '-mx-2 inline-flex cursor-pointer select-none items-center gap-2 rounded-md px-2 py-2 hover:bg-gray-50 hover:dark:bg-gray-900'
-        }
-        {...(isSortable && {
-          role: 'button',
-          tabIndex: 0,
-          onClick: handleSorting,
-          onKeyDown: (e: React.KeyboardEvent) => {
-            if (e.key === 'Enter' || e.key === ' ') {
-              e.preventDefault();
-              handleSorting();
-            }
-          },
-        })}>
+      <div className={'-mx-2 inline-flex select-none items-center gap-2 rounded-md px-2 py-2'}>
         <span>{children}</span>
 
-        <div className='-space-y-2'>
-          <RiArrowUpSLine
-            aria-hidden='true'
-            className={cx(
-              'size-3.5 text-gray-900 dark:text-gray-50',
-              sortDirection === SortDirection.DESC ? 'opacity-30' : '',
-            )}
-          />
-          <RiArrowDownSLine
-            aria-hidden='true'
-            className={cx(
-              'size-3.5 text-gray-900 dark:text-gray-50',
-              sortDirection === SortDirection.ASC ? 'opacity-30' : '',
-            )}
-          />
-        </div>
+        {isSortable && (
+          <div
+            className='-space-y-2 hover:bg-gray-50 hover:dark:bg-gray-900'
+            role='button'
+            tabIndex={0}
+            onClick={handleSorting}
+            onKeyDown={(e: React.KeyboardEvent) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                handleSorting();
+              }
+            }}>
+            <RiArrowUpSLine
+              aria-hidden='true'
+              className={cx(
+                'size-3.5 text-gray-900 dark:text-gray-50',
+                sortDirection === SortDirection.DESC ? 'opacity-30' : '',
+              )}
+            />
+            <RiArrowDownSLine
+              aria-hidden='true'
+              className={cx(
+                'size-3.5 text-gray-900 dark:text-gray-50',
+                sortDirection === SortDirection.ASC ? 'opacity-30' : '',
+              )}
+            />
+          </div>
+        )}
+
+        {isFilterable && <RiFilterLine className={cx('size-3.5 text-gray-900 dark:text-gray-50 opacity-30')} />}
       </div>
     </TableHeaderCell>
   );

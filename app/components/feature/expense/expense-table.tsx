@@ -49,6 +49,7 @@ export function ExpenseTable({ expenses, paginationState, excludeColumns, search
       id: 'category',
       title: t('ExpenseTable.headers.category'),
       isSortable: true,
+      isFilterable: true,
     },
     {
       id: 'budget',

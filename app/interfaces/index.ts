@@ -65,6 +65,7 @@ export type ThDef = {
   id: string;
   title?: string;
   isSortable: boolean;
+  isFilterable?: boolean;
   options?: { align: 'left' | 'center' | 'right' };
 }; // id is used for the 'sortBy' query param
 
