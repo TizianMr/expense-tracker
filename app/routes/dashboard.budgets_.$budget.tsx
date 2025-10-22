@@ -10,7 +10,7 @@ import { ExpenseTable } from '../components/feature/expense/expense-table';
 import { useDelayedNavigation } from '~/customHooks/useDelayedNavigation';
 import { getLoggedInUser } from '~/db/auth.server';
 import { fetchBudgetById } from '~/db/budget.server';
-import { fetchExpenses } from '~/db/expense.server';
+import { fetchPaginatedExpenses } from '~/db/expense.server';
 import { QueryParams, SortDirection } from '~/interfaces';
 import { EXPENSE_CATEGORIES, EXPENSE_PAGE_SIZE, NO_CATEGORY } from '~/utils/constants';
 import { formatCurrency } from '~/utils/helpers';
@@ -25,7 +25,7 @@ export const loader = async ({ request, params }: LoaderFunctionArgs) => {
   const parsedQueryParams = qs.parse(query.toString()) as QueryParams;
 
   const [expenses, budget] = await Promise.all([
-    await fetchExpenses(
+    await fetchPaginatedExpenses(
       {
         sortBy: parsedQueryParams.budgetDetails?.sortBy || 'expenseDate',
         sortDirection: parsedQueryParams.budgetDetails?.sortDirection || SortDirection.ASC,

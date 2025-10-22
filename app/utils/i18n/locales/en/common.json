@@ -192,6 +192,12 @@
     },
     "noData": "No data to show"
   },
+  "ExportDropdown": {
+    "exportAsJson": "Export as JSON",
+    "exportAsXlsx": "Export as XLSX",
+    "exportAsCsv": "Export as CSV",
+    "noData": "No data to export"
+  },
   "LoginPage": {
     "dividerText": "or",
     "errors": {
