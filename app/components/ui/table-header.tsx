@@ -1,8 +1,9 @@
 import { useSearchParams } from '@remix-run/react';
-import { RiArrowDownSLine, RiArrowUpSLine, RiFilterLine } from '@remixicon/react';
+import { RiArrowDownSLine, RiArrowUpSLine } from '@remixicon/react';
 import { TableHeaderCell } from '@tremor/react';
 import qs from 'qs';
 
+import FilterButton from './filter-button';
 import { QueryParams, SortDirection, TableState, ThDef } from '~/interfaces';
 import { cx } from '~/utils/helpers';
 
@@ -122,7 +123,7 @@ const TableHeader = ({
           </div>
         )}
 
-        {isFilterable && <RiFilterLine className={cx('size-3.5 text-gray-900 dark:text-gray-50 opacity-30')} />}
+        {isFilterable && <FilterButton />}
       </div>
     </TableHeaderCell>
   );
