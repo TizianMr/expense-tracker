@@ -6,5 +6,6 @@
   "jsxSingleQuote": true,
   "bracketSameLine": true,
   "arrowParens": "avoid",
-  "singleAttributePerLine": true
+  "singleAttributePerLine": true,
+  "endOfLine": "auto"
 }
