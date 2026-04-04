@@ -24,7 +24,11 @@ export const updateMailAddress = async (id: string, newMail: string) => {
 export const updatePassword = async (id: string, oldPassword: string, newPassword: string) => {
   const user = await prisma.user.findUnique({ where: { id } });
 
-  if (!user || !(await verify(user.password, oldPassword))) {
+  if (!user || !user.password) {
+    throw new Error('Could not retrieve user password.');
+  }
+
+  if (!(await verify(user.password, oldPassword))) {
     throw new Error('Old password is incorrect.');
   }
 

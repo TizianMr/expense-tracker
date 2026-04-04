@@ -70,6 +70,7 @@ const ExpenseForm = ({ errors, expense, budgets, locale }: Props) => {
         </label>
         <DatePicker
           defaultValue={selectedDate}
+          disabledDates={[selectedDate]}
           enableClear={false}
           id='expense-date'
           locale={locale === 'de' ? de : enUS}
