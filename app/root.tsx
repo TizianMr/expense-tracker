@@ -5,6 +5,7 @@ import { useEffect } from 'react';
 import notify, { Toaster } from 'react-hot-toast';
 import { useChangeLanguage } from 'remix-i18next/react';
 import { getToast } from 'remix-toast';
+
 import './tailwind.css';
 
 import { getLoggedInUser } from './db/auth.server';
